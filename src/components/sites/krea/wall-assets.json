@@ -1,0 +1,452 @@
+[
+  {
+    "index": 1,
+    "id": "gam-05",
+    "title": "Blockout to boss arena",
+    "category": "Games",
+    "prompt": "Turn the white arena blockout in image 1 into boss-arena key art from the same camera, keeping the central pit, the broken columns and the stepped platforms.",
+    "portrait": false,
+    "image": "/sites/krea/wall/gam-05.webp",
+    "reference": "/sites/krea/wall/gam-05-input.webp"
+  },
+  {
+    "index": 2,
+    "id": "mkt-14",
+    "title": "Billboard, re-skinned",
+    "category": "Marketing",
+    "prompt": "Re-skin the roadside billboard in image 1 for the coffee range in image 2.",
+    "portrait": false,
+    "image": "/sites/krea/wall/mkt-14.webp",
+    "reference": "/sites/krea/wall/mkt-14-input.webp"
+  },
+  {
+    "index": 3,
+    "id": "pho-16",
+    "title": "Storm-lit sunset",
+    "category": "Photography",
+    "prompt": "Replace the clear sky behind the dancing couple, the white house and the wind-bent tree in image 1 with the fiery orange-gold storm clouds of image 2.",
+    "portrait": false,
+    "image": "/sites/krea/wall/pho-16.webp",
+    "reference": "/sites/krea/wall/pho-16-input.webp"
+  },
+  {
+    "index": 4,
+    "id": "gam-10",
+    "title": "Concept to full character sheet",
+    "category": "Games",
+    "prompt": "Create a production character sheet for the bald old man with the long white braid in image 1, keeping his face, spectacles, eyebrows, apron and cane and his thick-line colour style.",
+    "portrait": false,
+    "image": "/sites/krea/wall/gam-10.webp",
+    "reference": "/sites/krea/wall/gam-10-input.webp"
+  },
+  {
+    "index": 5,
+    "id": "arc-04",
+    "title": "Tower massing to photoreal skyline",
+    "category": "Architecture",
+    "prompt": "Make the white clay massing model in image 1 a photoreal city photograph from the same aerial camera.",
+    "portrait": true,
+    "image": "/sites/krea/wall/arc-04.webp",
+    "reference": "/sites/krea/wall/arc-04-input.webp"
+  },
+  {
+    "index": 6,
+    "id": "arc-12",
+    "title": "Line sketch to glass-block townhouse",
+    "category": "Architecture",
+    "prompt": "Turn the ink sketch in image 1 into a daylight photograph of the building from the same street-level viewpoint.",
+    "portrait": true,
+    "image": "/sites/krea/wall/arc-12.webp",
+    "reference": "/sites/krea/wall/arc-12-input.webp"
+  },
+  {
+    "index": 7,
+    "id": "ecm-21",
+    "title": "Bag on model leaving the shop",
+    "category": "E-commerce",
+    "prompt": "Photograph the model from image 2 walking out of the green tailor's shopfront from image 3, carrying the burgundy croc-embossed bag from image 1.",
+    "portrait": true,
+    "image": "/sites/krea/wall/ecm-21.webp",
+    "reference": "/sites/krea/wall/ecm-21-input.webp"
+  },
+  {
+    "index": 8,
+    "id": "con-05",
+    "title": "Selfie to greetings-from postcard",
+    "category": "Personal",
+    "prompt": "Create a 'Greetings from LISBON' postcard in the style of image 2, with the woman from image 1 leaning into the 'O' as if taking a selfie.",
+    "portrait": false,
+    "image": "/sites/krea/wall/con-05.webp",
+    "reference": "/sites/krea/wall/con-05-input.webp"
+  },
+  {
+    "index": 9,
+    "id": "pho-09",
+    "title": "Lighting setup to a three-person portrait",
+    "category": "Photography",
+    "prompt": "Create a group portrait of the three people from images 2, 3 and 4 standing together on the red-orange seamless paper of image 1.",
+    "portrait": true,
+    "image": "/sites/krea/wall/pho-09.webp",
+    "reference": "/sites/krea/wall/pho-09-input.webp"
+  },
+  {
+    "index": 18,
+    "id": "arc-24",
+    "title": "Render to built pavilion",
+    "category": "Architecture",
+    "prompt": "Turn the painterly competition render in image 1 into a photograph of the built pavilion, keeping its long red timber form, thin stilts, shallow gabled roof and slat rhythm.",
+    "portrait": false,
+    "image": "/sites/krea/wall/arc-24.webp",
+    "reference": "/sites/krea/wall/arc-24-input.webp"
+  },
+  {
+    "index": 19,
+    "id": "gam-02",
+    "title": "Blockout to flooded city",
+    "category": "Games",
+    "prompt": "Paint over the white town-street blockout in image 1 as finished concept art, keeping the camera, every building volume, the pipes and the stairs exactly.",
+    "portrait": false,
+    "image": "/sites/krea/wall/gam-02.webp",
+    "reference": "/sites/krea/wall/gam-02-input.webp"
+  },
+  {
+    "index": 20,
+    "id": "pho-13",
+    "title": "Three food shots into one overhead tablescape",
+    "category": "Photography",
+    "prompt": "Extend the overhead table of image 1 into a fuller tablescape, with the same camera and light.",
+    "portrait": true,
+    "image": "/sites/krea/wall/pho-13.webp",
+    "reference": "/sites/krea/wall/pho-13-input.webp"
+  },
+  {
+    "index": 21,
+    "id": "ecm-12",
+    "title": "Autumn re-skin of a summer lifestyle image",
+    "category": "E-commerce",
+    "prompt": "Turn the sunny lifestyle image in image 1 (the burgundy half-moon bag hanging from a white vintage car's chrome mirror) into an autumn version.",
+    "portrait": true,
+    "image": "/sites/krea/wall/ecm-12.webp",
+    "reference": "/sites/krea/wall/ecm-12-input.webp"
+  },
+  {
+    "index": 22,
+    "id": "con-11",
+    "title": "Add the missing friend to the caf\u00e9 table",
+    "category": "Personal",
+    "prompt": "Add the woman from image 3 to the caf\u00e9 table in image 1 as a fourth friend, seated on the right and holding her green mug.",
+    "portrait": true,
+    "image": "/sites/krea/wall/con-11.webp",
+    "reference": "/sites/krea/wall/con-11-input.webp"
+  },
+  {
+    "index": 23,
+    "id": "fas-19",
+    "title": "Heels and skirt fabric swap on a legs shot",
+    "category": "Fashion",
+    "prompt": "In the legs shot in image 2, replace the red Mary Janes with the yellow patent kitten-heel slingbacks from image 1, keeping the white socks.",
+    "portrait": true,
+    "image": "/sites/krea/wall/fas-19.webp",
+    "reference": "/sites/krea/wall/fas-19-input.webp"
+  },
+  {
+    "index": 24,
+    "id": "prd-14",
+    "title": "Brand application on a radio and its box",
+    "category": "Product",
+    "prompt": "Rebrand the product shot in image 1 with the linocut walker-and-dog mark from image 2 and the name 'DOG DAYS RADIO' in the hand-drawn capitals of image 3.",
+    "portrait": true,
+    "image": "/sites/krea/wall/prd-14.webp",
+    "reference": "/sites/krea/wall/prd-14-input.webp"
+  },
+  {
+    "index": 25,
+    "id": "mkt-41",
+    "title": "Film-night poster with two new images",
+    "category": "Marketing",
+    "prompt": "Create a poster in the layout of image 1, replacing the top landscape photo with the porthole image from image 2.",
+    "portrait": true,
+    "image": "/sites/krea/wall/mkt-41.webp",
+    "reference": "/sites/krea/wall/mkt-41-input.webp"
+  },
+  {
+    "index": 26,
+    "id": "mkt-43",
+    "title": "Two follow-up issues from a cover template",
+    "category": "Marketing",
+    "prompt": "Create two follow-up covers of 'Simmer' in the template of image 1, shown side by side.",
+    "portrait": false,
+    "image": "/sites/krea/wall/mkt-43.webp",
+    "reference": "/sites/krea/wall/mkt-43-input.webp"
+  },
+  {
+    "index": 200,
+    "id": "con-23",
+    "title": "Movie-night photo to fan-made film poster with my cat",
+    "category": "Personal",
+    "prompt": "Make a film poster in the layout and title treatment of image 3: the huge red condensed title stacked over the photo, small credit names and a billing block.",
+    "portrait": true,
+    "image": "/sites/krea/wall/con-23.webp",
+    "reference": "/sites/krea/wall/con-23-input.webp"
+  },
+  {
+    "index": 201,
+    "id": "ecm-20",
+    "title": "Cans in hands with a juice splash",
+    "category": "E-commerce",
+    "prompt": "Recreate the stacking pose of image 2 (three hands from different people holding cans in a vertical stack on white) using three 'Sol Mayor' coffee cans from image 1 in yellow, blue and orange.",
+    "portrait": true,
+    "image": "/sites/krea/wall/ecm-20.webp",
+    "reference": "/sites/krea/wall/ecm-20-input.webp"
+  },
+  {
+    "index": 202,
+    "id": "flm-23",
+    "title": "Period lobby scene with tickets in hand",
+    "category": "Film",
+    "prompt": "Place the 1970s couple from image 3 in the cinema lobby of image 1, standing under the marquee boards and looking up at the listings.",
+    "portrait": true,
+    "image": "/sites/krea/wall/flm-23.webp",
+    "reference": "/sites/krea/wall/flm-23-input.webp"
+  },
+  {
+    "index": 203,
+    "id": "con-01",
+    "title": "Flat selfie to soft window-light portrait",
+    "category": "Personal",
+    "prompt": "Turn the flat, straight-on selfie in image 1 into a flattering portrait lit like image 2, with soft window light from the left.",
+    "portrait": true,
+    "image": "/sites/krea/wall/con-01.webp",
+    "reference": "/sites/krea/wall/con-01-input.webp"
+  },
+  {
+    "index": 204,
+    "id": "con-14",
+    "title": "Selfie to pixel-art sprite",
+    "category": "Personal",
+    "prompt": "Turn the woman in image 1 into a full-body pixel-art sprite in the running format of image 3: side view, mid-stride, on a plain background.",
+    "portrait": false,
+    "image": "/sites/krea/wall/con-14.webp",
+    "reference": "/sites/krea/wall/con-14-input.webp"
+  },
+  {
+    "index": 205,
+    "id": "pho-15",
+    "title": "Sky swap with matching backlight",
+    "category": "Photography",
+    "prompt": "Replace the plain sky in image 1 with the golden dusk sky of image 2 and relight the leaping man with a rim of low sun like image 3.",
+    "portrait": true,
+    "image": "/sites/krea/wall/pho-15.webp",
+    "reference": "/sites/krea/wall/pho-15-input.webp"
+  },
+  {
+    "index": 206,
+    "id": "pho-17",
+    "title": "Overhead composite with re-projected subjects",
+    "category": "Photography",
+    "prompt": "Add the couple in their striped deck chairs from image 2 and the two friends on the red gingham blanket from image 3 into the overhead scene of image 1, among the white plastic chairs on the sand.",
+    "portrait": true,
+    "image": "/sites/krea/wall/pho-17.webp",
+    "reference": "/sites/krea/wall/pho-17-input.webp"
+  },
+  {
+    "index": 207,
+    "id": "mkt-16",
+    "title": "Extend a poster series and place it in a shelter",
+    "category": "Marketing",
+    "prompt": "Design a new poster in the series concept of image 2: a pear whose stem stretches down the white page and grows into a fig at the bottom.",
+    "portrait": true,
+    "image": "/sites/krea/wall/mkt-16.webp",
+    "reference": "/sites/krea/wall/mkt-16-input.webp"
+  },
+  {
+    "index": 208,
+    "id": "arc-10",
+    "title": "Desert illustration to photograph",
+    "category": "Architecture",
+    "prompt": "Turn the textured illustration in image 1 into a photograph from the same viewpoint, keeping the pavilion, pool, terrace and planting as drawn.",
+    "portrait": true,
+    "image": "/sites/krea/wall/arc-10.webp",
+    "reference": "/sites/krea/wall/arc-10-input.webp"
+  },
+  {
+    "index": 217,
+    "id": "gam-08",
+    "title": "Cutaway to cosy cottage",
+    "category": "Games",
+    "prompt": "Dress the grey cutaway blockout in image 1 as a lived-in cottage interior from the same camera, keeping the walls, room sizes, door openings, staircase and the positions of the block furniture.",
+    "portrait": false,
+    "image": "/sites/krea/wall/gam-08.webp",
+    "reference": "/sites/krea/wall/gam-08-input.webp"
+  },
+  {
+    "index": 218,
+    "id": "mkt-28",
+    "title": "Rebranded to go",
+    "category": "Marketing",
+    "prompt": "Rebrand the cup carrier and cups in image 1 for a new caf\u00e9 called 'nudo coffee'.",
+    "portrait": false,
+    "image": "/sites/krea/wall/mkt-28.webp",
+    "reference": "/sites/krea/wall/mkt-28-input.webp"
+  },
+  {
+    "index": 219,
+    "id": "prd-18",
+    "title": "Shoe design sheet to sample photography",
+    "category": "Product",
+    "prompt": "Make a photograph of a physical sample of the hiking runner designed in image 1: same upper pattern, toe bumper, lacing and lug sole, in a three-quarter side view.",
+    "portrait": true,
+    "image": "/sites/krea/wall/prd-18.webp",
+    "reference": "/sites/krea/wall/prd-18-input.webp"
+  },
+  {
+    "index": 220,
+    "id": "fas-04",
+    "title": "Necklace stack and watch styling",
+    "category": "Fashion",
+    "prompt": "Accessorise the woman in image 1 with the layered gold chains from image 2 at her neckline, without changing anything else.",
+    "portrait": true,
+    "image": "/sites/krea/wall/fas-04.webp",
+    "reference": "/sites/krea/wall/fas-04-input.webp"
+  },
+  {
+    "index": 221,
+    "id": "fas-08",
+    "title": "Two collage looks on two jumping models",
+    "category": "Fashion",
+    "prompt": "Restyle both models in image 1 in mid-air, the woman on the left in the look from image 2 and the woman on the right in the look from image 3.",
+    "portrait": true,
+    "image": "/sites/krea/wall/fas-08.webp",
+    "reference": "/sites/krea/wall/fas-08-input.webp"
+  },
+  {
+    "index": 222,
+    "id": "prd-23",
+    "title": "Three-angle concept board for a chair",
+    "category": "Product",
+    "prompt": "Create a concept board in the layout of image 2 for the lounge chair in image 1, replacing the ONDA chair entirely.",
+    "portrait": false,
+    "image": "/sites/krea/wall/prd-23.webp",
+    "reference": "/sites/krea/wall/prd-23-input.webp"
+  },
+  {
+    "index": 223,
+    "id": "prd-10",
+    "title": "Scooter sketch to location photo",
+    "category": "Product",
+    "prompt": "Realise the electric scooter drawn in image 1 as a real vehicle and photograph it parked in the alpine valley of image 2, replacing the mustard van.",
+    "portrait": false,
+    "image": "/sites/krea/wall/prd-10.webp",
+    "reference": "/sites/krea/wall/prd-10-input.webp"
+  },
+  {
+    "index": 224,
+    "id": "mkt-09",
+    "title": "Brand lockup and headline on a campaign photo",
+    "category": "Marketing",
+    "prompt": "Turn the photo in image 1 into a finished campaign image with the headline 'FRESH FROM THE STALL' in the pink display capitals of image 3.",
+    "portrait": true,
+    "image": "/sites/krea/wall/mkt-09.webp",
+    "reference": "/sites/krea/wall/mkt-09-input.webp"
+  },
+  {
+    "index": 225,
+    "id": "flm-02",
+    "title": "Storyboard shot realised with cast, car and weather",
+    "category": "Film",
+    "prompt": "Realise the top-right panel of the storyboard in image 1 (the driver seen through the windscreen) as a live-action frame with the same framing and lens feel.",
+    "portrait": false,
+    "image": "/sites/krea/wall/flm-02.webp",
+    "reference": "/sites/krea/wall/flm-02-input.webp"
+  },
+  {
+    "index": 234,
+    "id": "mkt-18",
+    "title": "Shelter ad, new brand",
+    "category": "Marketing",
+    "prompt": "Rework the print ad in image 2 for the bubblegum brand in image 3, with a new headline in the same red serif and the Yums logo in place of the wordmark.",
+    "portrait": false,
+    "image": "/sites/krea/wall/mkt-18.webp",
+    "reference": "/sites/krea/wall/mkt-18-input.webp"
+  },
+  {
+    "index": 235,
+    "id": "gam-01",
+    "title": "Greybox to game",
+    "category": "Games",
+    "prompt": "Turn the greybox level in image 1 into a finished, in-engine-looking game screenshot from the same camera.",
+    "portrait": false,
+    "image": "/sites/krea/wall/gam-01.webp",
+    "reference": "/sites/krea/wall/gam-01-input.webp"
+  },
+  {
+    "index": 236,
+    "id": "pho-01",
+    "title": "Snapshot, restored",
+    "category": "Photography",
+    "prompt": "Restore the faded snapshot in image 1, correcting the colour cast, recovering contrast and removing dust, scratches and print damage.",
+    "portrait": false,
+    "image": "/sites/krea/wall/pho-01.webp",
+    "reference": "/sites/krea/wall/pho-01-input.webp"
+  },
+  {
+    "index": 237,
+    "id": "prd-25",
+    "title": "Lantern from board to outdoor dusk scene",
+    "category": "Product",
+    "prompt": "Show the spinning-top lantern from the board in image 1 in use: hang it from a bracket beside the front door of the white house in image 2.",
+    "portrait": true,
+    "image": "/sites/krea/wall/prd-25.webp",
+    "reference": "/sites/krea/wall/prd-25-input.webp"
+  },
+  {
+    "index": 238,
+    "id": "flm-11",
+    "title": "Dry plate to rainy dusk",
+    "category": "Film",
+    "prompt": "Change the weather and time of day in the plate of image 1 to a rainy dusk, using image 2 as the target.",
+    "portrait": true,
+    "image": "/sites/krea/wall/flm-11.webp",
+    "reference": "/sites/krea/wall/flm-11-input.webp"
+  },
+  {
+    "index": 239,
+    "id": "con-16",
+    "title": "Holiday couple as a vintage travel poster",
+    "category": "Personal",
+    "prompt": "Make a vintage travel poster of the couple from image 1 eating ice lollies on a seaside promenade, in the printed style of image 2.",
+    "portrait": true,
+    "image": "/sites/krea/wall/con-16.webp",
+    "reference": "/sites/krea/wall/con-16-input.webp"
+  },
+  {
+    "index": 240,
+    "id": "prd-19",
+    "title": "Sneaker sketch to prototype photo",
+    "category": "Product",
+    "prompt": "Design and photograph a prototype sneaker that merges the low-top silhouette from image 1 with the straps and collar details called out in image 2.",
+    "portrait": true,
+    "image": "/sites/krea/wall/prd-19.webp",
+    "reference": "/sites/krea/wall/prd-19-input.webp"
+  },
+  {
+    "index": 241,
+    "id": "prd-13",
+    "title": "Swap the product on a presentation board",
+    "category": "Product",
+    "prompt": "Update the presentation board in image 1 for a different product, replacing the coat stand photo with the black spindle-back chair from image 2.",
+    "portrait": true,
+    "image": "/sites/krea/wall/prd-13.webp",
+    "reference": "/sites/krea/wall/prd-13-input.webp"
+  },
+  {
+    "index": 242,
+    "id": "pho-22",
+    "title": "Dinner extended into one long table",
+    "category": "Photography",
+    "prompt": "Extend the dinner in image 1 into one long table running away from the camera, keeping its people, the blue-striped tablecloth, the white tiles and the direct flash.",
+    "portrait": true,
+    "image": "/sites/krea/wall/pho-22.webp",
+    "reference": "/sites/krea/wall/pho-22-input.webp"
+  }
+]

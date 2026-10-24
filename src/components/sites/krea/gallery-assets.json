@@ -1,0 +1,82 @@
+[
+  {
+    "id": "c4dd3ec2-8be2-50be-894d-b2df453c806f",
+    "alt": "A worn green skateboard against a red and yellow graffiti wall",
+    "tags": "skateboard graffiti street photography",
+    "column": 0,
+    "width": 572,
+    "height": 1024,
+    "image": "/sites/krea/gallery/c4dd3ec2-8be2-50be-894d-b2df453c806f.webp",
+    "href": "https://www.krea.ai/feed/c4dd3ec2-8be2-50be-894d-b2df453c806f"
+  },
+  {
+    "id": "7e998c47-d1c6-5338-94ad-2896502a3c10",
+    "alt": "A snowy harvested cornfield and farm at sunset",
+    "tags": "farm sunset landscape photography",
+    "column": 1,
+    "width": 683,
+    "height": 1024,
+    "image": "/sites/krea/gallery/7e998c47-d1c6-5338-94ad-2896502a3c10.webp",
+    "href": "https://www.krea.ai/feed/7e998c47-d1c6-5338-94ad-2896502a3c10"
+  },
+  {
+    "id": "2f88f071-7887-5c7b-b47e-294abf3b14a4",
+    "alt": "A spiky-haired traveler above a circular manga city",
+    "tags": "manga illustration ink city",
+    "column": 2,
+    "width": 1024,
+    "height": 1024,
+    "image": "/sites/krea/gallery/2f88f071-7887-5c7b-b47e-294abf3b14a4.webp",
+    "href": "https://www.krea.ai/feed/2f88f071-7887-5c7b-b47e-294abf3b14a4"
+  },
+  {
+    "id": "863d230d-371e-57e8-b6f4-6c2f81e7ce2d",
+    "alt": "A lavender underwater bedroom with floating fish and bubbles",
+    "tags": "anime bedroom pastel illustration",
+    "column": 3,
+    "width": 1024,
+    "height": 572,
+    "image": "/sites/krea/gallery/863d230d-371e-57e8-b6f4-6c2f81e7ce2d.webp",
+    "href": "https://www.krea.ai/feed/863d230d-371e-57e8-b6f4-6c2f81e7ce2d"
+  },
+  {
+    "id": "7d895234-742f-58ba-8d24-d64d1eff6c77",
+    "alt": "An iridescent hooded figure on moss-covered rocks",
+    "tags": "cloak stars surreal iridescent",
+    "column": 3,
+    "width": 1024,
+    "height": 1024,
+    "image": "/sites/krea/gallery/7d895234-742f-58ba-8d24-d64d1eff6c77.webp",
+    "href": "https://www.krea.ai/feed/7d895234-742f-58ba-8d24-d64d1eff6c77"
+  },
+  {
+    "id": "a617b730-7aa7-58a4-b432-0323bc21bc4f",
+    "alt": "A woman with a dark bob seen through reflective metal dividers",
+    "tags": "cinematic portrait reflection photography",
+    "column": 1,
+    "width": 1024,
+    "height": 1024,
+    "image": "/sites/krea/gallery/a617b730-7aa7-58a4-b432-0323bc21bc4f.webp",
+    "href": "https://www.krea.ai/feed/a617b730-7aa7-58a4-b432-0323bc21bc4f"
+  },
+  {
+    "id": "blue-sky",
+    "alt": "Birds and overhead wires under a blue sky and airplane contrail",
+    "tags": "sky birds wires photography",
+    "column": 2,
+    "width": 678,
+    "height": 521,
+    "image": "/sites/krea/gallery/blue-sky.webp",
+    "href": "https://www.krea.ai/feed"
+  },
+  {
+    "id": "teal-horizon",
+    "alt": "A muted teal horizon",
+    "tags": "teal sky photography",
+    "column": 3,
+    "width": 680,
+    "height": 141,
+    "image": "/sites/krea/gallery/teal-horizon.webp",
+    "href": "https://www.krea.ai/feed"
+  }
+]

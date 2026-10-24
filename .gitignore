@@ -1,0 +1,10 @@
+node_modules
+.next
+.dependencies.nosync/
+.build.nosync/
+.*.icloud-backup*
+out/
+*.tsbuildinfo
+.env*
+.DS_Store
+next-env.d.ts

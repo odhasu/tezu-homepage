@@ -1,0 +1,27 @@
+{
+  "name": "krea-homepage-extract",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm run build"
+  },
+  "dependencies": {
+    "next": "16.3.5",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "lucide-react": "^1.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "typescript": "^5",
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}
