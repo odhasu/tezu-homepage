@@ -48,8 +48,7 @@ function AssistantMcpBanner({ platform, onConnect }: { platform: "chatgpt" | "cl
     </div>
     <div className="chatgpt-mcp-stage">
       <div className="chatgpt-mcp-details">
-        {isClaude ? <p>Get the world&apos;s best image, video, and<br className="chatgpt-mcp-break" /> upscaling models in Claude in 3 simple steps.</p>
-          : <p>Get the world&apos;s best image, video, and upscaling<br className="chatgpt-mcp-break" /> models in ChatGPT in 3 simple steps.</p>}
+        <p>Get the world&apos;s best image, video, and upscaling<br className="chatgpt-mcp-break" /> models in {name} in 3 simple steps.</p>
         <button type="button" onClick={onConnect}>
           <PlatformLogo id={platform} /><span>Add to {name}</span>
         </button>
