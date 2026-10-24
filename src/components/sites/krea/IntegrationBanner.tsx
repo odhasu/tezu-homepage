@@ -31,24 +31,30 @@ const pattern = Array.from({ length: 17 }, (_, row) => Array.from({ length: 60 }
   return characters[(row * 11 + column * 7 + Math.floor(column / 3)) % characters.length];
 }).join("   ")).join("\n");
 
-function ChatGptMcpBanner({ onConnect }: { onConnect: () => void }) {
-  return <div className="chatgpt-mcp" data-platform="chatgpt">
+function AssistantMcpBanner({ platform, onConnect }: { platform: "chatgpt" | "claude"; onConnect: () => void }) {
+  const isClaude = platform === "claude";
+  const name = isClaude ? "Claude" : "ChatGPT";
+  return <div className={`chatgpt-mcp${isClaude ? " claude-mcp" : ""}`} data-platform={platform}>
     <div className="chatgpt-mcp-rays" aria-hidden="true">
       {Array.from({ length: 8 }, (_, index) => <span key={index} />)}
     </div>
     <div className="chatgpt-mcp-heading">
-      <img src={publicAsset("/sites/krea/chatgpt-mcp-icon.webp")} width={48} height={48} alt="" />
-      <h2>Get Tezu into ChatGPT</h2>
+      {isClaude ? <span className="claude-mcp-brand"><PlatformLogo id="claude" /></span>
+        : <img src={publicAsset("/sites/krea/chatgpt-mcp-icon.webp")} width={48} height={48} alt="" />}
+      <h2>Get Tezu into {name}</h2>
     </div>
     <div className="chatgpt-mcp-stage">
       <div className="chatgpt-mcp-details">
-        <p>Get the world&apos;s best image, video, and upscaling<br className="chatgpt-mcp-break" /> models in ChatGPT in 3 simple steps.</p>
+        {isClaude ? <p>Get the world&apos;s best image, video, and<br className="chatgpt-mcp-break" /> upscaling models in Claude in 3 simple steps.</p>
+          : <p>Get the world&apos;s best image, video, and upscaling<br className="chatgpt-mcp-break" /> models in ChatGPT in 3 simple steps.</p>}
         <button type="button" onClick={onConnect}>
-          <PlatformLogo id="chatgpt" /><span>Add to ChatGPT</span>
+          <PlatformLogo id={platform} /><span>Add to {name}</span>
         </button>
       </div>
-      <img className="chatgpt-mcp-preview" src={publicAsset("/sites/krea/chatgpt-mcp-ui.webp")} width={3422} height={1151}
-        alt="Studio preview from the original ChatGPT MCP banner" loading="lazy" />
+      <img className="chatgpt-mcp-preview"
+        src={publicAsset(isClaude ? "/sites/tezu/integrations/claude-mcp-ui.webp" : "/sites/krea/chatgpt-mcp-ui.webp")}
+        width={isClaude ? 1430 : 3422} height={isClaude ? 476 : 1151}
+        alt={isClaude ? "Claude settings preview showing the Tezu plugin" : "Studio preview from the original ChatGPT MCP banner"} loading="lazy" />
     </div>
   </div>;
 }
@@ -111,7 +117,7 @@ export function IntegrationBanner() {
     </div>
     {platforms.map((item) => <div role="tabpanel" key={item.id} id={`integration-panel-${item.id}`}
       aria-labelledby={`integration-tab-${item.id}`} hidden={active !== item.id} tabIndex={0}>
-      {active === item.id && (active === "chatgpt" ? <ChatGptMcpBanner onConnect={() => guide.current?.showModal()} /> : <div className="integration-panel" data-platform={active}>
+      {active === item.id && (active === "chatgpt" || active === "claude" ? <AssistantMcpBanner platform={active} onConnect={() => guide.current?.showModal()} /> : <div className="integration-panel" data-platform={active}>
         <pre className="integration-pattern" aria-hidden="true">{pattern}</pre>
         <div className="integration-content" key={active}>
           <h2 className="integration-heading">

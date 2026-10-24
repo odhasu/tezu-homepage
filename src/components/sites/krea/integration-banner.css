@@ -86,3 +86,18 @@
 @media(hover:none),(prefers-reduced-motion:reduce){.chatgpt-mcp-details{opacity:1;pointer-events:auto}.chatgpt-mcp-preview{transform:translateY(128px)}}
 @media(max-width:767px) and (hover:none), (max-width:767px) and (prefers-reduced-motion:reduce){.chatgpt-mcp-preview{transform:none}}
 @media(prefers-reduced-motion:reduce){.chatgpt-mcp-rays>span{animation:none}.chatgpt-mcp-preview,.chatgpt-mcp-details,.chatgpt-mcp-details button{transition:none}}
+
+.claude-mcp{padding-top:clamp(48px,8vw,124px)}
+.claude-mcp .chatgpt-mcp-heading{flex-direction:column;gap:clamp(24px,2.32cqw,36px)}
+.claude-mcp-brand{display:grid;place-items:center;flex-shrink:0;width:clamp(72px,8.62cqw,134px);height:clamp(72px,8.62cqw,134px);border:2px solid #efb59c;border-radius:27%;background:#d97757}
+.claude-mcp-brand>img{width:70%;height:70%;filter:brightness(0) invert(1)}
+.claude-mcp .chatgpt-mcp-heading h2{font-size:clamp(36px,5.4cqw,84px);font-weight:400;line-height:1.15}
+.claude-mcp .chatgpt-mcp-stage{display:flex;flex-direction:column;gap:clamp(32px,4.63cqw,72px);margin-top:clamp(32px,4.63cqw,72px)}
+.claude-mcp .chatgpt-mcp-details{max-width:1100px;gap:clamp(24px,3.09cqw,48px);opacity:1;pointer-events:auto}
+.claude-mcp .chatgpt-mcp-details p{font-size:clamp(18px,2.96cqw,46px);line-height:1.44;font-weight:400}
+.claude-mcp .chatgpt-mcp-details button{gap:clamp(12px,1.55cqw,24px);min-height:clamp(52px,6.95cqw,108px);padding:16px clamp(32px,7cqw,108px);background:#d97757;color:#fff;font-size:clamp(20px,2.7cqw,42px);line-height:1.2;font-weight:400;box-shadow:0 7px #914c34}
+.claude-mcp .chatgpt-mcp-details button:hover{background:#e08364}
+.claude-mcp .chatgpt-mcp-details button>img{width:1.15em;height:1.15em;filter:brightness(0) invert(1)}
+.claude-mcp .chatgpt-mcp-preview{width:92%;border-radius:18px 18px 0 0}
+@media(max-width:767px){.claude-mcp .chatgpt-mcp-heading{gap:24px}.claude-mcp-brand{width:64px;height:64px}.claude-mcp .chatgpt-mcp-heading h2{font-size:30px;line-height:36px}.claude-mcp .chatgpt-mcp-details p{font-size:18px;line-height:27px}.claude-mcp .chatgpt-mcp-details button{min-height:52px;padding:12px 28px;font-size:18px;box-shadow:0 4px #914c34}.claude-mcp .chatgpt-mcp-preview{border-radius:8px 8px 0 0}}
+@media(hover:none),(prefers-reduced-motion:reduce){.claude-mcp .chatgpt-mcp-preview,.claude-mcp:is(:hover,:focus-within) .chatgpt-mcp-preview{transform:none}}
