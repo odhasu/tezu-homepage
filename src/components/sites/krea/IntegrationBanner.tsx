@@ -39,8 +39,11 @@ function AssistantMcpBanner({ platform, onConnect }: { platform: "chatgpt" | "cl
       {Array.from({ length: 8 }, (_, index) => <span key={index} />)}
     </div>
     <div className="chatgpt-mcp-heading">
-      {isClaude ? <span className="claude-mcp-brand"><PlatformLogo id="claude" /></span>
-        : <img src={publicAsset("/sites/krea/chatgpt-mcp-icon.webp")} width={48} height={48} alt="" />}
+      <span className="mcp-brand-icon" aria-hidden="true">
+        {isClaude ? <span className="claude-mcp-brand"><PlatformLogo id="claude" /></span>
+          : <img src={publicAsset("/sites/krea/chatgpt-mcp-icon.webp")} width={48} height={48} alt="" />}
+        <span className="mcp-brand-shine" />
+      </span>
       <h2>Get Tezu into {name}</h2>
     </div>
     <div className="chatgpt-mcp-stage">
