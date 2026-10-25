@@ -8,6 +8,7 @@ import { ImageWall, type WallImage } from "./ImageWall";
 import { GlassLens, useHeroEntrance } from "./HeroEffects";
 import { TezuFeatures, TezuResults } from "./TezuShowcase";
 import { IntegrationBanner } from "./IntegrationBanner";
+import { TezuSiteHeader } from "./TezuSiteHeader";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
 const subscribeMotion = (callback: () => void) => {
@@ -42,7 +43,7 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
     textarea.current?.focus({ preventScroll: true });
   };
 
-  return <section ref={hero} className="hero" aria-label="Create with Tezu">
+  return <section id="home" ref={hero} className="hero" aria-label="Create with Tezu">
     <h1 className="hero-intro"><span><span className="hero-intro-word">Welcome</span>{" "}<span className="hero-intro-word">to</span>{" "}<span className="hero-intro-word">Tezu</span></span></h1>
     <GlassLens target={promptBox} />
     <ImageWall onSelect={useExample} reducedMotion={reducedMotion} paused={focused || !!prompt || !!attachment} />
@@ -82,5 +83,5 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
 
 export function KreaHomePage() {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionPreference, serverMotionPreference);
-  return <main className="krea-home"><Hero reducedMotion={reducedMotion} /><IntegrationBanner /><TezuFeatures reducedMotion={reducedMotion} /><TezuResults reducedMotion={reducedMotion} /></main>;
+  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><IntegrationBanner /><TezuFeatures reducedMotion={reducedMotion} /><TezuResults reducedMotion={reducedMotion} /></main></>;
 }

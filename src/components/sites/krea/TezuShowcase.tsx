@@ -43,7 +43,7 @@ const features = [
 ];
 
 export function TezuFeatures({ reducedMotion }: { reducedMotion: boolean }) {
-  return <section className="tezu-features" aria-labelledby="tezu-create-heading">
+  return <section id="create" className="tezu-features" aria-labelledby="tezu-create-heading">
     <div className="section-heading"><h2 id="tezu-create-heading">Create with Tezu</h2></div>
     <div className="tezu-feature-grid">{features.map((feature) => {
       const item = media.find((item) => item.id === feature.mediaId)!;
@@ -62,7 +62,7 @@ export function TezuResults({ reducedMotion }: { reducedMotion: boolean }) {
   const [selected, setSelected] = useState<MediaItem | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const open = (item: MediaItem) => { setSelected(item); dialog.current?.showModal(); };
-  return <section className="tezu-results" aria-labelledby="tezu-results-heading">
+  return <section id="results" className="tezu-results" aria-labelledby="tezu-results-heading">
     <div className="tezu-results-heading"><h2 id="tezu-results-heading">Tezu results</h2>
       {!reducedMotion && <button type="button" className="tezu-pause" onClick={() => setPaused(!paused)} aria-label={paused ? "Play result videos" : "Pause result videos"}>{paused ? <Play size={17} /> : <Pause size={17} />}</button>}
     </div>

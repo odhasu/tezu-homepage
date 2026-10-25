@@ -70,3 +70,6 @@ h2,h3{font-weight:450}
 
 .section-heading{display:flex;align-items:center;gap:16px;padding:0 var(--gutter)}
 .section-heading h2{font-size:24px;line-height:32px;font-weight:450;letter-spacing:-.02em}
+
+/* Keep homepage section headings below the fixed navigation. */
+#home,#mcp,#create,#results{scroll-margin-top:88px}

@@ -107,7 +107,7 @@ export function IntegrationBanner() {
     }
   }
 
-  return <section className="integration-section" aria-label="Create with Tezu in your apps">
+  return <section id="mcp" className="integration-section" aria-label="Create with Tezu in your apps">
     <div className="integration-tabs" role="tablist" aria-label="Choose your app">
       {platforms.map((item, index) => <button type="button" role="tab" key={item.id}
         ref={(element) => { tabs.current[index] = element; }}
