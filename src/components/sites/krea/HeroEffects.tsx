@@ -21,19 +21,34 @@ export function useHeroEntrance(hero: RefObject<HTMLElement | null>, prompt: Ref
     const region = hero.current;
     const form = prompt.current;
     const stage = region?.querySelector<HTMLElement>(".wall-stage");
-    if (!region || !form || !stage || reducedMotion) return;
+    const title = region?.querySelector<HTMLElement>(".hero-intro");
+    const wall = region?.querySelector<HTMLElement>(".image-wall");
+    const centre = stage?.querySelector<HTMLImageElement>("[data-origin=true] img");
+    if (!region || !form || !stage || !title || !wall) return;
+    if (region.dataset.entered === "true") return;
+    if (reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      region.setAttribute("data-entered", "true");
+      return;
+    }
     let frame = 0;
-    const started = performance.now();
+    let fallback: ReturnType<typeof setTimeout>;
+    let cancelled = false;
+    let started = 0;
     const angle = -18;
     const radians = Math.abs(angle) * Math.PI / 180;
+    form.setAttribute("inert", "");
+    wall.setAttribute("inert", "");
     function animate(time: number) {
-      if (!region || !form || !stage) return;
+      if (!region || !form || !stage || !wall) return;
       const elapsed = Math.min(1, (time - started) / 5500);
       const progress = entranceEase(elapsed);
       const width = region.clientWidth;
       const height = region.clientHeight;
       const { tileWidth, tileHeight } = wallGeometry(width);
-      const zoom = Math.max((width * Math.cos(radians) + height * Math.sin(radians)) / tileWidth, (width * Math.sin(radians) + height * Math.cos(radians)) / tileHeight) * 1.1;
+      const origin = centre?.closest<HTMLElement>(".wall-tile");
+      const originWidth = origin?.offsetWidth || tileWidth;
+      const originHeight = origin?.offsetHeight || tileHeight;
+      const zoom = Math.max((width * Math.cos(radians) + height * Math.sin(radians)) / originWidth, (width * Math.sin(radians) + height * Math.cos(radians)) / originHeight) * 1.1;
       const glassZoom = Math.max(width / form.offsetWidth, height / form.offsetHeight) * 1.15;
       stage.style.transform = `scale(${zoom ** (1 - progress)}) rotate(${angle * (1 - progress)}deg)`;
       form.style.scale = String(glassZoom ** (1 - Math.max(0, (progress - 0.12) / 0.88)) ** 2);
@@ -41,15 +56,39 @@ export function useHeroEntrance(hero: RefObject<HTMLElement | null>, prompt: Ref
       form.style.setProperty("--controls-opacity", String(fade * fade * (3 - 2 * fade)));
       form.inert = progress < 0.85;
       if (elapsed < 1) frame = requestAnimationFrame(animate);
-      else region.dataset.entered = "true";
+      else {
+        region.dataset.entered = "true";
+        wall.inert = false;
+        stage.style.removeProperty("transform");
+        form.style.removeProperty("scale");
+        form.style.removeProperty("--controls-opacity");
+      }
     }
-    frame = requestAnimationFrame(animate);
+
+    // Like the source, finish the title and load the central artwork before zooming.
+    const artworkReady = Promise.race([
+      centre?.decode().catch(() => {}),
+      new Promise<void>((resolve) => { fallback = setTimeout(resolve, 6000); }),
+    ]);
+    const titleReady = Promise.allSettled(title.getAnimations({ subtree: true }).map((animation) => animation.finished));
+    void Promise.all([artworkReady, titleReady]).then(() => {
+      clearTimeout(fallback);
+      if (cancelled) return;
+      started = performance.now();
+      animate(started);
+      region.dataset.go = "true";
+    });
     return () => {
+      cancelled = true;
+      clearTimeout(fallback);
       cancelAnimationFrame(frame);
       stage.style.removeProperty("transform");
       form.style.removeProperty("scale");
       form.style.removeProperty("--controls-opacity");
       form.inert = false;
+      wall.inert = false;
+      delete region.dataset.go;
+      delete region.dataset.entered;
     };
   }, [hero, prompt, reducedMotion]);
 }

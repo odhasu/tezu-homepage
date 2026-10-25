@@ -43,7 +43,7 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
   };
 
   return <section ref={hero} className="hero" aria-label="Create with Tezu">
-    <h1 className="sr-only">Create with Tezu</h1>
+    <h1 className="hero-intro"><span><span className="hero-intro-word">Welcome</span>{" "}<span className="hero-intro-word">to</span>{" "}<span className="hero-intro-word">Tezu</span></span></h1>
     <GlassLens target={promptBox} />
     <ImageWall onSelect={useExample} reducedMotion={reducedMotion} paused={focused || !!prompt || !!attachment} />
     <div className="prompt-position">

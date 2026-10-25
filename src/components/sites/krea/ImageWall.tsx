@@ -31,7 +31,6 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
     let height = element.clientHeight;
     let frame = 0;
     let last = 0;
-    const enteredAt = performance.now() + (reducedMotion ? 0 : 5500);
     movement.current.lastActivity = performance.now();
     const lifts = coordinates.map(() => 0);
     const resize = new ResizeObserver(([entry]) => { width = entry.contentRect.width; height = entry.contentRect.height; });
@@ -58,7 +57,7 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
           const ease = reducedMotion ? 1 : 1 - Math.exp(-dt / 0.2);
           state.x += (state.target.x - state.x) * ease;
           state.y += (state.target.y - state.y) * ease;
-        } else if (!drag.current.active && !reducedMotion && !state.paused && time >= enteredAt) {
+        } else if (!drag.current.active && !reducedMotion && !state.paused && element?.closest(".hero")?.getAttribute("data-entered") === "true") {
           const decay = Math.exp(-dt / 0.7);
           const idle = state.hover < 0 && time < state.lastActivity + 15000 ? 1 : 0;
           state.vx = state.vx * decay - 10 * idle * (1 - decay);
@@ -143,6 +142,7 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
           ref={(node) => { tileRefs.current[index] = node; }}
           type="button"
           className="wall-tile"
+          data-origin={col === 0 && row === 0 ? "true" : undefined}
           tabIndex={col === 0 && row === 0 ? 0 : -1}
           aria-label={`${image.category}: ${image.title}`}
           onClick={() => { if (!drag.current.moved) onSelect(image); }}
