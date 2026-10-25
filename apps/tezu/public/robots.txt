@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /characters
+Disallow: /creations
+Disallow: /settings
+Disallow: /rewards
+Disallow: /intro-preview
+Disallow: /thank-you
+Disallow: /create/image
+Disallow: /create/video
+Disallow: /create/character
+
+Sitemap: https://tezu.ai/sitemap.xml

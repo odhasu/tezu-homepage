@@ -1,0 +1,50 @@
+.utility-page { position:relative; width:min(100%,900px); min-height:70svh; margin:auto; padding:80px 24px 100px; overflow:hidden; }
+.utility-kicker { color:var(--highlight); font-size:13px; margin:0 0 18px; }
+.utility-page h1 { position:relative; font-family:var(--font-display),sans-serif; font-size:clamp(48px,8vw,86px); font-weight:600; letter-spacing:-.035em; line-height:1.02; margin:0 0 24px; }
+.utility-page>p:not(.utility-kicker) { position:relative; max-width:480px; color:var(--muted-foreground); line-height:1.7; }
+.utility-actions { position:relative; display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:32px; }
+.utility-actions>a,.utility-actions>button { min-height:48px; }
+.missing-scene-number { display:block; color:#c4a6ff16; font-family:var(--font-display),sans-serif; font-size:clamp(140px,25vw,220px); line-height:.9; margin-bottom:28px; font-weight:700; letter-spacing:-.06em; }
+.utility-check { display:grid; place-items:center; width:60px; height:60px; margin-bottom:32px; border:1px solid #c4a6ff40; border-radius:50%; background:#c4a6ff12; color:var(--highlight); }
+.thank-you-steps { max-width:500px; padding-left:23px; margin:30px 0 0; color:#d2c9dc; line-height:1.7; }
+.thank-you-steps li { padding-left:5px; margin:12px 0; }
+.utility-page .utility-footnote { margin-top:24px; font-size:12px; }
+.route-loading { min-height:70svh; max-width:1100px; padding:80px 24px; margin:auto; }
+.route-loading>p { color:var(--muted-foreground); font-size:14px; }
+.loading-lines { max-width:520px; display:grid; gap:14px; margin:28px 0 40px; }
+.loading-lines>span,.loading-panels>span { display:block; border-radius:10px; background:#c4a6ff0c; animation:loading-pulse 1.4s ease-in-out infinite alternate; }
+.loading-lines>span { height:24px; }.loading-lines>span:first-child { height:56px; }.loading-lines>span:last-child { width:70%; }
+.loading-panels { display:grid; grid-template-columns:1fr 1fr; gap:20px; }.loading-panels>span { height:220px; }
+@keyframes loading-pulse { to { background:#c4a6ff20; } }
+.privacy-banner { position:fixed; z-index:90; left:20px; right:20px; bottom:calc(82px + env(safe-area-inset-bottom)); width:auto; max-width:440px; max-height:calc(100dvh - 160px); overflow:auto; padding:22px; border:1px solid #c4a6ff36; border-radius:16px; background:#181220; box-shadow:0 14px 60px #0009; }
+.privacy-banner-heading { display:flex; gap:12px; align-items:center; color:var(--highlight); }
+.privacy-banner-heading h2 { color:var(--foreground); margin:0; font-size:17px; font-weight:600; letter-spacing:-.02em; }
+.privacy-banner>p { margin:14px 0 18px; color:#b9afc5; font-size:13px; line-height:1.65; }
+.privacy-banner a { color:#d6c2ff; text-decoration:underline; text-underline-offset:3px; }
+.cookie-settings-link { display:block; min-height:36px; padding:6px 0; text-align:left; border:0; background:transparent; color:var(--muted-foreground); font-size:13px; }
+.cookie-settings-link:hover { color:var(--highlight); }
+.mobile-primary-cta { position:fixed; z-index:55; inset:auto 0 0; display:flex; justify-content:space-between; align-items:center; gap:14px; padding:12px 18px calc(12px + env(safe-area-inset-bottom)); background:#100b19f5; border-top:1px solid #c4a6ff26; backdrop-filter:blur(18px); }
+.mobile-primary-cta>span { max-width:140px; font-size:12px; line-height:1.5; color:#bcb2ca; }
+.mobile-primary-cta .primary-button { min-height:46px; white-space:nowrap; flex-shrink:0; font-size:13px; padding:10px 16px; }
+.legal-section { margin:32px 0; }.legal-section h2 { font-size:20px; line-height:1.35; margin:0 0 12px; color:var(--foreground); }.legal-section p { margin:10px 0; }.legal-section a { color:var(--highlight); text-decoration:underline; text-underline-offset:3px; }
+.legal-updated { margin-top:18px!important; color:var(--muted-foreground); font-size:13px; }
+.auth-field-error { display:block; color:#ffb7c9; font-size:12px; margin-top:6px; }
+.tezu-auth input[aria-invalid=true] { border-color:#f590ac; }
+.scene-loading { position:absolute; inset:auto 12px 12px; margin:0; padding:7px 10px; border-radius:6px; background:#100b19da; color:white; font-size:12px; pointer-events:none; }
+.hire-studio-finish { display:block; margin-top:16px; width:fit-content; color:#d4bbff; font-size:13px; text-decoration:underline; text-underline-offset:4px; }
+@media(min-width:768px) { .utility-page { padding-top:100px; }.privacy-banner { left:24px; right:auto; width:440px; bottom:90px; }.loading-panels>span { height:320px; } }
+@media(min-width:1024px) { .mobile-primary-cta { display:none; }.privacy-banner { bottom:24px; } }
+@media(max-width:374px) { .mobile-primary-cta { padding-inline:14px; gap:10px; }.mobile-primary-cta>span { max-width:110px; font-size:11px; }.mobile-primary-cta .primary-button { padding-inline:12px; font-size:12px; }.privacy-banner { left:12px; right:12px; padding:18px; } }
+@media(prefers-reduced-motion:reduce) { .loading-lines>span,.loading-panels>span { animation:none; } }
+
+.privacy-dismiss { min-height:44px; padding:10px 24px; color:#fff; background:var(--primary); border:0; border-radius:8px; font-size:13px; font-weight:600; }
+.header-login-button { display:inline-flex; justify-content:center; align-items:center; color:#d2c8df; background:transparent; border:0; min-width:0; padding:10px 8px; white-space:nowrap; }
+.header-login-button:hover { color:#fff; }
+.header-create-button { min-height:44px; white-space:nowrap; }
+.footer-bottom { display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between; gap:12px; }
+@media(max-width:1023px) { .has-mobile-cta { padding-bottom:calc(78px + env(safe-area-inset-bottom)); } }
+@media(max-width:639px) { .header-create-button { font-size:12px; padding:10px 12px; }.header-create-button svg { display:none; }.header-login-button { padding:10px 3px; font-size:12px; }.site-header .site-logo { gap:7px; }.site-header .site-logo>span { font-size:19px; } }
+@media(max-width:374px) { .site-header { padding-inline:12px; gap:7px; }.site-header .site-logo>span { display:none; }.header-actions { gap:6px; } }
+
+.site-logo { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:650; letter-spacing:-.03em; }
+.secondary-legal .legal-section h2 { font-size:20px; margin-top:0; }

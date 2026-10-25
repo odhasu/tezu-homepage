@@ -1,0 +1,50 @@
+.stage-model {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  min-height:44px;
+  padding:0 11px;
+  border:1px solid #ffffff0d;
+  border-radius:10px;
+  background:#251a30;
+  color:#e7dfee;
+  font-size:12px;
+  text-align:left;
+  transition:background .15s,border-color .15s;
+}
+.stage-model:hover,.stage-model[data-popup-open] { background:#30233d; border-color:#c4a6ff40; }
+.stage-model:focus-visible { outline:2px solid #c4a6ff; outline-offset:3px; }
+.stage-model-logo { width:20px; height:20px; flex-shrink:0; object-fit:contain; }
+.stage-model-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.stage-model-chevron { display:flex; margin-left:auto; flex-shrink:0; color:#b7a9c4; transition:transform .15s; }
+.stage-model-chevron[data-popup-open] { transform:rotate(180deg); }
+.stage-model-positioner { z-index:70; max-width:calc(100vw - 32px); }
+.stage-model-popup {
+  width:340px;
+  max-width:calc(100vw - 32px);
+  max-height:var(--available-height);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:7px;
+  border:1px solid #c4a6ff29;
+  border-radius:16px;
+  background:#17121ff5;
+  backdrop-filter:blur(24px);
+  box-shadow:0 18px 50px #0008,0 3px 12px #0005;
+  color:#faf8ff;
+  transform-origin:var(--transform-origin);
+  transition:opacity .15s,transform .15s;
+}
+.stage-model-popup[data-starting-style],.stage-model-popup[data-ending-style] { opacity:0; transform:translateY(-4px) scale(.985); }
+.stage-model-list { outline:none; }
+.stage-model-option { display:flex; align-items:center; gap:12px; min-height:58px; padding:9px 12px 9px 9px; border-radius:10px; cursor:pointer; outline:none; user-select:none; }
+.stage-model-option[data-selected] { background:#c4a6ff12; }
+.stage-model-option[data-highlighted] { background:#c4a6ff20; }
+.stage-model-option:focus-visible { box-shadow:inset 0 0 0 1px #c4a6ff80; }
+.stage-model-brand { display:grid; place-items:center; flex-shrink:0; width:38px; height:38px; border:1px solid #ffffff08; border-radius:9px; background:#ffffff08; }
+.stage-model-brand img { width:24px; height:24px; object-fit:contain; }
+.stage-model-option-name { font-size:14px; font-weight:550; line-height:1.4; }
+.stage-model-check { display:flex; margin-left:auto; padding-left:12px; color:#c4a6ff; }
+@media(max-width:767px) { .stage-model { flex:1; font-size:11px; } }
+@media(prefers-reduced-motion:reduce) { .stage-model,.stage-model-chevron,.stage-model-popup { transition:none; } }

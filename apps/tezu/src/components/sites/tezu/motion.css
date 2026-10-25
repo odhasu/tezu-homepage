@@ -1,0 +1,9 @@
+:root { --motion-ease: cubic-bezier(.22, 1, .36, 1); }
+[data-reveal] { transition: opacity .7s var(--motion-ease), translate .7s var(--motion-ease); }
+[data-reveal-state="pending"] { opacity: 0; translate: 0 32px; }
+[data-reveal-state="visible"] { opacity: 1; translate: 0 0; }
+.hire-studio-step:nth-child(2),.mcp-demo-wrap { transition-delay: 100ms; }
+.hire-studio-step:nth-child(3) { transition-delay: 200ms; }
+@media(prefers-reduced-motion:reduce) {
+  [data-reveal] { opacity: 1; translate: none; transition: none; }
+}

@@ -4,7 +4,7 @@
 
 import { ArrowRight, Pause, Play, X } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { tezuMedia as media } from "./assets";
+import { publicAsset, tezuMedia as media } from "./assets";
 import "./tezu-showcase.css";
 
 type MediaItem = (typeof media)[number];
@@ -38,7 +38,7 @@ function TezuVideo({ item, reducedMotion, paused = false, autoplay = false, clas
 }
 
 const features = [
-  { title: "Cartoon Maker", mediaId: "tezu-07-preview", href: "https://tezu.ai/", action: "Create a cartoon" },
+  { title: "Cartoon Maker", mediaId: "tezu-07-preview", href: process.env.NODE_ENV === "development" ? "http://127.0.0.1:3000/#mcp" : publicAsset("/tezu/#mcp"), action: "Create a cartoon" },
   { title: "Character Swap", mediaId: "template-1", href: "https://tezu.ai/templates", action: "Swap a character" },
 ];
 
