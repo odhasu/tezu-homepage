@@ -38,7 +38,7 @@ function TezuVideo({ item, reducedMotion, paused = false, autoplay = false, clas
 }
 
 const features = [
-  { title: "Cartoon Maker", mediaId: "tezu-07-preview", href: "https://tezu.ai/create/video", action: "Create a cartoon" },
+  { title: "Cartoon Maker", mediaId: "tezu-07-preview", href: "https://tezu.ai/", action: "Create a cartoon" },
   { title: "Character Swap", mediaId: "template-1", href: "https://tezu.ai/templates", action: "Swap a character" },
 ];
 
