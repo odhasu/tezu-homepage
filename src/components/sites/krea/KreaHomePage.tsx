@@ -11,6 +11,7 @@ import { FadeText, RotatingPrompt } from "./AnimatedText";
 import { MediaGallery } from "./MediaGallery";
 import { IntegrationBanner } from "./IntegrationBanner";
 import { TezuSiteHeader } from "./TezuSiteHeader";
+import { TezuMotionGalleries } from "./TezuMotionGalleries";
 import "./text-motion.css";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
@@ -91,5 +92,5 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
 
 export function KreaHomePage() {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionPreference, serverMotionPreference);
-  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><MediaGallery reducedMotion={reducedMotion} /><IntegrationBanner /><TezuResults reducedMotion={reducedMotion} /></main></>;
+  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><MediaGallery reducedMotion={reducedMotion} /><IntegrationBanner /><TezuMotionGalleries reducedMotion={reducedMotion} /><TezuResults reducedMotion={reducedMotion} /></main></>;
 }

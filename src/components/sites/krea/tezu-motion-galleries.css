@@ -1,0 +1,30 @@
+.tezu-motion-collection{padding:56px 0 0}
+.tezu-motion-grid{display:grid;grid-template-columns:1fr;gap:24px;margin:24px var(--gutter) 0}
+.tezu-motion-scene{position:relative;min-width:0;overflow:hidden;border:1px solid #ffffff12;border-radius:20px;background:#121212;isolation:isolate}
+.tezu-motion-scene-heading{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 0;gap:16px}
+.tezu-motion-scene-heading h3{font-size:16px;line-height:24px;letter-spacing:-.015em;font-weight:450}
+.tezu-motion-count{font-size:11px;letter-spacing:.08em;font-variant-numeric:tabular-nums;color:#747474}
+.tezu-motion-stage{position:relative;height:420px;overflow:hidden;margin-top:12px;background:radial-gradient(ellipse at center,#ffffff03,transparent 68%)}
+.tezu-motion-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;pointer-events:none;cursor:grab;touch-action:pan-y;transition:opacity .4s}
+.tezu-motion-canvas:active{cursor:grabbing}
+.tezu-motion-canvas:focus-visible{outline:1px solid #ffffff80;outline-offset:-4px;border-radius:8px}
+.tezu-motion-stage[data-ready=true] .tezu-motion-canvas{opacity:1;pointer-events:auto}
+.tezu-motion-fallback{display:flex;align-items:center;gap:12px;padding:20px;overflow:auto;height:100%;scrollbar-width:thin}
+.tezu-motion-fallback button{flex:0 0 42%;padding:0;background:#1a1a1a;border-radius:8px;overflow:hidden}
+.tezu-motion-fallback img{width:100%;height:auto;max-height:340px;object-fit:contain}
+.tezu-motion-stage[data-ready=true] .tezu-motion-fallback{visibility:hidden;pointer-events:none}
+.tezu-motion-drag-hint{position:absolute;inset:auto 0 10px;pointer-events:none;text-align:center;font-size:11px;color:#ffffff45;letter-spacing:.02em}
+.tezu-motion-footer{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px 22px;border-top:1px solid #ffffff08;background:#121212}
+.tezu-motion-caption{min-width:0;display:grid;gap:4px}
+.tezu-motion-caption>span{color:#767676;font-size:10px;line-height:14px;text-transform:uppercase;letter-spacing:.1em}
+.tezu-motion-caption p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;line-height:18px;color:#c7c7c7}
+.tezu-motion-controls{display:flex;gap:3px;flex:none}
+.tezu-motion-controls button{display:grid;place-items:center;min-width:36px;height:40px;padding:0;background:transparent;color:#a4a4a4;border-radius:9px;transition:background .2s,color .2s}
+.tezu-motion-controls button:is(:hover,:focus-visible){background:#ffffff0c;color:#fff}
+.tezu-motion-controls button:active{background:#ffffff16}
+.tezu-motion-scene[data-motion=lens] .tezu-motion-stage{height:460px}
+.tezu-motion-scene[data-motion=arc] .tezu-motion-stage{background:none}
+@media(min-width:900px){.tezu-motion-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}.tezu-motion-scene[data-motion=lens] .tezu-motion-stage{height:420px}}
+@media(max-width:480px){.tezu-motion-collection{padding-top:40px}.tezu-motion-grid{gap:20px;margin-top:20px}.tezu-motion-stage{height:370px}.tezu-motion-scene[data-motion=lens] .tezu-motion-stage{height:400px}.tezu-motion-scene-heading{padding:18px 18px 0}.tezu-motion-footer{padding:16px 14px 18px;gap:8px}.tezu-motion-caption p{font-size:12px;max-width:145px}.tezu-motion-controls{gap:0}.tezu-motion-controls button{min-width:34px}}
+@media(max-width:359px){.tezu-motion-controls button{min-width:30px}.tezu-motion-caption p{max-width:96px}}
+@media(prefers-reduced-motion:reduce){.tezu-motion-canvas,.tezu-motion-controls button{transition:none}}
