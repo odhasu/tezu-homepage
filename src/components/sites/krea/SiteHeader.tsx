@@ -1,10 +1,10 @@
 "use client";
 
 import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode, RefObject } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode, RefObject } from "react";
 import { AnimatePresence, LayoutGroup, motion, useIsPresent, useReducedMotion } from "motion/react";
 import type { Transition, Variants } from "motion/react";
-import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { motionTokens } from "./header-motion";
 import styles from "./SiteHeader.module.css";
 
@@ -56,6 +56,9 @@ export interface SiteHeaderDestination {
 }
 
 export interface SiteHeaderProps {
+  /** Resend's centered glass navigation, with full-screen mobile drill-down panels. */
+  appearance?: "arc" | "resend";
+  textureUrl?: string;
   /** `simple` puts links beside the brand, `centered` centers them in a quiet capsule, `mega` opens panels for items with links. */
   variant?: SiteHeaderVariant;
   brand?: { name: string; href?: string; mark?: ReactNode };
@@ -95,6 +98,7 @@ const GROW = physical(.44, 0), SHRINK = physical(.34, 0), GLIDE = physical(.3, 0
 const HOVER_INTENT = 70, LEAVE_GRACE = 180, TRAVEL = 36;
 /** Matches the container query in site-header.module.css. */
 const COLLAPSE_BELOW = 760;
+const RESEND_TRANSITION: Transition = { duration: .35, ease: [.22, 1, .36, 1] };
 
 /** Panel content slides in from the side of the newly opened item; opening from closed drops in from the bar. */
 const faceVariants: Variants = {
@@ -151,6 +155,8 @@ function Destination({ link, onChoose, children, ...rest }: DestinationProps) {
  * moved toward, and folds into a menu sheet on narrow containers.
  */
 export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function SiteHeader({
+  appearance = "arc",
+  textureUrl,
   variant = "mega",
   brand = { name: "Tezu", href: "#home" },
   items = [],
@@ -176,8 +182,12 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
   const [panel, setPanel] = useState<{ height: number | null; grow: boolean }>({ height: null, grow: true });
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const expandedItem = items.find(item => item.value === expanded);
   const rootRef = useRef<HTMLElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileTriggerRefs = useRef(new Map<string, HTMLButtonElement>());
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+  const previousExpanded = useRef<string | null>(null);
   const triggerRefs = useRef(new Map<string, HTMLButtonElement | HTMLAnchorElement>());
   const panelRef = useRef<HTMLDivElement>(null);
   const openTimer = useRef<number | undefined>(undefined), closeTimer = useRef<number | undefined>(undefined);
@@ -214,6 +224,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
   const closeMenu = useCallback((restoreFocus = false) => {
     setMenuOpen(false);
     setExpanded(null);
+    previousExpanded.current = null;
     if (restoreFocus) menuButtonRef.current?.focus();
   }, []);
 
@@ -243,11 +254,11 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
     if (!node || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(([entry]) => {
       if (!entry) return;
-      if (entry.contentRect.width >= COLLAPSE_BELOW) { setMenuOpen(false); setExpanded(null); } else setOpen(null);
+      if (entry.contentRect.width >= (appearance === "resend" ? 768 : COLLAPSE_BELOW)) { setMenuOpen(false); setExpanded(null); } else setOpen(null);
     });
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [appearance]);
   useEffect(() => {
     if (!menuOpen) return;
     const scroller: HTMLElement = scrollContainer?.current ?? document.documentElement;
@@ -280,6 +291,17 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
       document.removeEventListener("keydown", trapFocus);
     };
   }, [menuOpen]);
+
+  // Resend uses a second mobile panel, rather than expanding an accordion in the list.
+  useEffect(() => {
+    if (appearance !== "resend" || !menuOpen) return;
+    if (expanded) previousExpanded.current = expanded;
+    const frame = requestAnimationFrame(() => {
+      const panel = rootRef.current?.querySelector<HTMLElement>("[data-mobile-navigation]");
+      panel?.scrollTo({ top: 0 });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [appearance, expanded, menuOpen]);
 
   useEffect(() => {
     if (!open || !focusFirst.current) return;
@@ -348,7 +370,10 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) close();
     }}
     data-variant={variant}
+    data-appearance={appearance}
     data-scrolled={scrolled || menuOpen || !!open ? "" : undefined}
+    data-page-scrolled={scrolled ? "" : undefined}
+    style={textureUrl ? { "--header-texture": `url("${textureUrl}")` } as CSSProperties : undefined}
   >
     <div className={styles.inner} onPointerLeave={onRegionPointerLeave} onPointerEnter={onRegionPointerEnter}>
       <div className={styles.bar}>
@@ -421,13 +446,14 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
           id={`${id}-panel`}
           ref={panelRef}
           className={styles.panel}
+          data-featured={openItem.feature ? "" : undefined}
           role="region"
           aria-label={openItem.label}
           onKeyDown={onPanelKeyDown}
-          initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: .985 }}
+          initial={reduced ? { opacity: 0 } : { opacity: 0, y: appearance === "resend" ? 0 : -6, scale: appearance === "resend" ? .9 : .985 }}
           animate={{ opacity: 1, y: 0, scale: 1, height: panel.height ?? "auto" }}
           exit={reduced ? { opacity: 0, transition: { duration: motionTokens.duration.instant } } : { opacity: 0, y: -4, scale: .99, transition: { duration: motionTokens.duration.exit, ease: standard } }}
-          transition={reduced ? { duration: 0 } : { height: panel.grow ? GROW : SHRINK, y: GROW, scale: GROW, opacity: { duration: motionTokens.duration.fast, ease: enter } }}
+          transition={reduced ? { duration: 0 } : appearance === "resend" ? RESEND_TRANSITION : { height: panel.grow ? GROW : SHRINK, y: GROW, scale: GROW, opacity: { duration: motionTokens.duration.fast, ease: enter } }}
         >
           <AnimatePresence initial={false} custom={open?.direction ?? 0}>
             <Face key={openItem.value} direction={open?.direction ?? 0} reduced={reduced} onHeight={onHeight}>
@@ -459,12 +485,45 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
           key="sheet"
           id={`${id}-sheet`}
           className={styles.sheet}
-          initial={reduced ? { opacity: 0 } : { height: 0 }}
-          animate={reduced ? { opacity: 1 } : { height: "auto" }}
-          exit={reduced ? { opacity: 0 } : { height: 0, transition: SHRINK }}
-          transition={reduced ? { duration: 0 } : GROW}
+          initial={reduced ? { opacity: 0 } : appearance === "resend" ? { opacity: 0, y: -8 } : { height: 0 }}
+          animate={reduced ? { opacity: 1 } : appearance === "resend" ? { opacity: 1, y: 0 } : { height: "auto" }}
+          exit={reduced ? { opacity: 0 } : appearance === "resend" ? { opacity: 0, y: -8 } : { height: 0, transition: SHRINK }}
+          transition={reduced ? { duration: 0 } : appearance === "resend" ? RESEND_TRANSITION : GROW}
         >
           <nav className={styles.sheetInner} aria-label={`${label} mobile`} data-mobile-navigation="">
+            {appearance === "resend" ? <AnimatePresence initial={false} mode="wait">
+              <motion.div key={expandedItem?.value ?? "main"} className={styles.mobilePanel}
+                initial={reduced ? false : { opacity: 0, x: expandedItem ? 24 : -24 }}
+                animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                onAnimationComplete={() => {
+                  if (expandedItem) backButtonRef.current?.focus();
+                  else if (previousExpanded.current) mobileTriggerRefs.current.get(previousExpanded.current)?.focus();
+                }}
+                transition={reduced ? { duration: 0 } : { duration: .2, ease: [.22, 1, .36, 1] }}>
+                {expandedItem ? <>
+                  <button ref={backButtonRef} type="button" className={styles.backButton} aria-label="Back to main menu" onClick={() => setExpanded(null)}><ArrowLeft size={20} aria-hidden="true" /></button>
+                  {expandedItem.feature && <Destination link={{ label: expandedItem.feature.title, href: expandedItem.feature.href }} className={styles.mobileFeature} onChoose={() => choose({ label: expandedItem.feature!.title, href: expandedItem.feature!.href, section: expandedItem.value }, expandedItem.value)}>
+                    {expandedItem.feature.image && <img src={expandedItem.feature.image.src} alt={expandedItem.feature.image.alt} width={520} height={325} />}
+                    <span>{expandedItem.feature.title}<ArrowRight size={16} aria-hidden="true" /></span>
+                  </Destination>}
+                  <ul className={styles.sheetList} aria-label={expandedItem.label}>
+                    {expandedItem.links?.map(link => <li key={link.label} className={styles.sheetItem}>
+                      <Destination link={link} className={styles.sheetRow} onChoose={() => choose({ label: link.label, href: link.href, section: expandedItem.value }, expandedItem.value)}><span>{link.label}</span></Destination>
+                    </li>)}
+                  </ul>
+                </> : <>
+                  {(secondaryAction || primaryAction) && <div className={styles.sheetActions}>
+                    {primaryAction && actionNode(primaryAction, "primary")}
+                    {secondaryAction && actionNode(secondaryAction, "secondary")}
+                  </div>}
+                  <ul className={styles.sheetList}>
+                    {items.map(item => <li key={item.value} className={styles.sheetItem}>
+                      {item.links?.length && hasPanels ? <button type="button" ref={node => { if (node) mobileTriggerRefs.current.set(item.value, node); else mobileTriggerRefs.current.delete(item.value); }} className={styles.sheetRow} aria-expanded={false} onClick={() => setExpanded(item.value)}><span>{item.label}</span><ArrowRight size={20} aria-hidden="true" /></button> : <Destination link={item} className={styles.sheetRow} aria-current={current === item.value ? "location" : undefined} onChoose={() => choose({ label: item.label, href: item.href, section: item.value }, item.value)}><span>{item.label}</span></Destination>}
+                    </li>)}
+                  </ul>
+                </>}
+              </motion.div>
+            </AnimatePresence> : <>
             <ul className={styles.sheetList}>
               {items.map((item, index) => {
                 const isCurrent = current === item.value;
@@ -495,6 +554,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
               {secondaryAction && actionNode(secondaryAction, "secondary")}
               {primaryAction && actionNode(primaryAction, "primary")}
             </motion.div>}
+            </>}
           </nav>
         </motion.div>
       </>}

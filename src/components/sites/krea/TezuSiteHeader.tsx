@@ -63,6 +63,8 @@ export function TezuSiteHeader() {
   }, []);
 
   return <SiteHeader
+    appearance="resend"
+    textureUrl={publicAsset("/sites/resend/texture-btn.png")}
     variant="mega"
     brand={{ name: "Tezu", href: "#home", mark: <img className={styles.brandMark} src={publicAsset("/sites/tezu/tezu-knot-logo.png")} width={36} height={36} alt="" /> }}
     items={items}
