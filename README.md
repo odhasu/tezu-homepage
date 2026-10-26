@@ -20,3 +20,7 @@ Pushes to `main` deploy automatically to GitHub Pages. See [GITHUB_PAGES.md](GIT
 Generation links open the Tezu studio. Assistant connection buttons show the existing availability guide; this repository does not provide a Tezu generation backend or MCP server.
 
 The layout is based on the Krea homepage and uses locally saved source media from Krea and Tezu. Media retains its original formats and proportions.
+
+## Project notes
+
+Read [the documentation index](docs/README.md) for current status, decisions, verification, and source research. Keep these Markdown notes updated when continuing the project.

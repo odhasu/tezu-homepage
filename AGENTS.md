@@ -19,7 +19,7 @@ The repository root owns the current image-wall Tezu homepage. The older Tezu ap
 - Match the upward, softly blurred text reveals from https://www.aura.build/create for the hero heading and rotating prompt examples. Stop prompt rotation while the user types.
 - Move the image-wall background slowly to the right. Pause it during interaction with the prompt and respect reduced-motion preferences.
 - Use https://www.scrolltide.co/components#c-media-gallery as the visual reference for an image gallery that curves around the viewer. Use actual local Tezu artwork, with drag, button, keyboard, and pause controls.
-- Keep the content order: hero, curved image gallery, app integrations, Cartoon Maker with cartoon videos, then Character Swap with template videos. Do not combine all media under "Tezu results".
+- Keep the content order: hero, curved image gallery, app integrations, the four motion galleries, Cartoon Maker with cartoon videos, then Character Swap with template videos. Do not combine all media under "Tezu results".
 - Preserve the source aspect ratios of videos. Gallery thumbnails may crop to portrait frames; opened previews must show the full image.
 - Keep existing app integrations, navigation, and linked Tezu tools working. Do not add live AI generation, authentication, or payments as part of visual work.
 
@@ -33,3 +33,9 @@ The repository root owns the current image-wall Tezu homepage. The older Tezu ap
 - Run `npm run check` in this app and compare desktop and mobile renders before delivery.
 - Use `npm run dev -- --port 3002` when port 3001 is serving the existing static preview. Do not overwrite or stop unrelated previews.
 - Some Desktop files may be iCloud placeholders. Prefer verified existing local copies for recovery; never treat an unread placeholder as an empty file.
+
+## Persistent project notes
+
+- The user requests more `.md` documentation. Read `docs/README.md`, `docs/STATUS.md`, and the relevant research brief before continuing project work.
+- Keep `docs/STATUS.md`, `docs/DECISIONS.md`, and `docs/VERIFICATION.md` current after meaningful work. Record actual checks, release state, and evidence; label proposals and unverified assumptions.
+- Link existing research instead of duplicating it. New user instructions supersede historical notes. Never store credentials in documentation.
