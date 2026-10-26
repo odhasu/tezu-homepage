@@ -36,7 +36,7 @@ const items: SiteHeaderItem[] = [
       { label: "Claude Code", description: "Add Tezu to your workflow", icon: <Clapperboard {...iconProps} />, href: "#mcp" },
     ],
   },
-  { value: "results", label: "Results", href: "#results" },
+  { value: "results", label: "Cartoon Maker", href: "#results" },
 ];
 
 export function TezuSiteHeader() {
@@ -44,7 +44,7 @@ export function TezuSiteHeader() {
 
   useEffect(() => {
     const update = () => {
-      const sections = ["home", "mcp", "create", "results"];
+      const sections = ["home", "create", "mcp", "results"];
       const marker = Math.min(window.innerHeight * .35, 240);
       let next = "home";
       for (const section of sections) {

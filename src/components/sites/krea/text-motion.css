@@ -1,0 +1,11 @@
+.fade-text { display: inline; }
+.fade-word { display: inline-block; white-space: pre; animation: tezu-text-in 700ms cubic-bezier(.2,.7,.2,1) var(--text-delay,0ms) both; }
+.prompt-input { position: relative; }
+.prompt-example { position: absolute; inset: 0; padding: 0 9px; pointer-events: none; overflow: hidden; color: #c4c4c4; font-size: 16px; line-height: 24px; }
+.prompt-example-line { display: block; animation: tezu-prompt-cycle 6s ease both; }
+.prompt-example-word { display: inline-block; white-space: pre; }
+.prompt-example-word>span { display: inline-block; animation: tezu-text-in 650ms cubic-bezier(.2,.7,.2,1) var(--text-delay,0ms) both; }
+@keyframes tezu-text-in { from { opacity: 0; filter: blur(4px); transform: translateY(16px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+@keyframes tezu-prompt-cycle { 0%,90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-12px); } }
+@media(max-width:480px) { .prompt-example { font-size: 14px; line-height: 22px; } }
+@media(prefers-reduced-motion:reduce) { .fade-word,.prompt-example-line,.prompt-example-word>span { animation: none; opacity: 1; filter: none; transform: none; } }

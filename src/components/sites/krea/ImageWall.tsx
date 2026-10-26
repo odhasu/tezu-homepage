@@ -57,11 +57,10 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
           const ease = reducedMotion ? 1 : 1 - Math.exp(-dt / 0.2);
           state.x += (state.target.x - state.x) * ease;
           state.y += (state.target.y - state.y) * ease;
-        } else if (!drag.current.active && !reducedMotion && !state.paused && element?.closest(".hero")?.getAttribute("data-entered") === "true") {
+        } else if (!drag.current.active && !reducedMotion && !state.paused && document.visibilityState === "visible") {
           const decay = Math.exp(-dt / 0.7);
-          const idle = state.hover < 0 && time < state.lastActivity + 15000 ? 1 : 0;
-          state.vx = state.vx * decay - 10 * idle * (1 - decay);
-          state.vy = state.vy * decay - 6 * idle * (1 - decay);
+          state.vx = state.vx * decay + 9 * (1 - decay);
+          state.vy = state.vy * decay;
           state.x += state.vx * dt;
           state.y += state.vy * dt;
         }

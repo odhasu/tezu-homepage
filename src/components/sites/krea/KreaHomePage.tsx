@@ -5,10 +5,13 @@
 import { ChevronDown, Clapperboard, Minus, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ImageWall, type WallImage } from "./ImageWall";
-import { GlassLens, useHeroEntrance } from "./HeroEffects";
-import { TezuFeatures, TezuResults } from "./TezuShowcase";
+import { GlassLens } from "./HeroEffects";
+import { TezuResults } from "./TezuShowcase";
+import { FadeText, RotatingPrompt } from "./AnimatedText";
+import { MediaGallery } from "./MediaGallery";
 import { IntegrationBanner } from "./IntegrationBanner";
 import { TezuSiteHeader } from "./TezuSiteHeader";
+import "./text-motion.css";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
 const subscribeMotion = (callback: () => void) => {
@@ -33,7 +36,6 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const promptBox = useRef<HTMLFormElement>(null);
   const objectUrl = useRef<string | null>(null);
-  useHeroEntrance(hero, promptBox, reducedMotion);
 
   useEffect(() => () => { if (objectUrl.current) URL.revokeObjectURL(objectUrl.current); }, []);
 
@@ -43,16 +45,22 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
     textarea.current?.focus({ preventScroll: true });
   };
 
-  return <section id="home" ref={hero} className="hero" aria-label="Create with Tezu">
-    <h1 className="hero-intro"><span><span className="hero-intro-word">Welcome</span>{" "}<span className="hero-intro-word">to</span>{" "}<span className="hero-intro-word">Tezu</span></span></h1>
+  return <section id="home" ref={hero} className="hero" aria-labelledby="hero-heading">
     <GlassLens target={promptBox} />
     <ImageWall onSelect={useExample} reducedMotion={reducedMotion} paused={focused || !!prompt || !!attachment} />
     <div className="prompt-position">
+      <div className="hero-copy">
+        <h1 id="hero-heading"><FadeText text="Create beyond imagination." delay={100} /></h1>
+        <p><FadeText text="Your characters. Your stories. Brought to life." delay={340} /></p>
+      </div>
       <form ref={promptBox} className="glass-prompt" action="https://tezu.ai/create/video" method="get" onFocus={() => setFocused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
         {attachment && <div className="prompt-attachment"><img src={attachment} alt="Image reference" />
           <button type="button" aria-label="Remove image" onClick={() => setAttachment(null)}><X size={14} /></button>
         </div>}
-        <textarea ref={textarea} value={prompt} onChange={(event) => setPrompt(event.target.value)} name="prompt" aria-label="Describe an idea" placeholder="Describe a video or upload an image to animate..." rows={1} required />
+        <div className="prompt-input">
+          <textarea ref={textarea} value={prompt} onChange={(event) => setPrompt(event.target.value)} name="prompt" aria-label="Describe an idea" placeholder={focused ? "Describe your video or add an image to animate…" : ""} rows={2} required />
+          <RotatingPrompt reducedMotion={reducedMotion} active={!prompt && !focused} />
+        </div>
         <div className="prompt-toolbar">
           <input ref={fileInput} className="sr-only" tabIndex={-1} type="file" accept="image/*" aria-label="Upload reference image" onChange={(event) => {
             const file = event.target.files?.[0];
@@ -83,5 +91,5 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
 
 export function KreaHomePage() {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionPreference, serverMotionPreference);
-  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><IntegrationBanner /><TezuFeatures reducedMotion={reducedMotion} /><TezuResults reducedMotion={reducedMotion} /></main></>;
+  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><MediaGallery reducedMotion={reducedMotion} /><IntegrationBanner /><TezuResults reducedMotion={reducedMotion} /></main></>;
 }
