@@ -85,7 +85,7 @@ export function TezuSiteHeader({ page = "home" }: { page?: "home" | "motion-cont
       }
       if (destination.label === "ChatGPT" || destination.label === "Claude" || destination.label === "Other") {
         const platform = destination.label === "ChatGPT" ? "chatgpt" : destination.label === "Claude" ? "claude" : "other";
-        document.getElementById(`integration-tab-${platform}`)?.click();
+        requestAnimationFrame(() => document.getElementById(`integration-tab-${platform}`)?.click());
       }
     }}
     secondaryAction={{ label: "Log in", href: `${appHome}auth/` }}
