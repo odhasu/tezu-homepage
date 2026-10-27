@@ -9,7 +9,9 @@ The user requested Affiliate in the navbar, then clarified that it should not op
 - `npm test`: 21/21 existing tests pass.
 - `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, strict TypeScript and static production export pass.
 - Export inspection confirms the Affiliate desktop button has `disabled` and no `href` on both public pages, and no `/affiliate/` page exists. Source review confirms the mobile menus use the same disabled destination and keyboard/focus selectors skip it. `git diff --check` passes.
-- In-app browser automation remains unavailable this turn. No alternate browser or local preview was opened. Tablet fit and desktop/mobile interactions have not been browser-verified for this release. Publication results will follow.
+- Product commit: `8eec3f48db9b7454e65bc50c78b9892ed40aaa9f`. [GitHub Pages run 40510839579](https://github.com/odhasu/tezu-homepage/actions/runs/40510839579) successfully checked/built both frontends and deployed. The sibling website and bundled Studio source were preserved.
+- Direct downloads of the published homepage and motion-control HTML return HTTP 200 and contain Affiliate as a disabled button without an `href`. These are source/HTTP checks, not browser interaction tests.
+- In-app browser automation remains unavailable this turn. No alternate browser or local preview was opened. Tablet fit and desktop/mobile interactions have not been browser-verified for this release.
 
 ## Mixed curved gallery and homepage Motion control — 27 October 2026
 
