@@ -16,15 +16,15 @@ Hero **Generate** now opens a native signup/login dialog after a nonempty prompt
 
 - [Live homepage](https://odhasu.github.io/tezu-homepage/)
 - [GitHub repository](https://github.com/odhasu/tezu-homepage)
-- Latest product commit: `c03d7a27779d12a929612f596066a2948b794915` — smaller display assets, idle animation scheduling, deferred gallery loading and focused hero/asset modules.
-- [Successful deployment](https://github.com/odhasu/tezu-homepage/actions/runs/40503716839)
-- Desktop and mobile browser checks passed against that live version. See [verification](VERIFICATION.md).
+- Latest product commit: `efdde962aca7b61db6094868bc00db44b334ffc0` — mixed video/photo curved gallery, removed gallery footer and larger homepage Motion control comparison before Character Swap.
+- [Successful deployment](https://github.com/odhasu/tezu-homepage/actions/runs/40509449322)
+- 21 tests, lint, strict TypeScript and production export pass. Browser automation is unavailable this turn, so this release's desktop/mobile interaction checks remain pending. Earlier browser checks apply to the versions named in [verification](VERIFICATION.md).
 
 ## Current page
 
 The homepage contains the hero and prompt, the curved media gallery, MCP integrations, four added motion galleries, a larger Motion control comparison, and Character Swap, in that order. The Cartoon Maker homepage section was removed at the user's request; its media and existing tool destination remain available.
 
-The curved gallery mixes six muted looping videos and five photos/poster stills. Its three footer buttons and “A few ideas. Endless possibilities.” caption were removed at the user's request. Drag and Left/Right browsing remain; Space pauses motion/playback and Enter opens the original video or photo. Sources are attached only when a video is eligible and onscreen. Motion control leads the showcase area with a 640px comparison and the existing white divider; the standalone route remains available. These latest changes are awaiting publication and live review.
+The curved gallery mixes six muted looping videos and five photos/poster stills. Its three footer buttons and “A few ideas. Endless possibilities.” caption were removed at the user's request. Drag and Left/Right browsing remain; Space pauses motion/playback and Enter opens the original video or photo. Sources are attached only when a video is eligible and onscreen. Motion control leads the showcase area with a 640px comparison and the existing white divider; the standalone route remains available. See verification for the deployment result and pending browser review.
 
 Navigation now includes **Motion control** and **Pricing**, and the old Apps label is **MCP**. Log in and Start creating are larger (48px desktop, 56px in the mobile menu). Pricing uses the existing Studio pricing route through the shared app URL resolver.
 

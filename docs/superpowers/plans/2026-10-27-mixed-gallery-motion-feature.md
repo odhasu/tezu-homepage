@@ -20,10 +20,11 @@
 - [x] Curved gallery: implement mixed cards and full video/image previews; remove the footer; preserve efficient scheduling, visibility-gated playback and keyboard access. Ownership: gallery component/CSS and any focused gallery helper/tests.
 - [x] Comparison: extract the shared comparison, add a homepage variant with larger frame, and preserve standalone behavior. Gate loading/playback offscreen and keep the white pointer/keyboard divider. Ownership: comparison component, MotionControlPage and motion-control CSS.
 - [x] Composition: place the homepage feature before Character Swap; review both independent changes and update current instructions/documentation.
-- [ ] Run existing tests and production checks; review affected lifecycle/keyboard/media behavior. Publish, verify desktop/mobile on GitHub Pages, save screenshots and record release results.
+- [x] Run existing tests and production checks; review affected lifecycle/keyboard/media behavior. Publish and record release results: product commit `efdde96`, successful Pages run `40509449322`; published HTTP/source checks pass.
+- [ ] Verify desktop/mobile interactions on GitHub Pages and save screenshots when in-app browser automation is available.
 
 ## Verification
 
 Check a visible mix of video and image cards, muted video playback, offscreen/modal/reduced-motion pause, arrow/Space browsing, original full previews and Escape. Confirm no gallery footer or removed copy, comparison ordering and divider interaction, no horizontal overflow, and intact signup/navigation. Record actual evidence in `docs/VERIFICATION.md`.
 
-21 tests and the production checks pass. Exported markup confirms the media mix, removed footer/copy, deferred sources and section order. In-app browser automation is unavailable in this turn; desktop/mobile and live interaction verification remains pending. Do not mark those checks complete based on source inspection.
+21 tests and the production checks pass. Exported and published markup confirm the media mix, removed footer/copy, deferred sources and section order. GitHub Pages built both frontends and deployed successfully. In-app browser automation is unavailable in this turn; desktop/mobile and live interaction verification remains pending. Do not mark those checks complete based on source inspection.
