@@ -160,21 +160,21 @@
 .header[data-appearance="resend"][data-scrolled] { background: transparent; box-shadow: none; }
 .header[data-appearance="resend"][data-scrolled]::before { opacity: 1; }
 .header[data-appearance="resend"] .inner { max-width: 1280px; padding: 0 24px; }
-.header[data-appearance="resend"] .bar { height: 58px; gap: 0; }
+.header[data-appearance="resend"] .bar { height: 68px; gap: 16px; }
 .header[data-appearance="resend"] .brandSlot,
-.header[data-appearance="resend"] .actions { flex: 1 1 0; }
+.header[data-appearance="resend"] .actions { flex: 0 0 auto; }
 .header[data-appearance="resend"] .brand { padding: 4px 0; gap: 7px; border-radius: 4px; }
 .header[data-appearance="resend"] .brandMark { width: 30px; height: 30px; }
-.header[data-appearance="resend"] .nav { margin: 0; }
+.header[data-appearance="resend"] .nav { margin: 0 auto; }
 .header[data-appearance="resend"] .navList { gap: 0; }
-.header[data-appearance="resend"] .navItem { height: 58px; padding: 0 12px; gap: 6px; border-radius: 0; line-height: 20px; }
-.header[data-appearance="resend"] .navItem[data-current] { color: var(--text-secondary); }
+.header[data-appearance="resend"] .navItem { height: 68px; padding: 0 12px; gap: 6px; border-radius: 0; line-height: 20px; }
+.header[data-appearance="resend"] .navItem[data-current] { color: #fff; }
 .header[data-appearance="resend"] .indicator,
 .header[data-appearance="resend"] .hover { display: none; }
 .header[data-appearance="resend"] .chevron { opacity: .7; color: inherit; }
 .header[data-appearance="resend"] .navItem[data-open] .chevron { transform: translateY(2px); }
 .header[data-appearance="resend"] .actions { justify-content: flex-end; gap: 16px; margin: 0; }
-.header[data-appearance="resend"] .action { height: 40px; padding: 0 16px; border-radius: 16px; font-size: 14px; font-weight: 600; line-height: 20px; }
+.header[data-appearance="resend"] .action { height: 48px; padding: 0 20px; border-radius: 16px; font-size: 16px; font-weight: 600; line-height: 24px; }
 .header[data-appearance="resend"] .primary {
   border: 2px solid #ffffff0d;
   background: var(--header-texture), linear-gradient(104deg, #fdfdfd0d 5%, #f0f0e41a 100%);
@@ -223,10 +223,11 @@
 .header[data-appearance="resend"] .sheet { height: calc(100dvh - 76px); border: 0; background: #000; }
 .header[data-appearance="resend"] .sheetInner { height: 100%; max-height: none; padding: 16px 24px max(32px, env(safe-area-inset-bottom)); }
 .header[data-appearance="resend"] .sheetActions { display: flex; flex-direction: column; gap: 16px; margin: 0 0 16px; }
-.header[data-appearance="resend"] .sheetActions .action { height: 44px; font-size: 16px; line-height: 24px; }
+.header[data-appearance="resend"] .sheetActions .action { height: 56px; font-size: 18px; line-height: 26px; }
 .header[data-appearance="resend"] .sheetActions .secondary { border-color: transparent; }
 .header[data-appearance="resend"] .sheetRow { min-height: 56px; padding: 0; font-size: 16px; font-weight: 500; line-height: 24px; color: var(--text-secondary); }
 .header[data-appearance="resend"] .sheetRow:is(:hover, :focus-visible) { color: #fff; }
+.header[data-appearance="resend"] .sheetRow[aria-current] { color: #fff; }
 .header[data-appearance="resend"] .sheetItem { border-bottom-color: #292d2e; }
 .header[data-appearance="resend"] .sheetItem:last-child { border-bottom: 0; }
 .mobilePanel { width: 100%; }
@@ -236,10 +237,12 @@
 .mobileFeature img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
 .mobileFeature > span { position: absolute; z-index: 1; top: 16px; right: 16px; left: 16px; display: flex; justify-content: space-between; font-size: 14px; }
 @container site-header (min-width: 768px) and (max-width: 1023px) {
-  .header[data-appearance="resend"] .wideOnly { display: none; }
-  .header[data-appearance="resend"] .navItem { padding: 0 8px; }
+  .header[data-appearance="resend"] .navItem { padding: 0 6px; }
+  .header[data-appearance="resend"] .actions { gap: 8px; }
+  .header[data-appearance="resend"] .action { padding: 0 14px; }
 }
 @container site-header (max-width: 767px) {
+  .header[data-appearance="resend"] .actions { margin-left: auto; }
   .header[data-appearance="resend"] .sheet,
   .header[data-appearance="resend"] .scrim { display: block; }
   .header[data-appearance="resend"] .bar { height: 76px; }

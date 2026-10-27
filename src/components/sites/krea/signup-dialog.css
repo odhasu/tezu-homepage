@@ -1,0 +1,38 @@
+.tezu-signup-dialog{width:min(480px,calc(100% - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:32px;border:1px solid #ffffff30;border-radius:24px;background:#171717;color:#fff;box-shadow:0 32px 100px #0009;overflow-y:auto;overscroll-behavior:contain;font-family:Suisse Intl,Arial,sans-serif}
+.tezu-signup-dialog::backdrop{background:#000b;backdrop-filter:blur(8px)}
+body:has(.tezu-signup-dialog[open]){overflow:hidden}
+.tezu-signup-close{position:absolute;right:14px;top:14px;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#ffffff0d;color:#ccc}
+.tezu-signup-close:hover{background:#ffffff20;color:#fff}
+.tezu-signup-heading{padding-right:16px}
+.tezu-signup-heading>span{font-size:12px;letter-spacing:.12em;color:#aaa}
+.tezu-signup-heading h2{margin-top:12px;font-size:28px;font-weight:500;line-height:1.15;letter-spacing:-.035em}
+.tezu-signup-heading>p{margin-top:10px;color:#bdbdbd;font-size:14px;line-height:1.5}
+.tezu-signup-draft{display:flex;align-items:center;gap:12px;margin-top:22px;padding:12px;border:1px solid #ffffff1a;border-radius:12px;background:#ffffff05}
+.tezu-signup-draft>img{flex:none;border-radius:7px;object-fit:cover}
+.tezu-signup-draft>div{min-width:0}
+.tezu-signup-draft p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.tezu-signup-draft span{display:block;margin-top:5px;color:#b0b0b0;font-size:11px;line-height:1.5}
+.tezu-signup-notice{margin:14px 0 20px;color:#bdbdbd;font-size:12px;line-height:1.6}
+.tezu-signup-google,.tezu-signup-submit{display:flex;align-items:center;justify-content:center;gap:10px;min-height:46px;width:100%;border-radius:10px;font-size:14px;font-weight:500}
+.tezu-signup-google{background:#ffffff0a;border:1px solid #ffffff30;color:#fff}
+.tezu-signup-google>span{font-family:Arial,sans-serif;font-size:18px;font-weight:700}
+.tezu-signup-google:hover{background:#ffffff15}
+.tezu-signup-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:#aaa;font-size:11px;white-space:nowrap}
+.tezu-signup-divider>span{height:1px;flex:1;background:#ffffff20}
+.tezu-signup-form{display:grid;gap:12px}
+.tezu-signup-form>label{display:grid;gap:7px;font-size:12px;color:#ddd}
+.tezu-signup-form input:not([type=checkbox]){width:100%;min-height:44px;padding:10px 12px;border:1px solid #ffffff30;border-radius:8px;background:#ffffff05;color:#fff;font-size:16px}
+.tezu-signup-form input:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.tezu-signup-form input[aria-invalid=true]{border-color:#f3aaa4}
+.tezu-signup-help,.tezu-signup-error{margin-top:-5px;font-size:11px;line-height:1.5}
+.tezu-signup-help{color:#aaa}
+.tezu-signup-error{color:#ffc0ba}
+.tezu-signup-agreement{display:flex;align-items:flex-start;gap:9px;margin:3px 0 8px;font-size:11px;line-height:1.6;color:#bbb}
+.tezu-signup-agreement input{flex:none;width:16px;height:16px;margin:2px 0 0;accent-color:#fff}
+.tezu-signup-agreement a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.tezu-signup-submit{margin-top:2px;background:#f0ede8;color:#27231e}
+.tezu-signup-submit:hover{background:#fff}
+.tezu-signup-feedback{margin-top:16px;padding:12px;border:1px solid #ffffff25;border-radius:9px;font-size:12px;line-height:1.6;color:#d5d5d5}
+.tezu-signup-switch{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:20px;color:#aaa;font-size:12px}
+.tezu-signup-switch button{min-height:36px;padding:0 4px;background:none;color:#fff;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:480px){.tezu-signup-dialog{padding:26px 20px;border-radius:20px}.tezu-signup-heading h2{font-size:25px}}

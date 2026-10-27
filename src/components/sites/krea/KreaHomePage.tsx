@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- Source artwork is downloaded and preoptimized locally. */
 
 import { ChevronDown, Clapperboard, Minus, Plus, X } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { ImageWall, type WallImage } from "./ImageWall";
 import { GlassLens } from "./HeroEffects";
 import { TezuResults } from "./TezuShowcase";
@@ -12,6 +12,9 @@ import { MediaGallery } from "./MediaGallery";
 import { IntegrationBanner } from "./IntegrationBanner";
 import { TezuSiteHeader } from "./TezuSiteHeader";
 import { TezuMotionGalleries } from "./TezuMotionGalleries";
+import { SignupDialog } from "./SignupDialog";
+import { TezuFaq } from "./TezuFaq";
+import { getPromptError } from "./creation-form";
 import "./text-motion.css";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
@@ -31,20 +34,36 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
   const hero = useRef<HTMLElement>(null);
   const [prompt, setPrompt] = useState("");
   const [batch, setBatch] = useState(3);
+  const [resolution, setResolution] = useState("720p");
+  const [promptError, setPromptError] = useState("");
   const [attachment, setAttachment] = useState<string | null>(null);
   const [focused, setFocused] = useState(false);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const promptBox = useRef<HTMLFormElement>(null);
   const objectUrl = useRef<string | null>(null);
+  const signupDialog = useRef<HTMLDialogElement>(null);
+  const generateButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => () => { if (objectUrl.current) URL.revokeObjectURL(objectUrl.current); }, []);
 
   const useExample = (image: WallImage) => {
     setPrompt(image.prompt);
+    setPromptError("");
     setAttachment(image.reference);
     textarea.current?.focus({ preventScroll: true });
   };
+
+  function openSignup(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const error = getPromptError(prompt);
+    setPromptError(error);
+    if (error) {
+      textarea.current?.focus();
+      return;
+    }
+    signupDialog.current?.showModal();
+  }
 
   return <section id="home" ref={hero} className="hero" aria-labelledby="hero-heading">
     <GlassLens target={promptBox} />
@@ -54,14 +73,15 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
         <h1 id="hero-heading"><FadeText text="Create beyond imagination." delay={100} /></h1>
         <p><FadeText text="Your characters. Your stories. Brought to life." delay={340} /></p>
       </div>
-      <form ref={promptBox} className="glass-prompt" action="https://tezu.ai/create/video" method="get" onFocus={() => setFocused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
+      <form ref={promptBox} className="glass-prompt" onSubmit={openSignup} noValidate onFocus={() => setFocused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
         {attachment && <div className="prompt-attachment"><img src={attachment} alt="Image reference" />
           <button type="button" aria-label="Remove image" onClick={() => setAttachment(null)}><X size={14} /></button>
         </div>}
         <div className="prompt-input">
-          <textarea ref={textarea} value={prompt} onChange={(event) => setPrompt(event.target.value)} name="prompt" aria-label="Describe an idea" placeholder={focused ? "Describe your video or add an image to animate…" : ""} rows={2} required />
+          <textarea ref={textarea} id="hero-prompt" value={prompt} onChange={(event) => { setPrompt(event.target.value); setPromptError(""); }} name="prompt" aria-label="Describe an idea" aria-invalid={Boolean(promptError)} aria-describedby={promptError ? "hero-prompt-error" : undefined} placeholder={focused ? "Describe your video or add an image to animate…" : ""} rows={2} required />
           <RotatingPrompt reducedMotion={reducedMotion} active={!prompt && !focused} />
         </div>
+        {promptError && <p className="hero-prompt-error" id="hero-prompt-error" role="alert">{promptError}</p>}
         <div className="prompt-toolbar">
           <input ref={fileInput} className="sr-only" tabIndex={-1} type="file" accept="image/*" aria-label="Upload reference image" onChange={(event) => {
             const file = event.target.files?.[0];
@@ -74,7 +94,7 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
           <span className="glass-button model-option" aria-label="Video model: Seedance 2.5"><Clapperboard size={17} strokeWidth={1.4} /><span>Seedance 2.5</span></span>
           <input type="hidden" name="model" value="seedance-2.5" />
           <div className="resolution-option">
-            <select className="glass-button resolution-select" name="resolution" aria-label="Video resolution" defaultValue="720p">
+            <select className="glass-button resolution-select" name="resolution" aria-label="Video resolution" value={resolution} onChange={(event) => setResolution(event.target.value)}>
               <option value="480p">480p</option>
               <option value="720p">720p</option>
               <option value="1080p">1080p</option>
@@ -83,14 +103,15 @@ function Hero({ reducedMotion }: { reducedMotion: boolean }) {
           </div>
           <div className="batch-control" aria-label="Batch size"><button type="button" aria-label="Fewer videos" disabled={batch === 1} onClick={() => setBatch(Math.max(1, batch - 1))}><Minus size={14} /></button><output aria-live="polite">{batch}</output><button type="button" aria-label="More videos" disabled={batch === 8} onClick={() => setBatch(Math.min(8, batch + 1))}><Plus size={14} /></button></div>
           <input type="hidden" name="batchSize" value={batch} />
-          <button className="generate-button" aria-label="Generate videos on Tezu" title="Generate videos on Tezu" type="submit"><Sparkle /></button>
+          <button ref={generateButton} className="generate-button" aria-label="Generate videos on Tezu" aria-haspopup="dialog" aria-controls="tezu-signup-dialog" type="submit"><Sparkle /><span>Generate</span></button>
         </div>
       </form>
     </div>
+    <SignupDialog dialogRef={signupDialog} returnFocusRef={generateButton} prompt={prompt.trim()} reference={attachment} resolution={resolution} batchSize={batch} />
   </section>;
 }
 
 export function KreaHomePage() {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionPreference, serverMotionPreference);
-  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><MediaGallery reducedMotion={reducedMotion} /><IntegrationBanner /><TezuMotionGalleries reducedMotion={reducedMotion} /><TezuResults reducedMotion={reducedMotion} /></main></>;
+  return <><TezuSiteHeader /><main id="main-content" className="krea-home"><Hero reducedMotion={reducedMotion} /><MediaGallery reducedMotion={reducedMotion} /><IntegrationBanner /><TezuMotionGalleries reducedMotion={reducedMotion} /><TezuResults reducedMotion={reducedMotion} /><TezuFaq /></main></>;
 }

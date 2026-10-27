@@ -19,7 +19,7 @@ The repository root owns the current image-wall Tezu homepage. The older Tezu ap
 - Match the upward, softly blurred text reveals from https://www.aura.build/create for the hero heading and rotating prompt examples. Stop prompt rotation while the user types.
 - Move the image-wall background slowly to the right. Pause it during interaction with the prompt and respect reduced-motion preferences.
 - Use https://www.scrolltide.co/components#c-media-gallery as the visual reference for an image gallery that curves around the viewer. Use actual local Tezu artwork, with drag, button, keyboard, and pause controls.
-- Keep the content order: hero, curved image gallery, app integrations, the four motion galleries, Cartoon Maker with cartoon videos, then Character Swap with template videos. Do not combine all media under "Tezu results".
+- Keep the content order: hero, curved image gallery, MCP integrations, the four motion galleries, Character Swap with template videos, then FAQs. The 27 October request removed the Cartoon Maker homepage section and added a separate motion-control comparison page. Preserve original media.
 - Preserve the source aspect ratios of videos. Gallery thumbnails may crop to portrait frames; opened previews must show the full image.
 - Keep existing app integrations, navigation, and linked Tezu tools working. Do not add live AI generation, authentication, or payments as part of visual work.
 
@@ -31,6 +31,7 @@ The repository root owns the current image-wall Tezu homepage. The older Tezu ap
 - `AnimatedText.tsx` and `text-motion.css`: text reveals and rotating prompt examples.
 - `TezuShowcase.tsx` and `tezu-showcase.css`: cartoon and template video sections.
 - Run `npm run check` in this app and compare desktop and mobile renders before delivery.
+- Show previews and verify browser behavior on `https://odhasu.github.io/tezu-homepage/` using the ChatGPT in-app Browser. The user requested GitHub Pages publication and no local preview URLs on 27 October 2026. Local command-line builds and checks remain available.
 - Use `npm run dev -- --port 3002` when port 3001 is serving the existing static preview. Do not overwrite or stop unrelated previews.
 - Some Desktop files may be iCloud placeholders. Prefer verified existing local copies for recovery; never treat an unread placeholder as an empty file.
 

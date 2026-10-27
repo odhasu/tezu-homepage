@@ -1,0 +1,32 @@
+.motion-control-page{min-height:100svh;background:#000;color:#fff}
+.motion-control-main{display:flex;flex-direction:column;align-items:center;padding:144px 24px 72px;background:#000}
+.motion-control-heading{text-align:center;margin-bottom:36px}
+.motion-control-heading h1{font-size:clamp(42px,5.8vw,72px);line-height:1.04;font-weight:450;letter-spacing:-.055em}
+.motion-control-heading p{margin-top:19px;color:#a5a5a5;font-size:16px;line-height:1.6;letter-spacing:-.012em}
+.motion-comparison{width:min(100%,560px);margin:0}
+.motion-comparison-stage{position:relative;aspect-ratio:2/3;isolation:isolate;overflow:hidden;border-radius:20px;background:#0b0b0b;box-shadow:0 0 0 1px #ffffff1f}
+.motion-comparison-video{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;pointer-events:none}
+.motion-comparison-reveal{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--comparison-position)) 0 0)}
+.motion-comparison-labels{position:absolute;inset:0 0 auto;display:flex;justify-content:space-between;gap:16px;padding:20px 18px 42px;background:linear-gradient(#0008,transparent);pointer-events:none}
+.motion-comparison-labels span{padding:7px 10px;border:1px solid #ffffff30;border-radius:999px;background:#0006;color:#fff;font-size:11px;font-weight:450;line-height:1;backdrop-filter:blur(8px)}
+.motion-comparison-divider{position:absolute;z-index:2;inset-block:0;left:var(--comparison-position);width:3px;transform:translateX(-50%);background:#fff;pointer-events:none;box-shadow:0 0 4px #0004}
+.motion-comparison-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#fff;color:#111;box-shadow:0 2px 12px #0003}
+.motion-comparison-handle svg:first-child{margin-right:-6px}
+.motion-comparison-range{position:absolute;z-index:3;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;touch-action:pan-y}
+.motion-comparison-stage:focus-within{outline:2px solid #fff;outline-offset:6px}
+.motion-comparison-stage:focus-within .motion-comparison-handle{outline:2px solid #fff;outline-offset:5px}
+.motion-comparison-caption{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:17px;font-size:12px;line-height:1.5}
+.motion-comparison-credit{display:flex;align-items:center;gap:7px;color:#939393}
+.motion-comparison-credit svg{color:#fff;flex-shrink:0}
+.motion-comparison-credit strong{font-weight:450;color:#fff}
+.motion-playback{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;flex-shrink:0;padding:0 13px;border:1px solid #ffffff30;border-radius:999px;background:#000;color:#ddd;font-size:12px;line-height:1}
+.motion-playback:hover{border-color:#ffffff70;color:#fff}
+.motion-playback:disabled{opacity:.45}
+.motion-comparison-help{margin-top:14px;color:#777;font-size:11px;line-height:1.6;text-align:center}
+.motion-playback-status{color:#bcbcbc;font-size:12px;line-height:1.6;text-align:center}
+.motion-playback-status:not(:empty){margin-top:12px}
+.motion-control-cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;margin-top:32px;padding:0 21px;border:1px solid #ffffff30;border-radius:999px;color:#e7e7e7;font-size:14px;line-height:1}
+.motion-control-cta:hover{background:#fff;color:#000;border-color:#fff}
+@media(min-width:1100px){.motion-comparison{width:min(100%,calc(82svh * 2 / 3),560px)}}
+@media(max-width:600px){.motion-control-main{padding:116px 18px 48px}.motion-control-heading{margin-bottom:28px}.motion-control-heading p{font-size:14px;margin-top:15px}.motion-comparison-stage{border-radius:16px}.motion-comparison-labels{padding:15px 12px 38px;gap:8px}.motion-comparison-labels span{font-size:10px;padding:7px 8px}.motion-comparison-caption{gap:10px;font-size:11px}.motion-playback{min-height:44px;padding-inline:10px;font-size:11px}.motion-comparison-help{font-size:10px}.motion-control-cta{margin-top:26px}}
+@media(max-width:360px){.motion-control-main{padding-inline:14px}.motion-comparison-credit{gap:5px}.motion-comparison-credit>svg{display:none}}

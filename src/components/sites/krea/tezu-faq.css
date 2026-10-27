@@ -1,0 +1,21 @@
+.tezu-faq{width:100%;padding:96px 24px 104px;background:#000;color:#fff}
+.tezu-faq-inner{width:100%;max-width:900px;margin-inline:auto}
+.tezu-faq h2{margin:0 0 36px;font-size:clamp(30px,4vw,44px);font-weight:450;line-height:1.15;letter-spacing:-.04em;text-wrap:balance}
+.tezu-faq-list{border-top:1px solid #ffffff24}
+.tezu-faq details{border-bottom:1px solid #ffffff24}
+.tezu-faq summary{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:80px;padding-block:24px;list-style:none;color:#eee;font-size:16px;font-weight:450;line-height:1.5;cursor:pointer}
+.tezu-faq summary::-webkit-details-marker{display:none}
+.tezu-faq summary::marker{content:""}
+.tezu-faq summary:hover{color:#fff}
+.tezu-faq summary:focus-visible{outline:2px solid #fff;outline-offset:6px;border-radius:2px}
+.tezu-faq-indicator{position:relative;display:block;flex-shrink:0;width:24px;height:24px;color:#a8a8a8}
+.tezu-faq-indicator::before,.tezu-faq-indicator::after{content:"";position:absolute;top:50%;left:50%;width:12px;height:1.5px;background:currentColor;transform:translate(-50%,-50%)}
+.tezu-faq-indicator::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .18s ease}
+.tezu-faq details[open] .tezu-faq-indicator{color:#fff}
+.tezu-faq details[open] .tezu-faq-indicator::after{transform:translate(-50%,-50%) rotate(0deg)}
+.tezu-faq details>p{max-width:740px;margin:0;padding:0 40px 26px 0;color:#a8a8a8;font-size:16px;line-height:1.75}
+.tezu-faq a{color:#fff;text-decoration:underline;text-decoration-color:#ffffff70;text-underline-offset:4px}
+.tezu-faq a:hover{text-decoration-color:#fff}
+.tezu-faq a:focus-visible{outline:2px solid #fff;outline-offset:4px}
+@media(max-width:600px){.tezu-faq{padding:64px 20px 72px}.tezu-faq h2{margin-bottom:28px}.tezu-faq summary{min-height:76px;gap:16px;padding-block:22px}.tezu-faq details>p{padding-right:0;padding-bottom:24px}}
+@media(prefers-reduced-motion:reduce){.tezu-faq-indicator::after{transition:none}}

@@ -1,6 +1,45 @@
 # Verification record
 
-Updated: 26 October 2026. Results below record completed checks, not guarantees about future changes.
+Updated: 27 October 2026. Results below record completed checks, not guarantees about future changes.
+
+## FAQ and publication preparation — 27 October 2026
+
+The user requested FAQ sections, GitHub publication and published previews only. Five native `details`/`summary` answers now appear on both the homepage and motion-control page. An independent review found no actionable accessibility, copy or URL issues.
+
+- `npm test`: 9/9 pass.
+- `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, strict TypeScript and production static export pass.
+- Bundled Studio `npm run check` with its production base path: passes, including 32 prerendered routes. Its initially missing local dependencies were installed with its existing lockfile; no bundled source or manifest was changed.
+- GitHub Pages continues to use the existing `main` push workflow, building both the homepage and bundled `apps/tezu` before publishing. Source histories and the separate sibling website are preserved.
+- Browser review for this request uses only the public github.io site; no local preview is opened. Deployment success and live FAQ interaction must be verified after publishing, not inferred from the local build.
+
+The previous sections record earlier local checks and their release state at the time. They do not override the latest published-preview preference.
+
+## Navigation and motion-control page — local changes
+
+- `npm test`: existing 9/9 tests pass.
+- `npm run check`: ESLint, strict TypeScript and production build pass; `/motion-control` prerenders with the homepage.
+- `STATIC_EXPORT=true NEXT_PUBLIC_BASE_PATH=/tezu-homepage npm run build`: passes. The exported page was served locally under `/tezu-homepage/` and checked in the ChatGPT in-app Browser.
+- Browser checks at 1440px, 900px, 768px and 390px: responsive header, menu dismissal and no horizontal overflow. Production screenshots inspected at desktop, tablet and mobile widths. Desktop actions measure 48px high; mobile sheet actions measure 56px high. The mobile menu control remains at the right gutter.
+- Pricing and Log in navigate to the existing local Studio pages. Start creating focuses the homepage prompt. A Claude selection from the comparison page returns to the homepage with Claude selected. Generate still opens signup and Escape retains the prompt and restores Generate focus.
+- Both comparison videos decode and play muted. Pause stops both; Play starts both at matching times. Pointer drag and keyboard Home/End/arrow changes reveal the expected sides. Original 720×1280 and 540×960 videos remain undistorted within the shared cropped stage.
+- Source review confirms reduced-motion starts paused, visibility changes pause both clips, manual pause prevents visibility-based resume, and effects clean up. Reduced-motion preference was not emulated in this browser session.
+- Independent scoped code review found no actionable issues. `git diff --check` passes.
+
+Evidence: `C:/Users/User/.codex/artifacts/tezu-motion-control-20261027/`. The 450k likes claim was supplied by the user and was not independently verified. No live authentication/generation, commit, push or deployment occurred. The sibling website source and bundled `apps/tezu` were not changed by this task.
+
+## Creation signup frontend repair — local branch
+
+Working copy: `C:/Users/User/Downloads/Tezu-project-2026-10-26/Tezu Websites/tezu-homepage/`, branch `fix/creation-signup-flow`. This repair changes only the homepage; `apps/tezu/` is preserved.
+
+- `npm test`: 9/9 focused regression tests pass. Tests cover whitespace prompt rejection, signup/login field rules, age/terms agreement, deployment URL normalization, invalid overrides, local development links and the production bundled/base-path fallback. The first run against unimplemented validation/destination helpers produced seven expected assertion failures before implementation.
+- `npm run lint` and `npm run typecheck`: pass.
+- Full `npm run check`: passes lint, strict TypeScript and the Next.js 16.3.5 production build. The homepage and not-found routes prerender successfully.
+- GitHub Pages compatibility: a separate `npm run build` passes with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`. No deployment was performed.
+- `git diff --check`: pass.
+
+The implementation uses a native dialog with explicit close, Escape support, focus restoration, labelled fields, inline validation and a visible frontend availability notice. The form uses `method="dialog"` and prevents submission; Google and email handlers do not send credentials, connect an account or create a generation job. Hero state remains mounted through the dialog lifecycle.
+
+The primary agent verified the frontend in the ChatGPT in-app Browser: Generate opens signup; an uploaded local reference and prompt remain through signup/login switching and Escape; focus returns to Generate; whitespace is rejected; the selected 1080p resolution appears in the draft summary. At 390 × 844 the toolbar fits without horizontal overflow and the dialog fits and scrolls. The temporary viewport override was reset. No live auth/generation submission, commit, push or deployment was performed.
 
 ## Resend-style navbar — `5ff13fa`
 
@@ -24,7 +63,7 @@ Local evidence directory: `/Users/oscargraafmans/.codex/artifacts/tezu-motion-ga
 
 ## Running future checks
 
-In the deployment checkout, use the project's `npm run check` for product changes. The Pages build requires:
+In the current homepage repository, use the project's `npm test` and `npm run check` for product changes. The Pages build requires:
 
 ```sh
 NEXT_PUBLIC_BASE_PATH=/tezu-homepage STATIC_EXPORT=true npm run check

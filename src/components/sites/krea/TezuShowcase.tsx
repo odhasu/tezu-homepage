@@ -2,15 +2,15 @@
 
 import { ArrowUpRight, Pause, Play, X } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { publicAsset, tezuMedia as media } from "./assets";
+import { tezuMedia as media } from "./assets";
+import { tezuAppHome } from "./app-links";
 import { FadeText } from "./AnimatedText";
 import "./tezu-showcase.css";
 
 type MediaItem = (typeof media)[number];
-const cartoonVideos = media.filter(item => item.kind === "video" && !item.id.startsWith("template-")).slice(0, 8);
 const templateVideos = media.filter(item => item.id.startsWith("template-"));
-const cartoonHref = process.env.NODE_ENV === "development" ? "http://127.0.0.1:3000/#mcp" : publicAsset("/tezu/#mcp");
-const templateHref = process.env.NODE_ENV === "development" ? "http://127.0.0.1:3000/templates/" : publicAsset("/tezu/templates/");
+const cartoonHref = `${tezuAppHome}#mcp`;
+const templateHref = `${tezuAppHome}templates/`;
 
 function TezuVideo({ item, reducedMotion, paused }: { item: MediaItem; reducedMotion: boolean; paused: boolean }) {
   const video = useRef<HTMLVideoElement>(null);
@@ -56,7 +56,6 @@ export function TezuResults({ reducedMotion }: { reducedMotion: boolean }) {
   }, []);
   const open = (item: MediaItem) => { setSelected(item); dialog.current?.showModal(); };
   const groups = [
-    { id: "results", title: "Cartoon Maker", description: "Your cast. Your story. A cartoon only you could make.", action: "Create a cartoon", href: cartoonHref, items: cartoonVideos },
     { id: "character-swap", title: "Character Swap", description: "Pick a template. Add your characters. Make the scene yours.", action: "Explore templates", href: templateHref, items: templateVideos },
   ];
   return <div ref={results} className="tezu-showcases">

@@ -1,18 +1,26 @@
 # Current Tezu decisions
 
-Updated: 26 October 2026. These notes describe the implemented direction. Source measurements and details remain in the linked research briefs.
+Updated: 27 October 2026. These notes describe the implemented direction. Source measurements and details remain in the linked research briefs.
 
 | Decision | Reason and reference |
 | --- | --- |
 | Preserve the Tezu knot logo, dark palette, and Suisse Intl fonts | Maintain Tezu's identity while adapting external layout references. |
 | Keep the hero prompt immediately available | Current project instructions supersede historical welcome/zoom experiments. Heading and empty-prompt text use the Aura-inspired reveals; typing stops example rotation. See [homepage motion](research/tezu-homepage-motion/brief.md). |
 | Adapt Resend navigation inside the existing header | Reuse working Tezu destinations and keyboard behavior. The `resend` appearance adds centered links, textured glass, compact dropdowns, and mobile drill-down panels; the default Arc appearance remains available. See [navbar research](research/resend-navbar/brief.md). |
-| Preserve existing homepage sections while inserting galleries in the middle | The user requested all four references with random images and videos. Their section sits between integrations and the tool showcases. See [gallery research](research/tezu-motion-galleries/brief.md). |
+| Keep the four motion galleries and Character Swap; remove the Cartoon Maker homepage section | The latest user request supersedes the earlier section order. Original cartoon media and the Create menu tool destination are preserved. See [gallery research](research/tezu-motion-galleries/brief.md). |
 | Reconstruct public motion references in editable code | Lens, reel, fold, and arc effects are original implementations based on public demonstrations. No paywalled source or downloaded production bundles are embedded. |
 | Retain original media formats and preview proportions | Source media stays local. Opened previews use source dimensions and `object-fit: contain`; gallery motion may deform thumbnails. |
 | Provide alternatives to drag and respect reduced motion | Galleries include buttons, keyboard navigation, pause, and previews. Reduced motion disables autoplay. Mobile vertical scrolling remains available. |
-| Link Cartoon Maker to the included Tezu application | The user clarified that the destination is the local/published Tezu app, not the real `tezu.ai` website. Published destination: `/tezu-homepage/tezu/#mcp`. |
-| Keep preview work separate from generation, auth, and payments | Existing UI and destinations are preserved; visual changes do not imply new backend capability. |
+| Keep Generate in an accessible native signup dialog | The user requested the frontend funnel first. A nonempty prompt opens signup in context; native modal behavior provides keyboard containment and Escape, and dismissal restores focus to Generate. |
+| Keep the creation draft owned by the mounted hero | Prompt, reference object URL, resolution and batch survive signup/login changes and closing. No cross-origin upload transfer or new persistence layer is needed for this gate. Auth field values are reset on close/mode changes; credentials are never persisted or submitted. |
+| Show honest frontend availability | Signup/login and Google controls validate or display preview feedback, without fake account success or generation progress. No backend, payment processing or free-generation promise is introduced. |
+| Centralize studio destinations in `app-links.ts` | Development keeps the separate app on port 3000; production keeps bundled `/tezu/` under the base path. An optional absolute HTTP(S) `NEXT_PUBLIC_TEZU_APP_URL` supports a future separate deployment. Invalid overrides fall back to existing destinations. |
+| Send Start creating to the hero prompt | Guests can immediately enter an idea instead of landing at the upcoming assistant integrations section. |
+| Put Pricing and Motion control in the main navigation; label integrations MCP | Pricing reuses the existing Studio route. Secondary-page section links return to the correct homepage/base path; MCP choices preserve the selected integration. Actions are enlarged without changing their destinations. |
+| Show motion comparison on its own black page | The supplied screenshot determines the rounded comparison frame, white divider and circular handle. The supplied cartoon clip is labelled Viral result and template-2 is labelled Motion reference. Both retain their original files and share the same stage geometry. The 450k likes claim comes from the user. |
+| Use native FAQ accordions on both public pages | Accessible summary controls support keyboard, touch and JavaScript-free reading. Answers describe the actual frontend flow and keep account/generation availability honest. Pricing uses the existing app URL resolver. |
+| Use GitHub Pages for all user-facing previews | The user explicitly requested publication and no local previews on 27 October 2026. Keep building/checking source locally, then verify the published site in the ChatGPT in-app Browser. |
+| Preserve existing Cartoon Maker/template destinations | Explicit showcase links retain their existing app routes through the shared URL resolver. Selecting a particular showcase clip does not yet prefill a creation draft. |
 | Persist context in Markdown and read it before continuing | Explicit user preference on 26 October 2026. Use [the documentation index](README.md), keep status and checks current, and link to evidence rather than duplicating it. |
 
 If a later request changes one of these choices, update this file and the affected brief. Do not treat older screenshots or research as instructions to restore superseded behavior.
