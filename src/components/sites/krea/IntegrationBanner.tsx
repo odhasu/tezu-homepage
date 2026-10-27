@@ -4,7 +4,7 @@
 
 import { Bot, X } from "lucide-react";
 import { useRef, useState, type KeyboardEvent } from "react";
-import { publicAsset } from "./assets";
+import { publicAsset } from "./asset-urls";
 import { tezuAppHome } from "./app-links";
 import "./integration-banner.css";
 

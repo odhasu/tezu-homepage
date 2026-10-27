@@ -1,4 +1,5 @@
 import type { TezuMotionItem } from "./motion-gallery-media";
+import { createGalleryVideoPlayback } from "./gallery-runtime";
 
 export type GalleryMotion = "lens" | "reel" | "fold" | "arc";
 
@@ -7,6 +8,7 @@ type TextureMedia = {
   texture: WebGLTexture;
   image: HTMLImageElement;
   video: HTMLVideoElement | null;
+  playback: ReturnType<typeof createGalleryVideoPlayback> | null;
   loaded: boolean;
   uploadedAt: number;
 };
@@ -113,7 +115,9 @@ export class MotionGalleryEngine {
     private readonly reducedMotion: boolean,
     private readonly onIndex: (index: number) => void,
     private readonly onReady: () => void,
+    initialIndex = 0,
   ) {
+    this.position = this.target = initialIndex;
     const gl = canvas.getContext("webgl", { alpha: true, antialias: true, premultipliedAlpha: false, powerPreference: "low-power" });
     if (!gl) throw new Error("WebGL is unavailable");
     this.gl = gl;
@@ -167,7 +171,7 @@ export class MotionGalleryEngine {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([28, 28, 28, 255]));
       const image = new Image();
-      const entry: TextureMedia = { item, texture, image, video: null, loaded: false, uploadedAt: 0 };
+      const entry: TextureMedia = { item, texture, image, video: null, playback: null, loaded: false, uploadedAt: 0 };
       image.onload = () => {
         if (this.disposed) return;
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -175,7 +179,7 @@ export class MotionGalleryEngine {
         entry.loaded = true;
         this.wake();
       };
-      image.src = item.poster;
+      image.src = item.thumbnail;
       return entry;
     });
     this.observer = new ResizeObserver(() => this.resize());
@@ -200,15 +204,17 @@ export class MotionGalleryEngine {
   }
 
   setVisible(visible: boolean) {
+    if (this.visible === visible) return;
     this.visible = visible;
     this.lastTime = 0;
-    if (!visible) this.media.forEach(entry => entry.video?.pause());
+    this.media.forEach(entry => { if (visible) entry.playback?.retry(); else entry.playback?.setPlaying(false); });
     this.wake();
   }
 
   setPaused(paused: boolean) {
+    if (this.paused === paused) return;
     this.paused = paused;
-    if (paused) this.media.forEach(entry => entry.video?.pause());
+    this.media.forEach(entry => { if (paused) entry.playback?.setPlaying(false); else entry.playback?.retry(); });
     this.wake();
   }
 
@@ -252,11 +258,11 @@ export class MotionGalleryEngine {
       video.preload = "metadata";
       video.src = entry.item.src;
       entry.video = video;
+      entry.playback = createGalleryVideoPlayback(video);
     }
     const video = entry.video;
     if (!video) return;
-    if (playing && video.paused) void video.play().catch(() => {});
-    if (!playing && !video.paused) video.pause();
+    entry.playback?.setPlaying(playing);
     if (video.readyState >= 2 && time - entry.uploadedAt > 40 && (playing || !entry.loaded)) {
       this.gl.bindTexture(this.gl.TEXTURE_2D, entry.texture);
       this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, video);
@@ -313,7 +319,8 @@ export class MotionGalleryEngine {
     this.observer.disconnect();
     this.media.forEach(entry => {
       entry.image.onload = null;
-      if (entry.video) { entry.video.pause(); entry.video.removeAttribute("src"); entry.video.load(); }
+      entry.playback?.dispose();
+      if (entry.video) { entry.video.removeAttribute("src"); entry.video.load(); }
       this.gl.deleteTexture(entry.texture);
     });
     this.gl.deleteBuffer(this.buffer);

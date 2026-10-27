@@ -4,7 +4,7 @@
 
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Expand, Pause, Play, X } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { MotionGalleryEngine, type GalleryMotion } from "./motion-gallery-engine";
+import type { MotionGalleryEngine, GalleryMotion } from "./motion-gallery-engine";
 import { gallerySelections, type TezuMotionItem } from "./motion-gallery-media";
 import "./tezu-motion-galleries.css";
 
@@ -27,9 +27,14 @@ function MotionScene({ mode, title, reducedMotion, blocked, onOpen }: {
   const canvas = useRef<HTMLCanvasElement>(null);
   const engine = useRef<MotionGalleryEngine | null>(null);
   const playbackPaused = useRef(false);
+  const selectedIndex = useRef(0);
   const id = useId();
   const pointer = useRef<{ id: number; x: number; y: number; previous: number; time: number; moved: number; velocity: number } | null>(null);
   const item = items[index];
+  const updateIndex = useCallback((next: number) => {
+    selectedIndex.current = next;
+    setIndex(next);
+  }, []);
 
   useEffect(() => {
     if (!root.current) return;
@@ -44,38 +49,44 @@ function MotionScene({ mode, title, reducedMotion, blocked, onOpen }: {
     const element = canvas.current;
     const region = root.current;
     if (!nearby || !element || !region) return;
-    let instance: MotionGalleryEngine;
-    const onLost = (event: Event) => { event.preventDefault(); setReady(false); instance?.setVisible(false); };
-    try {
-      instance = new MotionGalleryEngine(element, mode, items, reducedMotion, setIndex, () => setReady(true));
+    let cancelled = false;
+    let dispose: (() => void) | undefined;
+    void import("./motion-gallery-engine").then(({ MotionGalleryEngine: Engine }) => {
+      if (cancelled) return;
+      const instance = new Engine(element, mode, items, reducedMotion, updateIndex, () => setReady(true), selectedIndex.current);
       engine.current = instance;
-    } catch (error) {
+      const onLost = (event: Event) => { event.preventDefault(); setReady(false); instance.setVisible(false); };
+      const visibility = new IntersectionObserver(([entry]) => instance.setVisible(entry.isIntersecting), { threshold: .05 });
+      visibility.observe(region);
+      const onDocumentVisibility = () => instance.setPaused(document.hidden || playbackPaused.current);
+      onDocumentVisibility();
+      document.addEventListener("visibilitychange", onDocumentVisibility);
+      const wheel = (event: WheelEvent) => {
+        // Vertical wheel input also advances the lens, while the document keeps scrolling.
+        const pixels = mode === "lens" ? event.deltaY : event.deltaX;
+        if (pixels) instance.scroll(pixels);
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) event.preventDefault();
+      };
+      element.addEventListener("wheel", wheel, { passive: false });
+      element.addEventListener("webglcontextlost", onLost);
+      dispose = () => {
+        visibility.disconnect();
+        document.removeEventListener("visibilitychange", onDocumentVisibility);
+        element.removeEventListener("wheel", wheel);
+        element.removeEventListener("webglcontextlost", onLost);
+        instance.dispose();
+        engine.current = null;
+      };
+    }).catch(error => {
+      if (cancelled) return;
       element.dataset.fallbackReason = error instanceof Error ? error.message : "Renderer unavailable";
       // Native media cards remain usable on devices without a graphics context.
-      return;
-    }
-    const visibility = new IntersectionObserver(([entry]) => instance.setVisible(entry.isIntersecting), { threshold: .05 });
-    visibility.observe(region);
-    const onDocumentVisibility = () => instance.setPaused(document.hidden || playbackPaused.current);
-    onDocumentVisibility();
-    document.addEventListener("visibilitychange", onDocumentVisibility);
-    const wheel = (event: WheelEvent) => {
-      // Vertical wheel input also advances the lens, while the document keeps scrolling.
-      const pixels = mode === "lens" ? event.deltaY : event.deltaX;
-      if (pixels) instance.scroll(pixels);
-      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) event.preventDefault();
-    };
-    element.addEventListener("wheel", wheel, { passive: false });
-    element.addEventListener("webglcontextlost", onLost);
+    });
     return () => {
-      visibility.disconnect();
-      document.removeEventListener("visibilitychange", onDocumentVisibility);
-      element.removeEventListener("wheel", wheel);
-      element.removeEventListener("webglcontextlost", onLost);
-      instance.dispose();
-      engine.current = null;
+      cancelled = true;
+      dispose?.();
     };
-  }, [nearby, mode, items, reducedMotion]);
+  }, [nearby, mode, items, reducedMotion, updateIndex]);
 
   useEffect(() => {
     playbackPaused.current = paused || blocked;
@@ -83,8 +94,8 @@ function MotionScene({ mode, title, reducedMotion, blocked, onOpen }: {
   }, [paused, blocked, nearby]);
 
   function step(direction: number) {
-    if (engine.current && ready) engine.current.step(direction);
-    else setIndex(previous => (previous + direction + items.length) % items.length);
+    if (engine.current) engine.current.step(direction);
+    else updateIndex((selectedIndex.current + direction + items.length) % items.length);
   }
 
   return <article ref={root} className="tezu-motion-scene" data-motion={mode} aria-labelledby={`${id}-title`}>
@@ -95,7 +106,7 @@ function MotionScene({ mode, title, reducedMotion, blocked, onOpen }: {
     <div className="tezu-motion-stage" data-ready={ready}>
       <div className="tezu-motion-fallback" aria-hidden={ready || undefined} inert={ready}>
         {items.map((entry, itemIndex) => <button key={`${entry.id}-${itemIndex}`} type="button" aria-label={`Open ${entry.title}`} onClick={() => onOpen(entry)}>
-          <img src={entry.poster} width={entry.width} height={entry.height} alt={entry.title} loading="lazy" />
+          <img src={entry.thumbnail} width={entry.width} height={entry.height} alt={entry.title} loading="lazy" />
         </button>)}
       </div>
       <canvas ref={canvas} className="tezu-motion-canvas" tabIndex={ready ? 0 : -1} role="group"

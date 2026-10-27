@@ -5,12 +5,12 @@
 import { Bot, Clapperboard, ImagePlay, MessageCircle, Sparkles, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader, type SiteHeaderItem } from "./SiteHeader";
-import { publicAsset, tezuMedia } from "./assets";
+import { publicAsset, thumbnailFor } from "./asset-urls";
 import styles from "./SiteHeader.module.css";
 import { tezuAppHome as appHome } from "./app-links";
 
 const iconProps = { size: 18, strokeWidth: 1.5, "aria-hidden": true } as const;
-const artwork = tezuMedia.find(item => item.id === "tezu-07-preview");
+const artwork = thumbnailFor("/sites/tezu/10db0993-tezu-07-poster.jpg");
 function navigationItems(page: "home" | "motion-control"): SiteHeaderItem[] {
   const section = (id: string) => page === "home" ? `#${id}` : `${publicAsset("/")}#${id}`;
   const integration = (platform: string) => page === "home" ? "#mcp" : `${publicAsset("/")}?integration=${platform}#mcp`;
@@ -26,7 +26,7 @@ function navigationItems(page: "home" | "motion-control"): SiteHeaderItem[] {
       ],
       feature: {
         title: "Made with Tezu", description: "A little inspiration for your next idea.", href: section("character-swap"),
-        image: artwork ? { src: artwork.poster, alt: "A cartoon created with Tezu" } : undefined,
+        image: { src: artwork, alt: "A cartoon created with Tezu" },
       },
     },
     {
@@ -75,7 +75,7 @@ export function TezuSiteHeader({ page = "home" }: { page?: "home" | "motion-cont
     appearance="resend"
     textureUrl={publicAsset("/sites/resend/texture-btn.png")}
     variant="mega"
-    brand={{ name: "Tezu", href: page === "home" ? "#home" : `${publicAsset("/")}#home`, mark: <img className={styles.brandMark} src={publicAsset("/sites/tezu/tezu-knot-logo.png")} width={36} height={36} alt="" /> }}
+    brand={{ name: "Tezu", href: page === "home" ? "#home" : `${publicAsset("/")}#home`, mark: <img className={styles.brandMark} src={thumbnailFor("/sites/tezu/tezu-knot-logo.png")} width={36} height={36} alt="" /> }}
     items={items}
     current={page === "home" ? current : page}
     onCurrentChange={setCurrent}

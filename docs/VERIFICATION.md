@@ -2,6 +2,29 @@
 
 Updated: 27 October 2026. Results below record completed checks, not guarantees about future changes.
 
+## Homepage performance pass — 27 October 2026
+
+Source baseline: `950bcc1`. The user requested code analysis, organization and speed improvements. Existing appearance, media, controls and creation behavior are retained.
+
+| Measured exported resource | Before | After |
+| --- | ---: | ---: |
+| 31 unique display posters | 4,222,980 B | 599,138 B |
+| Header logo | 114,982 B | 7,498 B |
+| Poster pixels, estimated RGBA at 4 bytes/pixel | 82,442,496 B | 29,160,960 B |
+| Homepage initial modern script files | 676,667 B | 672,168 B |
+| Homepage scripts, local gzip estimate | 205,427 B | 203,416 B |
+| Motion-control initial modern scripts | 635,875 B | 632,531 B |
+
+Poster transfer size falls 85.8%; dimensions reduce the estimated decoded poster pixels by 64.6%. This pixel calculation is not a measurement of browser/GPU allocation. Full-size assets remain unchanged for previews and references. The generated derivatives preserve aspect ratios and logo transparency.
+
+Modern script totals exclude the 112,594-byte legacy `nomodule` bundle. The WebGL engine is now a deferred chunk requested near its gallery. `node scripts/performance-report.cjs` reproduces export size reports; gzip uses local Node defaults, not observed CDN transfer. Browser tooling did not expose Performance Timing, so no Lighthouse, Core Web Vitals or load-time score is claimed.
+
+- `npm test`: 21/21 pass, including meaningful frame-idling, cancellation/resume, finite easing, autoplay rejection/pending cleanup, thumbnail dimensions/proportions and display-byte-budget checks. New scheduling/playback tests were first run failing before implementation; the thumbnail dimension test failed before bounding both dimensions, then passed.
+- `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, strict TypeScript and production export pass.
+- Original and derivative contact sheets were visually inspected. The generator is deterministic with fixed inputs and the installed Sharp version; original media and reference URLs are retained.
+- Removed the unused displacement-map generator: the current hero CSS already overrides its backdrop-filter rule. The visible glass style remains in CSS.
+- Independent scoped reviews found no actionable issues in animation scheduling, lifecycle cleanup, playback eligibility, hero extraction, asset URLs or source preservation. Publication and live browser interaction results are recorded after release.
+
 ## MCP panel cleanup — 27 October 2026
 
 Removed Claude Code from the homepage tabs and shared navigation. Other now uses the existing assistant card styling, with a black background, Suisse type, muted copy and one Connect action. Removed unused clipboard state, ASCII artwork and legacy panel styles. The guide clearly states that connections are coming soon and links to the configured Studio preview.

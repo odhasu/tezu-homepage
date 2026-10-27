@@ -5,8 +5,9 @@
 import { useEffect, useRef } from "react";
 import { tezuMedia } from "./assets";
 import { wallGeometry } from "./wall-geometry";
+import { createWallFrameLoop, settleTowards, wallHasMotion } from "./wall-animation";
 
-const wallAssets = tezuMedia.map((item) => ({ ...item, image: item.poster, reference: item.poster,
+const wallAssets = tezuMedia.map((item) => ({ ...item, image: item.thumbnail, reference: item.poster,
   category: item.kind === "video" ? "Tezu video" : "Tezu character",
   prompt: `Create a cartoon scene inspired by ${item.title.toLowerCase()}.` }));
 
@@ -19,22 +20,33 @@ const presetAt = (col: number, row: number) => wallAssets[modulo(20 + col + 9 * 
 export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (image: WallImage) => void; reducedMotion: boolean; paused: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const tileRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const wake = useRef<() => void>(() => {});
   const drag = useRef({ x: 0, y: 0, lastTime: 0, active: false, moved: false });
   const movement = useRef({ x: 0, y: 0, vx: 0, vy: 0, hover: -1, visible: true, paused: false, lastActivity: 0, target: null as null | { x: number; y: number } });
 
-  useEffect(() => { movement.current.paused = paused; }, [paused]);
+  useEffect(() => { movement.current.paused = paused; wake.current(); }, [paused]);
 
   useEffect(() => {
     const element = root.current;
     if (!element) return;
     let width = element.clientWidth;
     let height = element.clientHeight;
-    let frame = 0;
-    let last = 0;
+    let geometry = wallGeometry(width);
+    let sizesDirty = true;
     movement.current.lastActivity = performance.now();
     const lifts = coordinates.map(() => 0);
-    const resize = new ResizeObserver(([entry]) => { width = entry.contentRect.width; height = entry.contentRect.height; });
-    const visibility = new IntersectionObserver(([entry]) => { movement.current.visible = entry.isIntersecting; });
+    const resize = new ResizeObserver(([entry]) => {
+      if (width !== entry.contentRect.width || height !== entry.contentRect.height) {
+        width = entry.contentRect.width; height = entry.contentRect.height;
+        geometry = wallGeometry(width);
+        sizesDirty = true;
+        loop.wake();
+      }
+    });
+    const visibility = new IntersectionObserver(([entry]) => {
+      movement.current.visible = entry.isIntersecting;
+      if (entry.isIntersecting) loop.wake(); else loop.stop();
+    });
     resize.observe(element);
     visibility.observe(element);
 
@@ -44,57 +56,68 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
       return distance <= start ? value : Math.sign(value) * (start + band * Math.tanh((distance - start) / band));
     };
 
-    function animate(time: number) {
-      const dt = Math.min(0.05, (time - (last || time)) / 1000);
-      last = time;
+    const tileSizes = coordinates.map(({ col, row }) => {
+      const image = presetAt(col, row);
+      return { ratio: image.width / image.height, width: 0, height: 0, hidden: undefined as boolean | undefined, small: undefined as boolean | undefined };
+    });
+    const loop = createWallFrameLoop(requestAnimationFrame, cancelAnimationFrame, dt => {
       const state = movement.current;
-      if (state.visible) {
-        const { tileWidth: size, tileHeight: tall, stepX, stepY } = wallGeometry(width);
-        const band = size * 0.25;
-        const halfX = width / 2 - size * 0.08;
-        const halfY = height / 2 - size * 0.08;
-        if (state.target) {
-          const ease = reducedMotion ? 1 : 1 - Math.exp(-dt / 0.2);
-          state.x += (state.target.x - state.x) * ease;
-          state.y += (state.target.y - state.y) * ease;
-        } else if (!drag.current.active && !reducedMotion && !state.paused && document.visibilityState === "visible") {
-          const decay = Math.exp(-dt / 0.7);
-          state.vx = state.vx * decay + 9 * (1 - decay);
-          state.vy = state.vy * decay;
-          state.x += state.vx * dt;
-          state.y += state.vy * dt;
-        }
-        tileRefs.current.forEach((tile, index) => {
-          if (!tile) return;
-          const { col, row } = coordinates[index];
-          const image = presetAt(col, row);
-          const tileWidth = Math.min(size, tall * image.width / image.height);
-          const tileHeight = tileWidth * image.height / image.width;
-          const x = modulo((col + (row & 1) / 2) * stepX + state.x + stepX * 4.5, stepX * 9) - stepX * 4.5;
-          const y = modulo(row * stepY + state.y + stepY * 2.5, stepY * 5) - stepY * 2.5;
-          const left = curve(x - tileWidth / 2, halfX, band);
-          const right = curve(x + tileWidth / 2, halfX, band);
-          const top = curve(y - tileHeight / 2, halfY, band);
-          const bottom = curve(y + tileHeight / 2, halfY, band);
-          // Uniform edge scaling preserves every source image's native proportions.
-          const fit = Math.min((right - left) / tileWidth, (bottom - top) / tileHeight);
-          const small = fit < 0.8;
-          const hidden = fit < 0.04;
-          tile.style.visibility = hidden ? "hidden" : "visible";
-          tile.dataset.small = String(small);
-          const targetLift = state.hover === index && !small ? 1 : 0;
-          lifts[index] += (targetLift - lifts[index]) * (reducedMotion ? 1 : 1 - Math.exp(-dt / 0.12));
-          const scale = 1 + 0.03 * lifts[index];
-          tile.style.width = `${tileWidth}px`;
-          tile.style.height = `${tileHeight}px`;
-          tile.style.borderRadius = `${size * 0.07}px`;
-          tile.style.transform = `translate3d(${width / 2 + (left + right - tileWidth * fit * scale) / 2}px,${height / 2 + (top + bottom - tileHeight * fit * scale) / 2}px,0) scale(${fit * scale})`;
-        });
+      if (!state.visible || document.visibilityState !== "visible") return false;
+      const { tileWidth: size, tileHeight: tall, stepX, stepY } = geometry;
+      const band = size * 0.25;
+      const halfX = width / 2 - size * 0.08;
+      const halfY = height / 2 - size * 0.08;
+      if (state.target) {
+        state.x = settleTowards(state.x, state.target.x, dt, .2, reducedMotion, .05);
+        state.y = settleTowards(state.y, state.target.y, dt, .2, reducedMotion, .05);
+      } else if (!drag.current.active && !reducedMotion && !state.paused && document.visibilityState === "visible") {
+        const decay = Math.exp(-dt / 0.7);
+        state.vx = state.vx * decay + 9 * (1 - decay);
+        state.vy = state.vy * decay;
+        state.x += state.vx * dt;
+        state.y += state.vy * dt;
       }
-      frame = requestAnimationFrame(animate);
-    }
-    frame = requestAnimationFrame(animate);
-    return () => { cancelAnimationFrame(frame); resize.disconnect(); visibility.disconnect(); };
+      let liftMoving = false;
+      tileRefs.current.forEach((tile, index) => {
+        if (!tile) return;
+        const { col, row } = coordinates[index];
+        const cached = tileSizes[index];
+        if (sizesDirty) {
+          cached.width = Math.min(size, tall * cached.ratio);
+          cached.height = cached.width / cached.ratio;
+          tile.style.width = `${cached.width}px`;
+          tile.style.height = `${cached.height}px`;
+          tile.style.borderRadius = `${size * .07}px`;
+        }
+        const tileWidth = cached.width;
+        const tileHeight = cached.height;
+        const x = modulo((col + (row & 1) / 2) * stepX + state.x + stepX * 4.5, stepX * 9) - stepX * 4.5;
+        const y = modulo(row * stepY + state.y + stepY * 2.5, stepY * 5) - stepY * 2.5;
+        const left = curve(x - tileWidth / 2, halfX, band);
+        const right = curve(x + tileWidth / 2, halfX, band);
+        const top = curve(y - tileHeight / 2, halfY, band);
+        const bottom = curve(y + tileHeight / 2, halfY, band);
+        // Uniform edge scaling preserves every source image's native proportions.
+        const fit = Math.min((right - left) / tileWidth, (bottom - top) / tileHeight);
+        const small = fit < 0.8;
+        const hidden = fit < 0.04;
+        if (cached.hidden !== hidden) { tile.style.visibility = hidden ? "hidden" : "visible"; cached.hidden = hidden; }
+        if (cached.small !== small) { tile.dataset.small = String(small); cached.small = small; }
+        const targetLift = state.hover === index && !small ? 1 : 0;
+        lifts[index] = settleTowards(lifts[index], targetLift, dt, .12, reducedMotion, .001);
+        if (lifts[index] !== targetLift) liftMoving = true;
+        const scale = 1 + 0.03 * lifts[index];
+        tile.style.transform = `translate3d(${width / 2 + (left + right - tileWidth * fit * scale) / 2}px,${height / 2 + (top + bottom - tileHeight * fit * scale) / 2}px,0) scale(${fit * scale})`;
+      });
+      sizesDirty = false;
+      return wallHasMotion({ paused: state.paused, reducedMotion, dragging: drag.current.active, hasTarget: !!state.target,
+        targetMoving: !!state.target && (state.x !== state.target.x || state.y !== state.target.y), liftMoving });
+    });
+    const onVisibility = () => { if (document.visibilityState === "visible") loop.wake(); else loop.stop(); };
+    wake.current = loop.wake;
+    document.addEventListener("visibilitychange", onVisibility);
+    loop.wake();
+    return () => { wake.current = () => {}; loop.stop(); resize.disconnect(); visibility.disconnect(); document.removeEventListener("visibilitychange", onVisibility); };
   }, [reducedMotion]);
 
   return (
@@ -108,6 +131,7 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
         movement.current.target = null;
         movement.current.lastActivity = performance.now();
         movement.current.vx = movement.current.vy = 0;
+        wake.current();
       }}
       onPointerMove={(event) => {
         movement.current.lastActivity = performance.now();
@@ -116,7 +140,7 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
         const dx = event.clientX - pointer.x;
         const dy = event.clientY - pointer.y;
         if (!pointer.moved && Math.hypot(dx, dy) < 6) return;
-        if (!pointer.moved && event.pointerType === "touch" && Math.abs(dy) > Math.abs(dx)) { pointer.active = false; return; }
+        if (!pointer.moved && event.pointerType === "touch" && Math.abs(dy) > Math.abs(dx)) { pointer.active = false; wake.current(); return; }
         pointer.moved = true;
         event.currentTarget.setPointerCapture(event.pointerId);
         event.currentTarget.dataset.dragging = "true";
@@ -130,9 +154,10 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
         pointer.x = event.clientX;
         pointer.y = event.clientY;
         pointer.lastTime = event.timeStamp;
+        wake.current();
       }}
-      onPointerUp={(event) => { drag.current.active = false; event.currentTarget.dataset.dragging = "false"; }}
-      onPointerCancel={() => { drag.current.active = false; drag.current.moved = false; }}
+      onPointerUp={(event) => { drag.current.active = false; event.currentTarget.dataset.dragging = "false"; wake.current(); }}
+      onPointerCancel={(event) => { drag.current.active = false; drag.current.moved = false; event.currentTarget.dataset.dragging = "false"; wake.current(); }}
     >
       <div className="wall-stage">{coordinates.map(({ col, row }, index) => {
         const image = presetAt(col, row);
@@ -145,16 +170,17 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
           tabIndex={col === 0 && row === 0 ? 0 : -1}
           aria-label={`${image.category}: ${image.title}`}
           onClick={() => { if (!drag.current.moved) onSelect(image); }}
-          onPointerEnter={() => { movement.current.hover = index; }}
-          onPointerLeave={() => { movement.current.hover = -1; }}
+          onPointerEnter={() => { movement.current.hover = index; wake.current(); }}
+          onPointerLeave={() => { movement.current.hover = -1; wake.current(); }}
           onFocus={(event) => {
             movement.current.hover = index;
             if (event.currentTarget.matches(":focus-visible")) {
               const { stepX, stepY } = wallGeometry(root.current?.clientWidth ?? 1440);
               movement.current.target = { x: -(col + (row & 1) / 2) * stepX, y: -row * stepY };
             }
+            wake.current();
           }}
-          onBlur={() => { movement.current.target = null; movement.current.hover = -1; }}
+          onBlur={() => { movement.current.target = null; movement.current.hover = -1; wake.current(); }}
           onKeyDown={(event) => {
             const directions: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
             const direction = directions[event.key];
@@ -166,7 +192,7 @@ export function ImageWall({ onSelect, reducedMotion, paused }: { onSelect: (imag
         >
           <span className="wall-face">
             {/* Original Tezu artwork stays uncropped at its native aspect ratio. */}
-            <img src={image.image} alt="" draggable={false} decoding="async" fetchPriority={row === 0 ? "high" : "auto"} />
+            <img src={image.image} alt="" draggable={false} decoding="async" fetchPriority={row === 0 && Math.abs(col) <= 1 ? "high" : "auto"} />
             <span className="wall-caption"><small>{image.category}</small><span>{image.title}</span></span>
           </span>
         </button>;

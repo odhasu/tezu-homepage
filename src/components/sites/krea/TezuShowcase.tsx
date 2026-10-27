@@ -21,7 +21,6 @@ function TezuVideo({ item, reducedMotion, paused }: { item: MediaItem; reducedMo
     if (!element) return;
     const observer = new IntersectionObserver(([entry]) => {
       setVisible(entry.isIntersecting);
-      if (entry.isIntersecting) setLoaded(true);
     }, { threshold: 0.1 });
     observer.observe(element);
     return () => observer.disconnect();
@@ -30,14 +29,16 @@ function TezuVideo({ item, reducedMotion, paused }: { item: MediaItem; reducedMo
     const element = video.current;
     if (!element) return;
     const update = () => {
-      if (visible && !paused && !reducedMotion && document.visibilityState === "visible") void element.play().catch(() => {});
-      else element.pause();
+      if (visible && !paused && !reducedMotion && document.visibilityState === "visible") {
+        if (!loaded) setLoaded(true);
+        else void element.play().catch(() => {});
+      } else element.pause();
     };
     update();
     document.addEventListener("visibilitychange", update);
     return () => { document.removeEventListener("visibilitychange", update); element.pause(); };
   }, [visible, loaded, paused, reducedMotion]);
-  return <video ref={video} src={loaded ? item.src : undefined} poster={item.poster} width={item.width} height={item.height} muted loop playsInline preload={loaded ? "metadata" : "none"} aria-label={item.title} />;
+  return <video ref={video} src={loaded ? item.src : undefined} poster={item.thumbnail} width={item.width} height={item.height} muted loop playsInline preload={loaded ? "metadata" : "none"} aria-label={item.title} />;
 }
 
 export function TezuResults({ reducedMotion }: { reducedMotion: boolean }) {

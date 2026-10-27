@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, ChevronLeft, ChevronRight, Heart, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { publicAsset } from "./assets";
+import { publicAsset } from "./asset-urls";
 import { TezuSiteHeader } from "./TezuSiteHeader";
 import { TezuFaq } from "./TezuFaq";
 import "./motion-control.css";
