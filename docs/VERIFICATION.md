@@ -2,6 +2,17 @@
 
 Updated: 27 October 2026. Results below record completed checks, not guarantees about future changes.
 
+## Mixed curved gallery and homepage Motion control — 27 October 2026
+
+The user requested a mix of videos and photos in the pictured curved gallery, removal of its three footer buttons and “A few ideas. Endless possibilities.” text, and a larger Motion control feature before Character Swap with the existing white comparison divider.
+
+- The gallery preserves its 11-card order, with six muted looping videos and five still photos/posters. Card sources attach only while eligible and horizontally onscreen; guarded playback pauses offscreen, document-hidden, during its preview, on manual Space pause, or for reduced motion. Hover/focus pauses travel while retaining inline videos. Drag, Left/Right browsing and Enter previews remain available. Full previews use original videos or image/poster files.
+- `MotionComparison.tsx` is shared by the unchanged standalone route and a homepage feature with a maximum 640px frame. It retains the source clips, likes credit, white pointer/keyboard divider and synchronization. Sources load only on playback eligibility. Offscreen/document-hidden/modal states stop playback and the synchronization timer. Reduced motion starts paused; explicit Play remains available.
+- `npm test`: 21/21 existing tests pass, including frame scheduling and guarded video pending/rejection/disposal behavior.
+- `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, strict TypeScript and static production export pass. `git diff --check` passes.
+- Export inspection confirms six video cards/five photo labels, no removed footer/caption, deferred video `src` attributes in both new sections, Motion control before Character Swap, and retained standalone comparison markup. Source review covered effect cleanup, media originals, modal state, keyboard controls and responsive widths.
+- In-app browser automation is unavailable in this turn. No alternate browser or local preview was opened. These results do not establish live playback, desktop/mobile rendering or pointer behavior for this release; those remain pending. Publication results will be recorded below when available.
+
 ## Homepage performance pass — 27 October 2026
 
 Source baseline: `950bcc1`. The user requested code analysis, organization and speed improvements. Existing appearance, media, controls and creation behavior are retained.

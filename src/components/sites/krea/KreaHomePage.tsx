@@ -8,6 +8,7 @@ import { IntegrationBanner } from "./IntegrationBanner";
 import { TezuSiteHeader } from "./TezuSiteHeader";
 import { TezuMotionGalleries } from "./TezuMotionGalleries";
 import { TezuFaq } from "./TezuFaq";
+import { MotionControlFeature } from "./MotionComparison";
 import "./text-motion.css";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
@@ -28,6 +29,7 @@ export function KreaHomePage() {
       <MediaGallery reducedMotion={reducedMotion} />
       <IntegrationBanner />
       <TezuMotionGalleries reducedMotion={reducedMotion} />
+      <MotionControlFeature />
       <TezuResults reducedMotion={reducedMotion} />
       <TezuFaq />
     </main>

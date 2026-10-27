@@ -22,7 +22,9 @@ Hero **Generate** now opens a native signup/login dialog after a nonempty prompt
 
 ## Current page
 
-The homepage contains the hero and prompt, the original curved media gallery, MCP integrations, four added motion galleries, and Character Swap, in that order. The Cartoon Maker homepage section was removed at the user's request; its media and existing tool destination remain available.
+The homepage contains the hero and prompt, the curved media gallery, MCP integrations, four added motion galleries, a larger Motion control comparison, and Character Swap, in that order. The Cartoon Maker homepage section was removed at the user's request; its media and existing tool destination remain available.
+
+The curved gallery mixes six muted looping videos and five photos/poster stills. Its three footer buttons and “A few ideas. Endless possibilities.” caption were removed at the user's request. Drag and Left/Right browsing remain; Space pauses motion/playback and Enter opens the original video or photo. Sources are attached only when a video is eligible and onscreen. Motion control leads the showcase area with a 640px comparison and the existing white divider; the standalone route remains available. These latest changes are awaiting publication and live review.
 
 Navigation now includes **Motion control** and **Pricing**, and the old Apps label is **MCP**. Log in and Start creating are larger (48px desktop, 56px in the mobile menu). Pricing uses the existing Studio pricing route through the shared app URL resolver.
 

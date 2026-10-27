@@ -18,8 +18,8 @@ The repository root owns the current image-wall Tezu homepage. The older Tezu ap
 - Show the prompt immediately. Do not restore the "Welcome to Tezu" screen or the full-screen zoom entrance.
 - Match the upward, softly blurred text reveals from https://www.aura.build/create for the hero heading and rotating prompt examples. Stop prompt rotation while the user types.
 - Move the image-wall background slowly to the right. Pause it during interaction with the prompt and respect reduced-motion preferences.
-- Use https://www.scrolltide.co/components#c-media-gallery as the visual reference for an image gallery that curves around the viewer. Use actual local Tezu artwork, with drag, button, keyboard, and pause controls.
-- Keep the content order: hero, curved image gallery, MCP integrations, the four motion galleries, Character Swap with template videos, then FAQs. The 27 October request removed the Cartoon Maker homepage section and added a separate motion-control comparison page. Preserve original media.
+- Use https://www.scrolltide.co/components#c-media-gallery as the visual reference for a gallery that curves around the viewer. Mix local Tezu videos and photos; keep drag and keyboard browsing with Space to pause. The user removed the three footer buttons and the “A few ideas. Endless possibilities.” caption on 27 October 2026.
+- Keep the content order: hero, curved media gallery, MCP integrations, the four motion galleries, a larger Motion control comparison, Character Swap with template videos, then FAQs. The homepage comparison uses the same white divider and supplied clips as the separate motion-control route. Preserve original media.
 - Preserve the source aspect ratios of videos. Gallery thumbnails may crop to portrait frames; opened previews must show the full image.
 - Keep existing app integrations, navigation, and linked Tezu tools working. Do not add live AI generation, authentication, or payments as part of visual work.
 
