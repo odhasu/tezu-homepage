@@ -2,6 +2,16 @@
 
 Updated: 27 October 2026. Results below record completed checks, not guarantees about future changes.
 
+## MCP panel cleanup — 27 October 2026
+
+Removed Claude Code from the homepage tabs and shared navigation. Other now uses the existing assistant card styling, with a black background, Suisse type, muted copy and one Connect action. Removed unused clipboard state, ASCII artwork and legacy panel styles. The guide clearly states that connections are coming soon and links to the configured Studio preview.
+
+- `npm test`: 9/9 pass.
+- `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, TypeScript and production static export pass.
+- `git diff --check`: passes. No Claude Code references remain in public homepage source.
+- Independent source review found no actionable React, accessibility, keyboard-tab, responsive CSS or secondary-page selection issues.
+- Publication and live browser results are recorded below after deployment.
+
 ## FAQ publication — 27 October 2026
 
 The user requested FAQ sections, GitHub publication and published previews only. Five native `details`/`summary` answers now appear on both the homepage and motion-control page. An independent review found no actionable accessibility, copy or URL issues.

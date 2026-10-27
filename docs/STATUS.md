@@ -32,7 +32,7 @@ Both the homepage and motion-control page include five native FAQ accordions cov
 
 The navbar follows Resend's layout and glass styling with Tezu's knot logo, Suisse Intl typeface, labels, and destinations. Desktop menus open on hover, click, or keyboard input. Mobile navigation uses full-screen panels with a back button. The four middle galleries mix existing Tezu images and videos and support drag, buttons, keyboard controls, pause, and full-media previews.
 
-The prompt defaults to Seedance 2.5 and 720p, with 480p and 1080p choices. The existing assistant integrations remain available. Hero Generate stays in context; explicit studio/account links use the configured Tezu application. This visual homepage does not supply an AI backend or a live MCP service.
+The prompt defaults to Seedance 2.5 and 720p, with 480p and 1080p choices. MCP choices are ChatGPT, Claude App and Other; Claude Code was removed at the user's request. Other shares the black card, Suisse typography and compact actions used by the assistant panels. The MCP menu can select Other from either public page. Hero Generate stays in context; explicit studio/account links use the configured Tezu application. This visual homepage does not supply an AI backend or a live MCP service.
 
 ## Historical authoring and published route map
 

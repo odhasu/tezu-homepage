@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Supplied transparent logo is served from local assets. */
 
-import { Clapperboard, ImagePlay, MessageCircle, Sparkles, Users } from "lucide-react";
+import { Bot, Clapperboard, ImagePlay, MessageCircle, Sparkles, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader, type SiteHeaderItem } from "./SiteHeader";
 import { publicAsset, tezuMedia } from "./assets";
@@ -34,7 +34,7 @@ function navigationItems(page: "home" | "motion-control"): SiteHeaderItem[] {
       links: [
         { label: "ChatGPT", description: "Create with Tezu in ChatGPT", icon: <MessageCircle {...iconProps} />, href: integration("chatgpt") },
         { label: "Claude", description: "Create with Tezu in Claude", icon: <Sparkles {...iconProps} />, href: integration("claude") },
-        { label: "Claude Code", description: "Add Tezu to your workflow", icon: <Clapperboard {...iconProps} />, href: integration("claude-code") },
+        { label: "Other", description: "Tezu for your assistant", icon: <Bot {...iconProps} />, href: integration("other") },
       ],
     },
     { value: "motion-control", label: "Motion control", href: publicAsset("/motion-control/") },
@@ -49,7 +49,7 @@ export function TezuSiteHeader({ page = "home" }: { page?: "home" | "motion-cont
   useEffect(() => {
     if (page !== "home") return;
     const platform = new URLSearchParams(window.location.search).get("integration");
-    if (platform && ["chatgpt", "claude", "claude-code"].includes(platform)) {
+    if (platform && ["chatgpt", "claude", "other"].includes(platform)) {
       document.getElementById(`integration-tab-${platform}`)?.click();
     }
     const update = () => {
@@ -83,8 +83,8 @@ export function TezuSiteHeader({ page = "home" }: { page?: "home" | "motion-cont
       if (destination.label === "Start creating") {
         requestAnimationFrame(() => document.getElementById("hero-prompt")?.focus({ preventScroll: true }));
       }
-      if (destination.label === "ChatGPT" || destination.label === "Claude" || destination.label === "Claude Code") {
-        const platform = destination.label === "ChatGPT" ? "chatgpt" : destination.label === "Claude" ? "claude" : "claude-code";
+      if (destination.label === "ChatGPT" || destination.label === "Claude" || destination.label === "Other") {
+        const platform = destination.label === "ChatGPT" ? "chatgpt" : destination.label === "Claude" ? "claude" : "other";
         document.getElementById(`integration-tab-${platform}`)?.click();
       }
     }}
