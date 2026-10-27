@@ -2,7 +2,7 @@
 
 Updated: 27 October 2026. Results below record completed checks, not guarantees about future changes.
 
-## FAQ and publication preparation — 27 October 2026
+## FAQ publication — 27 October 2026
 
 The user requested FAQ sections, GitHub publication and published previews only. Five native `details`/`summary` answers now appear on both the homepage and motion-control page. An independent review found no actionable accessibility, copy or URL issues.
 
@@ -10,7 +10,10 @@ The user requested FAQ sections, GitHub publication and published previews only.
 - `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, strict TypeScript and production static export pass.
 - Bundled Studio `npm run check` with its production base path: passes, including 32 prerendered routes. Its initially missing local dependencies were installed with its existing lockfile; no bundled source or manifest was changed.
 - GitHub Pages continues to use the existing `main` push workflow, building both the homepage and bundled `apps/tezu` before publishing. Source histories and the separate sibling website are preserved.
-- Browser review for this request uses only the public github.io site; no local preview is opened. Deployment success and live FAQ interaction must be verified after publishing, not inferred from the local build.
+- Product commit: `464a75c1b9f2f45ba99490f569dc618711263480`. [GitHub Pages run 40493258556](https://github.com/odhasu/tezu-homepage/actions/runs/40493258556) completed successfully for both build and deploy.
+- Browser review used only the public github.io site; no local preview was opened. The published homepage and motion-control page each show five FAQs. Clicking opens answers; Enter closes the focused answer. At 390px the motion-page FAQ answer fits with no horizontal overflow. The FAQ Pricing link opens the published bundled pricing page.
+- Both published comparison videos decode successfully and remain muted. Navigation shows MCP, Motion control and Pricing, with the larger login/creation actions. The Cartoon Maker homepage section is absent and Character Swap remains.
+- Live evidence: `C:/Users/User/.codex/artifacts/tezu-live-faq-20261027/` contains desktop homepage and mobile motion-page FAQ screenshots. Local source checkout was fast-forwarded to the published source commit; the sibling website and bundled Studio source were preserved.
 
 The previous sections record earlier local checks and their release state at the time. They do not override the latest published-preview preference.
 

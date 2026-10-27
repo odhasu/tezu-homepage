@@ -16,8 +16,8 @@ Hero **Generate** now opens a native signup/login dialog after a nonempty prompt
 
 - [Live homepage](https://odhasu.github.io/tezu-homepage/)
 - [GitHub repository](https://github.com/odhasu/tezu-homepage)
-- Latest product commit: `5ff13fa` — Resend-style Tezu navigation.
-- [Successful deployment](https://github.com/odhasu/tezu-homepage/actions/runs/40329779223)
+- Latest product commit: `464a75c1b9f2f45ba99490f569dc618711263480` — motion control, FAQs and signup flow.
+- [Successful deployment](https://github.com/odhasu/tezu-homepage/actions/runs/40493258556)
 - Desktop and mobile browser checks passed against that live version. See [verification](VERIFICATION.md).
 
 ## Current page
