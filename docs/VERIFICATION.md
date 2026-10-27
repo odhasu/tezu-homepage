@@ -10,7 +10,9 @@ Removed Claude Code from the homepage tabs and shared navigation. Other now uses
 - `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, TypeScript and production static export pass.
 - `git diff --check`: passes. No Claude Code references remain in public homepage source.
 - Independent source review found no actionable React, accessibility, keyboard-tab, responsive CSS or secondary-page selection issues.
-- Publication and live browser results are recorded below after deployment.
+- Initial cleanup commit: `68ccb34e3f7d36ac62c78a631446607ec791e24f`. [GitHub Pages run 40494631718](https://github.com/odhasu/tezu-homepage/actions/runs/40494631718) built both frontends and deployed successfully.
+- Published desktop checks confirm three tabs, no Claude Code menu option, Other selection from the homepage menu, arrow wrapping and Home/End selection. Connect opens the honest availability guide; Escape and the close button restore focus to Connect. Other from the motion-control page returns to the homepage with the correct tab selected.
+- At 390px the card and dialog fit without page overflow. Live testing found that programmatic selection could leave Other partially clipped in the horizontally scrolling tab row. Selection now scrolls the selected tab into view for all input methods while moving focus only for keyboard input. The follow-up production check and independent review pass; its published result is recorded after deployment.
 
 ## FAQ publication — 27 October 2026
 

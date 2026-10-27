@@ -83,8 +83,8 @@ export function IntegrationBanner() {
     setActive(platforms[index].id);
     if (focus) {
       tabs.current[index]?.focus({ preventScroll: true });
-      tabs.current[index]?.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
+    tabs.current[index]?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
 
   function navigate(event: KeyboardEvent<HTMLButtonElement>, index: number) {
