@@ -19,7 +19,7 @@
 - [x] Stop idle/offscreen hero frames, cache size-dependent writes, and verify drag/keyboard/hover settling with focused regression tests.
 - [x] Stop idle curved-gallery frames, defer the renderer import until nearby, and prevent repeated pending/rejected autoplay requests. Test the extracted scheduling/playback logic.
 - [x] Extract `TezuHero.tsx`; remove the unused displacement-map effect whose visual rule is overridden. Wire display thumbnails into hero/gallery/header/showcase while retaining original previews.
-- [ ] Run tests and production checks, compare exact asset/bundle budgets, review the integrated diff, publish, then verify signup, navigation, galleries, previews and comparison on desktop/mobile.
+- [x] Run tests and production checks, compare exact asset/bundle budgets, review the integrated diff, publish, then verify signup, navigation, galleries, previews and comparison on desktop/mobile. Release `c03d7a2`, successful Pages run `40503716839`; results are recorded in `docs/VERIFICATION.md`.
 
 ## Verification limits
 

@@ -16,8 +16,8 @@ Hero **Generate** now opens a native signup/login dialog after a nonempty prompt
 
 - [Live homepage](https://odhasu.github.io/tezu-homepage/)
 - [GitHub repository](https://github.com/odhasu/tezu-homepage)
-- Latest product commit: `11f75e221416d3cc81a953a3e3ac40c9cb2fc214` — simplified MCP choices, cleaned Other panel and visible mobile selection.
-- [Successful deployment](https://github.com/odhasu/tezu-homepage/actions/runs/40495748785)
+- Latest product commit: `c03d7a27779d12a929612f596066a2948b794915` — smaller display assets, idle animation scheduling, deferred gallery loading and focused hero/asset modules.
+- [Successful deployment](https://github.com/odhasu/tezu-homepage/actions/runs/40503716839)
 - Desktop and mobile browser checks passed against that live version. See [verification](VERIFICATION.md).
 
 ## Current page
@@ -56,4 +56,4 @@ Earlier homepage releases synchronized files between `apps/krea` and the deploym
 
 ## Open work
 
-Live authentication, generation and automatic job resumption belong to the subsequent backend work. No first-generation offer or trial credit allowance is implied by this frontend repair. Gallery media and order are preserved; selected showcase/template reuse remains a separate improvement. See [verification](VERIFICATION.md) for completed checks and pending UI verification.
+Live authentication, generation and automatic job resumption belong to the subsequent backend work. No first-generation offer or trial credit allowance is implied by this frontend repair. Gallery media and order are preserved; selected showcase/template reuse remains a separate improvement. See [verification](VERIFICATION.md) for completed source, deployment and desktop/mobile checks.
