@@ -37,6 +37,8 @@ export interface SiteHeaderItem {
   value: string;
   label: string;
   href?: string;
+  /** A visible placeholder with no navigation or selection action. */
+  disabled?: boolean;
   links?: SiteHeaderLink[];
   feature?: SiteHeaderFeature;
 }
@@ -141,9 +143,10 @@ function Face({ direction, reduced, onHeight, children }: { direction: number; r
   </motion.div>;
 }
 
-type DestinationProps = Omit<HTMLAttributes<HTMLElement>, "onClick" | "children"> & { link: { href?: string; label: string }; onChoose: (event: ReactMouseEvent) => void; children: ReactNode };
+type DestinationProps = Omit<HTMLAttributes<HTMLElement>, "onClick" | "children"> & { link: { href?: string; label: string; disabled?: boolean }; onChoose: (event: ReactMouseEvent) => void; children: ReactNode };
 /** Renders an anchor when the destination has an href and a button otherwise, so demos and real sites share one path. */
 function Destination({ link, onChoose, children, ...rest }: DestinationProps) {
+  if (link.disabled) return <button {...(rest as ButtonHTMLAttributes<HTMLButtonElement>)} type="button" disabled>{children}</button>;
   return link.href
     ? <a {...(rest as AnchorHTMLAttributes<HTMLAnchorElement>)} href={link.href} onClick={onChoose}>{children}</a>
     : <button {...(rest as ButtonHTMLAttributes<HTMLButtonElement>)} type="button" onClick={onChoose}>{children}</button>;
@@ -328,13 +331,13 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
 
   function onNavKeyDown(event: ReactKeyboardEvent<HTMLElement>) {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    const triggers = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("[data-nav-item]"));
+    const triggers = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("[data-nav-item]:not([disabled])"));
     const index = triggers.indexOf(document.activeElement as HTMLElement);
     if (index < 0) return;
     event.preventDefault();
     const nextIndex = (index + (event.key === "ArrowRight" ? 1 : -1) + triggers.length) % triggers.length;
     triggers[nextIndex]!.focus();
-    if (open) { const item = items[nextIndex]; openPanel(item && hasPanels && item.links?.length ? item.value : null); }
+    if (open) { const item = items.find(candidate => candidate.value === triggers[nextIndex]!.dataset.navItem); openPanel(item && hasPanels && item.links?.length ? item.value : null); }
   }
   function onTriggerKeyDown(event: ReactKeyboardEvent, value: string) {
     if (event.key === "ArrowDown") { event.preventDefault(); focusFirst.current = true; openPanel(value); if (open?.value === value) panelRef.current?.querySelector<HTMLElement>("[data-face]:not([data-leaving]) [data-panel-link]")?.focus(); }
@@ -383,12 +386,12 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
             <ul className={styles.navList}>
               {items.map(item => {
                 const isCurrent = current === item.value;
-                const withPanel = hasPanels && !!item.links?.length;
+                const withPanel = !item.disabled && hasPanels && !!item.links?.length;
                 const isOpen = open?.value === item.value;
                 const panelId = `${id}-panel`;
                 const common = {
                   className: styles.navItem,
-                  "data-nav-item": "",
+                  "data-nav-item": item.value,
                   "data-current": isCurrent ? "" : undefined,
                   "data-open": isOpen ? "" : undefined,
                   onPointerEnter: (event: ReactPointerEvent) => { if (event.pointerType === "mouse") setHovered(item.value); if (withPanel) onTriggerPointerEnter(event, item.value); else if (event.pointerType === "mouse" && open) closeTimer.current = window.setTimeout(() => openPanel(null), LEAVE_GRACE); },
@@ -518,7 +521,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
                   </div>}
                   <ul className={styles.sheetList}>
                     {items.map(item => <li key={item.value} className={styles.sheetItem}>
-                      {item.links?.length && hasPanels ? <button type="button" ref={node => { if (node) mobileTriggerRefs.current.set(item.value, node); else mobileTriggerRefs.current.delete(item.value); }} className={styles.sheetRow} aria-expanded={false} onClick={() => setExpanded(item.value)}><span>{item.label}</span><ArrowRight size={20} aria-hidden="true" /></button> : <Destination link={item} className={styles.sheetRow} aria-current={current === item.value ? "location" : undefined} onChoose={() => choose({ label: item.label, href: item.href, section: item.value }, item.value)}><span>{item.label}</span></Destination>}
+                      {item.links?.length && hasPanels && !item.disabled ? <button type="button" ref={node => { if (node) mobileTriggerRefs.current.set(item.value, node); else mobileTriggerRefs.current.delete(item.value); }} className={styles.sheetRow} aria-expanded={false} onClick={() => setExpanded(item.value)}><span>{item.label}</span><ArrowRight size={20} aria-hidden="true" /></button> : <Destination link={item} className={styles.sheetRow} aria-current={current === item.value ? "location" : undefined} onChoose={() => choose({ label: item.label, href: item.href, section: item.value }, item.value)}><span>{item.label}</span></Destination>}
                     </li>)}
                   </ul>
                 </>}
@@ -527,7 +530,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
             <ul className={styles.sheetList}>
               {items.map((item, index) => {
                 const isCurrent = current === item.value;
-                const group = !!item.links?.length && variant === "mega";
+                const group = !item.disabled && !!item.links?.length && variant === "mega";
                 const isExpanded = expanded === item.value;
                 const rowMotion = { initial: reduced ? false : { opacity: 0, y: -6 }, animate: { opacity: 1, y: 0 }, transition: { duration: motionTokens.duration.standard, ease: enter, delay: reduced ? 0 : .04 + index * motionTokens.stagger.item } } as const;
                 return <motion.li key={item.value} className={styles.sheetItem} {...rowMotion}>

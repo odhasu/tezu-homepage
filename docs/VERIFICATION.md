@@ -2,6 +2,15 @@
 
 Updated: 27 October 2026. Results below record completed checks, not guarantees about future changes.
 
+## Affiliate navigation placeholder — 27 October 2026
+
+The user requested Affiliate in the navbar, then clarified that it should not open any link. It appears after Pricing in both menu layouts as a native disabled button. No affiliate page, destination, signup form or program claims were added. Disabled destinations have no click handler or active-selection change; desktop arrow navigation skips them and resolves the next panel using stable item values. Tablet spacing accommodates the sixth entry while preserving action height and typography.
+
+- `npm test`: 21/21 existing tests pass.
+- `npm run check` with `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage`: lint, strict TypeScript and static production export pass.
+- Export inspection confirms the Affiliate desktop button has `disabled` and no `href` on both public pages, and no `/affiliate/` page exists. Source review confirms the mobile menus use the same disabled destination and keyboard/focus selectors skip it. `git diff --check` passes.
+- In-app browser automation remains unavailable this turn. No alternate browser or local preview was opened. Tablet fit and desktop/mobile interactions have not been browser-verified for this release. Publication results will follow.
+
 ## Mixed curved gallery and homepage Motion control — 27 October 2026
 
 The user requested a mix of videos and photos in the pictured curved gallery, removal of its three footer buttons and “A few ideas. Endless possibilities.” text, and a larger Motion control feature before Character Swap with the existing white comparison divider.

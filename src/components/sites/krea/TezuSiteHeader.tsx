@@ -39,6 +39,7 @@ function navigationItems(page: "home" | "motion-control"): SiteHeaderItem[] {
     },
     { value: "motion-control", label: "Motion control", href: publicAsset("/motion-control/") },
     { value: "pricing", label: "Pricing", href: `${appHome}pricing/` },
+    { value: "affiliate", label: "Affiliate", disabled: true },
   ];
 }
 
