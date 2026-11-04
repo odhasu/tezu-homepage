@@ -141,3 +141,11 @@ NEXT_PUBLIC_BASE_PATH=/tezu-homepage STATIC_EXPORT=true npm run check
 The workflow also checks `apps/tezu` with its nested base path. See `.github/workflows/deploy.yml` for the complete publishing steps. Use port 3002 for a new development preview when port 3001 serves the existing static preview.
 
 Recheck the interactions and viewports affected by each change. Record actual outcomes, release identifiers, and evidence locations here. Markdown-only maintenance requires checking links and consistency; it does not require another product build.
+
+## 4 November 2026 — Flashloop Pages addition
+
+- Latest existing remote (`15e07ab`) was fast-forwarded before adding Flashloop; root Tezu source, public media, and bundled `apps/tezu` were preserved.
+- Flashloop lint, strict TypeScript, 93-asset audit, and production static export passed with `NEXT_PUBLIC_BASE_PATH=/tezu-homepage/flashloop STATIC_EXPORT=true`.
+- The export audit verified 80 rendered local route/asset destinations and found no unprefixed or missing URLs.
+- The existing Pages workflow now checks all three apps and adds Flashloop under `out/flashloop` without replacing the existing outputs.
+- Public verification and the workflow result are recorded after deployment below.

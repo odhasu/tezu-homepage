@@ -26,9 +26,11 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             apps/tezu/package-lock.json
+            apps/flashloop/package-lock.json
       - uses: actions/configure-pages@v5
       - run: npm ci
       - run: npm ci --prefix apps/tezu
+      - run: npm ci --prefix apps/flashloop
       - run: npm run check
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
@@ -37,7 +39,15 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/tezu
           NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/tezu/
+      - run: npm run check --prefix apps/flashloop
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/flashloop
+          STATIC_EXPORT: "true"
+      - run: node apps/flashloop/scripts/audit-export.mjs
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/flashloop
       - run: cp -R apps/tezu/out out/tezu
+      - run: cp -R apps/flashloop/out out/flashloop
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

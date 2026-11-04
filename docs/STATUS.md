@@ -1,6 +1,12 @@
 # Tezu homepage status
 
-Updated: 27 October 2026.
+Updated: 4 November 2026.
+
+## Flashloop publication
+
+The Flashloop blue homepage is added as an independent `apps/flashloop` app, published at `https://odhasu.github.io/tezu-homepage/flashloop/blue/`. Its own static export is copied below `/flashloop/` by the existing Pages workflow. The latest Tezu homepage and bundled application remain intact. The source app is authored in the Mac template workspace under `apps/flashloop`; only that app and deployment/documentation files were synchronized for this addition. Check the latest verification entry for deployment status.
+
+Use public GitHub Pages previews in user-facing replies; the user reaffirmed this preference on 4 November 2026.
 
 ## Current working copy
 

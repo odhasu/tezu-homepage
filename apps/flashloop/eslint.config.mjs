@@ -1,0 +1,16 @@
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+export default defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  globalIgnores([".next/**", "out/**", "next-env.d.ts"]),
+  {
+    files: ["src/components/sites/flashloop/**/*.tsx"],
+    rules: {
+      // Source assets are already optimized; native images preserve SVG animation and crops.
+      "@next/next/no-img-element": "off",
+    },
+  },
+]);

@@ -1,0 +1,669 @@
+{
+  "releases": [
+    {
+      "title": "Faceless Studio",
+      "description": "Turn one what-if into a faceless video series.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/faceless-studio/",
+      "poster": "/sites/flashloop/home/faceless-release.jpg",
+      "label": "",
+      "kind": "video",
+      "src": "/sites/flashloop/home/faceless-release.mp4"
+    },
+    {
+      "title": "Mirage Studio",
+      "description": "Keep the take, change who is in it.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/mirage-studio/",
+      "poster": "/sites/flashloop/ad3578db-mirage-studio.jpg",
+      "label": "",
+      "kind": "video",
+      "src": "/sites/flashloop/6015c7a6-mirage-studio.mp4"
+    },
+    {
+      "title": "Kling 4.0",
+      "description": "Clips up to 30 seconds with sound, in one pass.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/models/kling-4.0",
+      "poster": "/sites/flashloop/57d941cd-kling-4.jpg",
+      "label": "",
+      "kind": "video",
+      "src": "/sites/flashloop/7fb8d9c9-kling-4.mp4"
+    },
+    {
+      "title": "Film Studio",
+      "description": "Set the genre, era, camera and light, then direct.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/film-studio/",
+      "poster": "/sites/flashloop/e2e3fa7f-film-studio.jpg",
+      "label": "",
+      "kind": "video",
+      "src": "/sites/flashloop/9589b2b0-film-studio.mp4"
+    },
+    {
+      "title": "Ads Studio",
+      "description": "Turn any product into ready-to-post ads.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/ads-studio/",
+      "poster": "/sites/flashloop/ccff8824-ads-studio.jpg",
+      "label": "",
+      "kind": "video",
+      "src": "/sites/flashloop/9f31cf2e-ads-studio.mp4"
+    }
+  ],
+  "rails": [
+    [
+      {
+        "title": "UGC Skincare Ad",
+        "aspect": "9/16",
+        "poster": "/sites/flashloop/bfd01678-ugc-skincare.webp",
+        "label": "UGC Skincare Ad - Creator ad, fully AI-generated",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/ugc-skincare-hls/preview.mp4"
+      },
+      {
+        "title": "Lightning Storm",
+        "aspect": "16/9",
+        "poster": "/sites/flashloop/remote/99b350e13def-h3-max-v2.webp",
+        "label": "Lightning Storm - Made with MiniMax Hailuo 3",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/h3-max-hls/preview.mp4"
+      },
+      {
+        "title": "IRL Memes",
+        "aspect": "9/16",
+        "poster": "/sites/flashloop/a8d3b63b-ugc-street.webp",
+        "label": "IRL Memes - AI-generated creator vlog",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/ugc-street-hls/preview.mp4"
+      },
+      {
+        "title": "Social Content",
+        "aspect": "9/16",
+        "poster": "/sites/flashloop/db91593f-social-content.webp",
+        "label": "Social Content - Daily creator content that rides the trends",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/social-content-hls/preview.mp4"
+      },
+      {
+        "title": "The Horn from the Sea",
+        "aspect": "16/9",
+        "poster": "/sites/flashloop/remote/0840eae6ea36-poster.jpg",
+        "label": "The Horn from the Sea - A Sports Anime story scene",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/horn-from-sea-hls/preview.mp4"
+      },
+      {
+        "title": "Neon City",
+        "aspect": "16/9",
+        "poster": "/sites/flashloop/a5e59642-neon-city.webp",
+        "label": "Neon City - Cinematic AI city flythrough",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/neon-city-hls/preview.mp4"
+      },
+      {
+        "title": "The Curious Club",
+        "aspect": "9/16",
+        "poster": "/sites/flashloop/6d38ac86-poster.jpg",
+        "label": "The Curious Club - Tag the cast and ask the big questions",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/curious-club-hls/preview.mp4"
+      }
+    ],
+    [
+      {
+        "title": "Bob & Wendy",
+        "aspect": "9/16",
+        "poster": "/sites/flashloop/3d377f32-poster.jpg",
+        "label": "Bob & Wendy - Two clay icons, endless chaos",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/bob-wendy-hls/preview.mp4"
+      },
+      {
+        "title": "UGC Product Ad",
+        "aspect": "9/16",
+        "poster": "/sites/flashloop/2baa2e2f-ugc-product.webp",
+        "label": "UGC Product Ad - Creator ad, fully AI-generated",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/ugc-product-hls/preview.mp4"
+      },
+      {
+        "title": "Picnic Trouble",
+        "aspect": "16/9",
+        "poster": "/sites/flashloop/remote/8217a859d5d3-picnic-trouble.webp",
+        "label": "Picnic Trouble - An animated picnic gone sideways",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/picnic-trouble-hls/preview.mp4"
+      },
+      {
+        "title": "Brand Video",
+        "aspect": "16/9",
+        "poster": "/sites/flashloop/57a8e8be-brand-video-v2.webp",
+        "label": "Brand Video - A cinematic brand spot",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/brand-video-v2-hls/preview.mp4"
+      },
+      {
+        "title": "Stormblade Duel",
+        "aspect": "16/9",
+        "poster": "/sites/flashloop/effects/ca529f797477.jpg",
+        "label": "Stormblade Duel - A Sports Anime story scene",
+        "kind": "video",
+        "src": "/sites/flashloop/home-video/stormblade-duel-hls/preview.mp4"
+      }
+    ]
+  ],
+  "formats": [
+    {
+      "title": "UGC Ads",
+      "description": "Creator-style talking heads that sell, without booking a single creator.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Make%20a%2020-second%20UGC%20ad%20for%20a%20vitamin%20C%20face%20serum.%20A%20creator%20films%20herself%20selfie-style%20in%20her%20bathroom%2C%20hooks%20viewers%20in%20the%20first%20two%20seconds%2C%20shows%20the%20product%20up%20close%20and%20ends%20with%20a%20clear%20call%20to%20action.%20Vertical%209%3A16.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/2baa2e2f-ugc-product.webp",
+          "label": "UGC Ads example 1",
+          "kind": "video",
+          "src": "/sites/flashloop/home-video/ugc-product-hls/preview.mp4"
+        },
+        {
+          "poster": "/sites/flashloop/db91593f-social-content.webp",
+          "label": "UGC Ads example 2",
+          "kind": "video",
+          "src": "/sites/flashloop/home-video/social-content-hls/preview.mp4"
+        },
+        {
+          "poster": "/sites/flashloop/bfd01678-ugc-skincare.webp",
+          "label": "UGC Ads example 3",
+          "kind": "video",
+          "src": "/sites/flashloop/home-video/ugc-skincare-hls/preview.mp4"
+        }
+      ]
+    },
+    {
+      "title": "Micro Drama",
+      "description": "Episodic mini-stories with recurring characters your audience binges.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Write%20and%20produce%20episode%201%20of%20a%20micro%20drama%20about%20two%20rival%20baristas%20who%20secretly%20run%20the%20same%20anonymous%20coffee%20blog.%20Keep%20the%20same%20two%20characters%20in%20every%20scene%20and%20end%20on%20a%20cliffhanger.%20Vertical%209%3A16%2C%20about%2060%20seconds.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/421b87d5-poster.jpg",
+          "label": "Micro Drama example 1",
+          "kind": "video",
+          "src": "/sites/flashloop/home-video/curious-club-hls/preview.mp4"
+        },
+        {
+          "poster": "/sites/flashloop/3d377f32-poster.jpg",
+          "label": "Micro Drama example 2",
+          "kind": "video",
+          "src": "/sites/flashloop/home-video/bob-wendy-hls/preview.mp4"
+        },
+        {
+          "poster": "/sites/flashloop/6d38ac86-poster.jpg",
+          "label": "Micro Drama example 3",
+          "kind": "video",
+          "src": "/sites/flashloop/home-video/curious-club-hls/preview.mp4"
+        }
+      ]
+    },
+    {
+      "title": "Explainer Video",
+      "description": "Turn any topic into a narrated, animated explainer people actually finish.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Create%20a%2060-second%20animated%20explainer%20on%20how%20compound%20interest%20works%2C%20with%20a%20friendly%20narrator%20voiceover%2C%20simple%20visuals%20and%20one%20clear%20example%20with%20real%20numbers.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/201c6386-trojan-stickman.webp",
+          "label": "Explainer Video example 1",
+          "kind": "image"
+        },
+        {
+          "poster": "/sites/flashloop/1f69c4d8-explainer-2.webp",
+          "label": "Explainer Video example 2",
+          "kind": "image"
+        },
+        {
+          "poster": "/sites/flashloop/91b6f8c4-explainer-3.webp",
+          "label": "Explainer Video example 3",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "title": "Short Film",
+      "description": "A full short from one logline. Script, scenes and voiceover included.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Make%20a%2090-second%20short%20film%20from%20this%20logline%3A%20a%20lighthouse%20keeper%20finds%20a%20message%20in%20a%20bottle%20addressed%20to%20her%2C%20dated%20tomorrow.%20Cinematic%2016%3A9%20with%20a%20voiceover.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/a5e59642-neon-city.webp",
+          "label": "Short Film example 1",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "title": "Social Content",
+      "description": "Daily shorts in the formats going viral right now, faster than the trend moves.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Create%20three%2010-second%20vertical%20videos%20for%20a%20neighborhood%20bakery's%20TikTok%2C%20each%20riding%20a%20format%20that%20is%20trending%20right%20now%2C%20with%20an%20on-screen%20text%20hook%20in%20the%20first%20second.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/a8d3b63b-ugc-street.webp",
+          "label": "Social Content example 1",
+          "kind": "image"
+        },
+        {
+          "poster": "/sites/flashloop/4a78b59a-sports-celebrating.webp",
+          "label": "Social Content example 2",
+          "kind": "image"
+        },
+        {
+          "poster": "/sites/flashloop/8ade7a3b-poster.jpg",
+          "label": "Social Content example 3",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "title": "Brand Images",
+      "description": "Brand stills, ad creative and campaign shots, generated in one prompt.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Generate%20four%20campaign%20images%20for%20a%20minimalist%20running%20shoe%3A%20a%20studio%20packshot%20on%20a%20clean%20background%2C%20a%20runner%20on%20a%20city%20street%20at%20sunrise%2C%20a%20close-up%20of%20the%20sole%20texture%20and%20a%20flat%20lay%20with%20running%20gear.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/1e6b379f-brand-images-1.webp",
+          "label": "Brand Images example 1",
+          "kind": "image"
+        },
+        {
+          "poster": "/sites/flashloop/c4e31026-brand-car.webp",
+          "label": "Brand Images example 2",
+          "kind": "image"
+        },
+        {
+          "poster": "/sites/flashloop/924789a1-brand-images-3.webp",
+          "label": "Brand Images example 3",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "title": "Brand Video",
+      "description": "On-brand spots that look like an agency built them, minus the agency.",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/agent/?prompt=Produce%20a%2030-second%20brand%20spot%20for%20a%20reusable%20steel%20water%20bottle%3A%20premium%20product%20shots%2C%20people%20using%20it%20outdoors%2C%20upbeat%20music%20and%20a%20closing%20tagline.",
+      "media": [
+        {
+          "poster": "/sites/flashloop/57a8e8be-brand-video-v2.webp",
+          "label": "Brand Video example 1",
+          "kind": "image"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "What is Flashloop?",
+      "answer": "Flashloop is an AI creation suite: the latest image and video models, viral formats and trends, reusable characters, and a Super Agent that turns one idea into a finished video, all in one place."
+    },
+    {
+      "question": "How does the Super Agent work?",
+      "answer": "Describe what you want to make and the agent handles the rest. It picks the right models, writes the scenes, and generates the video end to end. Prefer full control? Every model is also available in the manual composers."
+    },
+    {
+      "question": "What AI models does Flashloop support?",
+      "answer": "Flashloop gives you access to a library of the leading AI models for image and video. That includes video models like Kling 3.0, Sora 2, Seedance 2.5, Veo 3.1, Wan 3.0, Grok Imagine, and MiniMax Hailuo 3, and image models like GPT Image 2, Nano Banana 2.1, Seedream, and Flux 2, from providers including OpenAI, Google, ByteDance, Alibaba, and Minimax, with new models landing as soon as they release. The Super Agent can choose the best model for your prompt automatically, or you can pick one yourself."
+    },
+    {
+      "question": "Is Flashloop free to try?",
+      "answer": "No, Flashloop runs on subscriptions and usage-based credits. But since you're here, use the code FREE1K to unlock 1,000 free credits and get started. That's enough to test image generation before you commit. FREE1K"
+    },
+    {
+      "question": "How does Unlimited work?",
+      "answer": "Unlimited lets you generate without spending credits on the models, resolutions, and quality tiers included in your plan. To keep the experience smooth for everyone, generation speed and concurrency may temporarily vary during peak hours, and processing limits can adjust dynamically under high load to keep the platform reliable. You can switch Unlimited off at any time to generate with credits instead, bypassing the standard queue and returning to maximum speed instantly. Unlimited is designed for personal, human use only: automation tools, credential sharing, and reselling access are prohibited. If unusual activity is detected, Unlimited access may be paused for a manual review by our support team and restored once normal usage is confirmed. The offer is subject to change."
+    },
+    {
+      "question": "Who owns the videos I create, and can I use them commercially?",
+      "answer": "They're yours. Post them, monetize them, and use them in client work across every platform."
+    },
+    {
+      "question": "Can I keep the same characters across videos?",
+      "answer": "Yes, create a character once and tag them into any video, so your cast stays consistent episode after episode. That consistency is the format behind our biggest view counts."
+    },
+    {
+      "question": "How is Flashloop different from single-model tools?",
+      "answer": "One place covers every top model plus everything around them: trending formats, characters, effects, and the Super Agent. So you always use the best model for the job instead of being locked to one."
+    },
+    {
+      "question": "Is Flashloop a good Higgsfield alternative?",
+      "answer": "Yes, if you want Seedance, Kling and Veo in one place with trend formats, reusable characters and official iOS and Android apps. Higgsfield is the better fit if you need cinematic camera presets or Adobe plugins. Compare the best Higgsfield alternatives"
+    }
+  ],
+  "trends": [
+    {
+      "title": "Sports Anime",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/effects/sports-anime/",
+      "posters": [
+        "/sites/flashloop/60bb068d-celebrating-poster.jpg",
+        "/sites/flashloop/c63760ff-fight-poster.jpg"
+      ]
+    },
+    {
+      "title": "Stickman Cartoon",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/effects/stickman-cartoon/",
+      "posters": [
+        "/sites/flashloop/a04cca20-poster.jpg",
+        "/sites/flashloop/3fd739c2-poster.jpg"
+      ]
+    },
+    {
+      "title": "Claymation",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/effects/claymotion-explainer/",
+      "posters": [
+        "/sites/flashloop/852e8f8b-poster.jpg",
+        "/sites/flashloop/f4913ae6-poster.jpg"
+      ]
+    },
+    {
+      "title": "Watercolor",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/effects/watercolor/",
+      "posters": [
+        "/sites/flashloop/6a82a0bf-poster.jpg",
+        "/sites/flashloop/b4056a2b-poster.jpg"
+      ]
+    },
+    {
+      "title": "Paper Collage",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/effects/paper-collage/",
+      "posters": [
+        "/sites/flashloop/4a7af228-poster.jpg",
+        "/sites/flashloop/f191e8a4-poster.jpg"
+      ]
+    },
+    {
+      "title": "Hand Drawn",
+      "href": "https://odhasu.github.io/flashloop-clone/blue/effects/hand-drawn/",
+      "posters": [
+        "/sites/flashloop/b868d009-poster.jpg"
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "title": "Flashloop",
+      "links": [
+        {
+          "label": "Features",
+          "href": "/blue/"
+        },
+        {
+          "label": "iOS App",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/get-app/"
+        },
+        {
+          "label": "Android App",
+          "href": "https://play.google.com/store/apps/details?id=com.laviralstudio.flashloop"
+        },
+        {
+          "label": "Vibe Coding",
+          "href": "https://www.vibecoding.build"
+        },
+        {
+          "label": "Pricing",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/pricing/"
+        },
+        {
+          "label": "Contact",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/contact/"
+        }
+      ]
+    },
+    {
+      "title": "Learn",
+      "links": [
+        {
+          "label": "Presets guide",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/learn/presets/"
+        }
+      ]
+    },
+    {
+      "title": "Create",
+      "links": [
+        {
+          "label": "Ads Studio",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/ads-studio/"
+        },
+        {
+          "label": "Film Studio",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/film-studio/"
+        },
+        {
+          "label": "Mirage Studio New",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/mirage-studio/"
+        },
+        {
+          "label": "Faceless Studio New",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/faceless-studio/"
+        },
+        {
+          "label": "One-Tap Scenes",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/effects/"
+        },
+        {
+          "label": "MCP",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/mcp/"
+        },
+        {
+          "label": "Characters",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/characters/"
+        },
+        {
+          "label": "Text to Video",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/video/"
+        },
+        {
+          "label": "Image to Video",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/video/"
+        },
+        {
+          "label": "AI Images",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/image/"
+        },
+        {
+          "label": "Upscale",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/upscale/"
+        },
+        {
+          "label": "Voiceover",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/voice/"
+        },
+        {
+          "label": "Change voice",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/voice/?mode=change_voice"
+        },
+        {
+          "label": "Translate",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/voice/?mode=translate"
+        }
+      ]
+    },
+    {
+      "title": "Video Models",
+      "links": [
+        {
+          "label": "Veo 3.1",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/veo-3/"
+        },
+        {
+          "label": "Gemini Omni Flash 1.1",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/gemini-omni-flash-1.1"
+        },
+        {
+          "label": "Kling 4.0",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/kling-4.0"
+        },
+        {
+          "label": "Kling 3.0",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/kling-3.0"
+        },
+        {
+          "label": "Kling 3.0 Turbo",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/kling-3.0-turbo"
+        },
+        {
+          "label": "Kling 2.6",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/kling-2.6"
+        },
+        {
+          "label": "Seedance 2.5 New",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/seedance-2.5"
+        },
+        {
+          "label": "Seedance 2.0",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/seedance-2.0"
+        },
+        {
+          "label": "Seedance 2.0 Mini",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/seedance-2.0-mini"
+        },
+        {
+          "label": "MiniMax H3 Max",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/h3-max/"
+        },
+        {
+          "label": "MiniMax H3 Max Turbo",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/h3-max-turbo/"
+        },
+        {
+          "label": "FLUX 3",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/flux-3/"
+        },
+        {
+          "label": "MiniMax Hailuo 3",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/minimax-hailuo-3/"
+        },
+        {
+          "label": "Wan 3.0",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/wan-3.0"
+        },
+        {
+          "label": "Wan 3.0 Prime",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/wan-3.0-prime"
+        },
+        {
+          "label": "Wan 2.6",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/wan-2.6"
+        },
+        {
+          "label": "Grok Imagine",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/grok-imagine/"
+        },
+        {
+          "label": "Kling Motion Control",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/video/?model=kling-2.6-motion-control"
+        },
+        {
+          "label": "Kling 3.0 Motion Control",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/video/?model=kling-3.0-motion-control"
+        },
+        {
+          "label": "Topaz Video Upscale",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/topaz-video-upscale/"
+        }
+      ]
+    },
+    {
+      "title": "Company",
+      "links": [
+        {
+          "label": "Pricing",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/pricing/"
+        },
+        {
+          "label": "Blog",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/blog/"
+        },
+        {
+          "label": "Alternatives",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/alternatives/"
+        },
+        {
+          "label": "Higgsfield Alternatives",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/alternatives/higgsfield/"
+        },
+        {
+          "label": "Flashloop vs Higgsfield",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/compare/flashloop-vs-higgsfield/"
+        },
+        {
+          "label": "Careers Hiring",
+          "href": "https://www.flashloop.ai/careers"
+        },
+        {
+          "label": "Creator Program",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/creators/"
+        },
+        {
+          "label": "Contact",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/contact/"
+        }
+      ]
+    },
+    {
+      "title": "Legal",
+      "links": [
+        {
+          "label": "Terms of Service",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/terms/"
+        },
+        {
+          "label": "Privacy Policy",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/privacy/"
+        },
+        {
+          "label": "Copyright Policy",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/copyright/"
+        },
+        {
+          "label": "AI Safety Policy",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/ai-safety/"
+        }
+      ]
+    },
+    {
+      "title": "Image Models",
+      "links": [
+        {
+          "label": "Nano Banana Pro",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/nano-banana-pro/"
+        },
+        {
+          "label": "Nano Banana 2.1",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/nano-banana-2.1"
+        },
+        {
+          "label": "Nano Banana",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/image/?model=nano-banana"
+        },
+        {
+          "label": "Nano Banana 2 Lite",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/create/image/?model=nano-banana-2-lite"
+        },
+        {
+          "label": "Flux 2",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/flux-2/"
+        },
+        {
+          "label": "Seedream 5.0 Lite",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/seedream-5.0-lite"
+        },
+        {
+          "label": "Seedream 5.0 Pro",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/seedream-5.0-pro"
+        },
+        {
+          "label": "GPT Image 2",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/gpt-image-2/"
+        },
+        {
+          "label": "GPT Image 2.5",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/gpt-image-2.5"
+        },
+        {
+          "label": "Topaz Image Upscale",
+          "href": "https://odhasu.github.io/flashloop-clone/blue/models/topaz-image-upscale/"
+        }
+      ]
+    }
+  ]
+}

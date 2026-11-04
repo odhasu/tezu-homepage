@@ -31,3 +31,7 @@ Updated: 27 October 2026. These notes describe the implemented direction. Source
 | Persist context in Markdown and read it before continuing | Explicit user preference on 26 October 2026. Use [the documentation index](README.md), keep status and checks current, and link to evidence rather than duplicating it. |
 
 If a later request changes one of these choices, update this file and the affected brief. Do not treat older screenshots or research as instructions to restore superseded behavior.
+
+## 4 November 2026 — independent Flashloop preview
+
+Publish Flashloop from `apps/flashloop` at `/tezu-homepage/flashloop/blue/`, preserving the latest root homepage and `apps/tezu`. Prefix local media/routes using the app's own `NEXT_PUBLIC_BASE_PATH`; do not rewrite existing product URLs or share global styles with Tezu. Existing linked Flashloop product pages continue to the supplied reference site. The public preview URL is the default user-facing deliverable; local command-line checks are implementation details.

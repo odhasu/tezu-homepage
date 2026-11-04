@@ -14,3 +14,5 @@ Start here when continuing work on the Tezu homepage. Read [status](STATUS.md) a
 Keep one home for each fact. Link to detailed research instead of copying it into every file. Mark proposals and unverified assumptions clearly. Earlier research is historical when it conflicts with current status and decisions. New user instructions take precedence.
 
 The user requested more persistent Markdown documentation on 26 October 2026. Save useful project context here, consult it during future work, and keep it current. Do not store credentials or private authentication data in notes.
+
+Flashloop is an independent app: [its implementation notes](../apps/flashloop/docs/README.md), [verification](../apps/flashloop/docs/VERIFICATION.md), and [public preview](https://odhasu.github.io/tezu-homepage/flashloop/blue/).
