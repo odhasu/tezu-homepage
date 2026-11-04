@@ -44,6 +44,8 @@ The hosted Auth configuration enables native `turnstile` CAPTCHA, confirmed emai
 
 Missing/invalid/expired/replayed/wrong-host/wrong-action tokens and provider failures are covered by local tests. Human challenge success/replay through the deployed website, actual delivered email and PKCE callback, and a browser's expired-token refresh are **not yet proven**. Administrative fixture verification does not prove those paths.
 
+The deployed signup page rendered in Chrome and advanced to the second challenge. Cloudflare then returned `300030`; the form cleared its tokens, showed a retry message, and kept account creation disabled. Cloudflare documents the `300*` family as bot-detection challenge failures. This is not proof of successful human signup. The open browser tab was handed to the user for a normal browser attempt; no CAPTCHA protection was disabled or bypassed. See [Cloudflare client error codes](https://developers.cloudflare.com/turnstile/troubleshooting/client-side-errors/error-codes/).
+
 ## Remaining setup and completion gate
 
 Supabase's built-in sender only sends to organization-member inboxes. A complete staging signup should first be tested with an allowed organization email, followed by its emailed PKCE confirmation and the second challenge. General public signup requires an SMTP sender and verified sending domain; no domain is connected to the current Cloudflare account. Do not disable email confirmation to work around sender limits.
