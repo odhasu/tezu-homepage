@@ -1,0 +1,11 @@
+{
+  "name": "flashloop-auth-database-regression",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node run-regression.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.15"
+  }
+}

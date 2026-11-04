@@ -1,5 +1,7 @@
 # Flashloop implementation notes
 
+Signup and session verification implementation, staging resource IDs, actual checks, and remaining email/browser gates are recorded in [AUTH.md](AUTH.md). This supersedes the earlier inventory's statement that no authentication code exists. Generation and payments remain unimplemented.
+
 Updated: 4 November 2026. This file records the new app only; Tezu/Krea product decisions stay in their existing notes.
 
 ## Public preview preference
@@ -35,6 +37,10 @@ There are no new animation, icon, or UI-library dependencies. Static sections st
 
 See [VERIFICATION.md](VERIFICATION.md) for actual checks and limits. This is a frontend recreation. Reference files selected in the composer stay on this device; navigation does not upload them. Credit amounts are estimates. Linked product pages and account/generation services remain on the reference site. The footer wordmark uses typography rather than the reference's animated particle canvas; five trend tiles cycle through recorded alternate thumbnail states; Hand Drawn keeps its recorded thumbnail. These are explicit fidelity gaps, not backend features.
 
+The current audit is recorded in [INVENTORY.md](INVENTORY.md), the isolated service plan in [STAGING.md](STAGING.md), and the frontend baseline in [BASELINE.md](BASELINE.md). The existing Vercel project is a separate runtime surface; staging must use a new Vercel project from `apps/flashloop`.
+
 ## GitHub Pages packaging
 
 Set `STATIC_EXPORT=true` and `NEXT_PUBLIC_BASE_PATH=/tezu-homepage/flashloop` to export. `localPath` prefixes literal images, media, metadata and home links; CSS backgrounds use dynamic root variables for the same prefix. Next.js prefixes its own scripts and font assets. `scripts/audit-export.mjs` validates rendered HTML/CSS destinations against the exported artifact. Product subpages retain the reference site's URLs.
+
+Public deployment verified on 4 November 2026: [release details](VERIFICATION.md#github-pages-release--4-november-2026).

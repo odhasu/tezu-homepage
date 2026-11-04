@@ -3,7 +3,7 @@
 import { localPath } from "@/lib/local-path";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "./Icon";
-import { referenceLink } from "@/lib/links";
+import { authLink, referenceLink } from "@/lib/links";
 import content from "./content.json";
 
 const nav = [
@@ -77,17 +77,17 @@ export function Header() {
             ))}
           </div>
           <div className="shell-actions">
-            <a className="shell-tryNow" href={referenceLink("auth/")}>Get Started</a>
+            <a className="shell-tryNow" href={authLink(true)}>Get Started</a>
             <div className="shell-desktopActions">
             <a className="shell-pricing" href={referenceLink("pricing/")}>
               <i />
               <b>Pricing</b>
               <span>30% OFF</span>
             </a>
-            <a className="shell-login" href={referenceLink("auth/")}>
+            <a className="shell-login" href={authLink()}>
               Login
             </a>
-            <a className="shell-signup" href={referenceLink("auth/")}>
+            <a className="shell-signup" href={authLink(true)}>
               Sign up
             </a>
             </div>
@@ -120,7 +120,7 @@ export function Header() {
             <a href={referenceLink("pricing/")}>
               Pricing <span>30% OFF</span>
             </a>
-            <a href={referenceLink("auth/")}>Login / Sign up</a>
+            <a href={authLink()}>Login / Sign up</a>
           </nav>
         </div>
       )}

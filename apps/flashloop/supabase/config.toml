@@ -1,0 +1,27 @@
+# Dedicated Kumi staging project. Secret values are supplied through environment variables.
+[auth]
+site_url = "https://kumi-staging.vercel.app"
+additional_redirect_urls = ["https://kumi-staging.vercel.app/api/auth/callback"]
+enable_signup = true
+enable_anonymous_sign_ins = false
+minimum_password_length = 12
+
+[auth.email]
+enabled = true
+enable_confirmations = true
+max_frequency = "60s"
+
+[auth.captcha]
+enabled = true
+provider = "turnstile"
+secret = "env(TURNSTILE_SECRET)"
+
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/before_user_created"
+
+[auth.rate_limit]
+email_sent = 2
+sign_in_sign_ups = 30
+token_verifications = 30
+token_refresh = 150

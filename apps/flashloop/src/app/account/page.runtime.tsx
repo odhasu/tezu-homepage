@@ -1,0 +1,18 @@
+import { redirect } from "next/navigation";
+import { authClients, requireProtectedSession } from "@/lib/auth/server";
+import { localPath } from "@/lib/local-path";
+
+export const dynamic = "force-dynamic";
+
+export default async function AccountPage() {
+  // Cookie refreshes run through /api/auth/session, where response cookies can be written.
+  const context = await requireProtectedSession(await authClients(false)).catch(() => null);
+  if (!context) redirect(localPath("/auth/verify"));
+  return (
+    <main id="main-content">
+      <h1>Your account</h1>
+      <p>Video credits: {context.credits}</p>
+      <a href={localPath("/blue")}>Back to Flashloop</a>
+    </main>
+  );
+}
