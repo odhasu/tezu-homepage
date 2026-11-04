@@ -27,7 +27,12 @@ export function SessionVerification() {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     getAuthSession(controller.signal).then((nextSession) => {
-      if (active) setSession(nextSession);
+      if (active) {
+        if (nextSession.authenticated && nextSession.emailConfirmed && nextSession.verified) {
+          window.location.replace(localPath("/blue"));
+        }
+        setSession(nextSession);
+      }
     }).catch(() => {
       if (active) {
         setError("Your session could not be checked. Please sign in again.");
@@ -49,7 +54,8 @@ export function SessionVerification() {
     try {
       await postAuth("verify", { token: tokens[0] });
       const nextSession = await getAuthSession();
-      if (!nextSession.authenticated || !nextSession.verified) throw new Error("Verification did not finish.");
+      if (!nextSession.authenticated || !nextSession.emailConfirmed || !nextSession.verified) throw new Error("Verification did not finish.");
+      window.location.replace(localPath("/blue"));
       setSession(nextSession);
     } catch {
       await postAuth("signout", {}).catch(() => undefined);
@@ -73,9 +79,13 @@ export function SessionVerification() {
     }
   }
 
+  if (session?.authenticated && session.emailConfirmed && session.verified) {
+    return <p className="auth-copy" role="status">Opening Flashloop…</p>;
+  }
+
   return (
     <section className="auth-card" aria-labelledby="auth-heading" aria-busy={pending}>
-      <h1 id="auth-heading">{session?.verified ? "Your account is verified" : "Verify your account"}</h1>
+      <h1 id="auth-heading">Verify your account</h1>
       {!enabled ? <p className="auth-copy">Account verification is not available yet. Please try again later.</p>
         : !session ? <p className="auth-copy" role="status">Checking your session…</p>
         : !session.authenticated ? <>
@@ -83,14 +93,8 @@ export function SessionVerification() {
           <a className="auth-primary" href={localPath("/auth")}>Sign in</a>
         </>
         : !session.emailConfirmed ? <>
-          <p className="auth-copy">Open the confirmation link in your email before continuing. Then sign in again.</p>
+          <p className="auth-copy">Confirm your email before continuing. Then sign in again.</p>
           <button className="auth-primary" type="button" disabled={pending} onClick={signOut}>Return to sign in</button>
-        </>
-        : session.verified ? <>
-          <p className="auth-copy" role="status">You can now use your account.</p>
-          {session.credits !== undefined ? <p className="auth-balance">Video credits <strong>{session.credits}</strong></p> : null}
-          <a className="auth-primary" href={localPath("/blue")}>Continue to Flashloop</a>
-          <button className="auth-text-button" type="button" onClick={signOut} disabled={pending}>Sign out</button>
         </>
         : <>
           <p className="auth-copy">Your email is confirmed. Complete one last security check to use your account.</p>

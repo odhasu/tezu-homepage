@@ -9,7 +9,7 @@ Updated: 4 November 2026. This is the authentication implementation for the inde
 | Supabase | `kumi`, reference `txwclngedcporvrfbolu`, organization `lukas`, region `eu-west-1` |
 | Vercel | Dedicated `odhasus-projects/kumi-staging`, project `prj_JqLdiHCni81bVfHQ1KkUYsL2Yvsa` |
 | Auth origin | `https://kumi-staging.vercel.app` |
-| Current staging release | `dpl_EziEm1g31giSYiHmDWMfvHTBrEwz`, READY, Node.js 24; this is the dedicated staging project's production target, not the unrelated production application |
+| Current staging release | `dpl_7p34A3RfdZwz5x1v7CnUznf767RB`, READY, Node.js 24; this is the dedicated staging project's production target, not the unrelated production application |
 | Allowed email callback | `https://kumi-staging.vercel.app/api/auth/callback` only |
 | Turnstile | Managed `kumi-staging` widget; staging, `localhost`, and `127.0.0.1` widget domains; staging Siteverify accepts only its exact hostname |
 | Previous Supabase project | `lucasresellzcodex` was paused, not deleted, to free an active free-project slot after the user authorized making room for Kumi. Its data was retained. |
@@ -19,6 +19,12 @@ The existing Vercel `flashloop` project is unrelated and was not modified. No R2
 ## User flow and enforcement
 
 The user selected email/password, confirmed email, and a second Turnstile check. `/auth` signs in, `/auth/signup` creates an account, `/auth/verify` completes the per-session gate, and `/account` is a protected server-rendered example. `/api/account` is the protected API. Auth links in the existing header use these routes when `NEXT_PUBLIC_AUTH_ENABLED=true`.
+
+On 4 November the user confirmed signup and verification worked and supplied the verified-account screen. They requested removing that success screen: verified sessions now navigate directly to `/blue`, both immediately after verification and when revisiting `/auth/verify`. The credit summary and extra Continue button have been removed from this step; database credit rules are unchanged.
+
+The user also requested six-digit email confirmation, then explicitly chose to keep the existing email-link flow for now after Supabase rejected template customization. The exact provider response was: `Email template modification is not available for free tier projects using the default email provider. Please upgrade your plan or configure a custom SMTP provider.` No SMTP service or paid upgrade was provisioned. The unshipped code-entry changes were removed and the hosted OTP settings were restored and read back; email confirmation links remain the active method.
+
+Validation for the success-screen removal: lint, strict TypeScript, runtime production build, 50 existing auth assertions, 69 database assertions, and the 93-asset audit passed. An executed component smoke check confirmed that only an authenticated, email-confirmed, verified session redirects; pending and anonymous sessions stay gated. The production verification bundle contains the redirect state and neither the removed success heading nor its Continue button. The in-app browser had no signed-in session during this check and correctly displayed the sign-in gate; the user's screenshot is the evidence of their prior successful human flow.
 
 Signup and sign-in each collect separate fresh tokens: the first is consumed by the Next.js backend's Siteverify call, and the second by native Supabase CAPTCHA enforcement. A single token cannot be redeemed by both validators. The backend requires exact hostname/action, a valid challenge timestamp younger than 300 seconds, provider success, and a bounded nonempty token. Provider/network/JSON errors deny the request. Cloudflare supplies cross-instance single-use enforcement; no in-memory replay cache is used.
 
