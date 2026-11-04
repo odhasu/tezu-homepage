@@ -1,5 +1,7 @@
 # Flashloop blue
 
+**[Public preview](https://odhasu.github.io/tezu-homepage/flashloop/blue/)**
+
 Editable Next.js 16 recreation of [the supplied blue homepage](https://odhasu.github.io/flashloop-clone/blue/). Tezu and Krea remain separate applications.
 
 ```bash

@@ -22,3 +22,13 @@ Work began 3 November 2026; final checks 4 November 2026.
 - No generation, authentication, payment, or email service is part of this frontend. Reference files are local previews and are not transmitted by navigation.
 
 The final scope deliberately preserves source-site destinations for linked product pages. Local homepage controls do not imply an AI backend. Five additional observed trend thumbnail states were added after the initial asset audit; the final 93-asset audit supersedes the earlier count.
+
+## GitHub Pages release — 4 November 2026
+
+- Public preview: https://odhasu.github.io/tezu-homepage/flashloop/blue/
+- Product commit: `45b37cbd56b1010e6e659313692f0729dac31e7d`.
+- [GitHub Actions deployment](https://github.com/odhasu/tezu-homepage/actions/runs/41803972445) succeeded, including checks/exports for all three apps and the Flashloop export audit.
+- Live HTTP verification passed for the Flashloop page and 103 local route/asset destinations, with no failures.
+- Existing Tezu homepage and bundled Tezu page returned HTTP 200 with their original titles and H1 content. No existing product source/media were changed in this release.
+- [Live verification data](pages-verification.json). Browser automation was unavailable for this publication; these live checks validate deployment/URLs, not a fresh rendered mobile comparison.
+- User-facing preview replies must use the public GitHub Pages URL.

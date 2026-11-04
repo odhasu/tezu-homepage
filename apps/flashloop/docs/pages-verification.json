@@ -1,0 +1,546 @@
+{
+  "release": "45b37cbd56b1010e6e659313692f0729dac31e7d",
+  "workflow": "https://github.com/odhasu/tezu-homepage/actions/runs/41803972445",
+  "url": "https://odhasu.github.io/tezu-homepage/flashloop/blue/",
+  "status": 200,
+  "title": [
+    "Flashloop - AI Video &amp; Image Generator"
+  ],
+  "checkedDestinations": 103,
+  "failures": [],
+  "existingPages": {
+    "https://odhasu.github.io/tezu-homepage/": {
+      "status": 200,
+      "title": [
+        "Tezu \u2014 Create with Tezu"
+      ],
+      "titlePreserved": true,
+      "headingsPreserved": true
+    },
+    "https://odhasu.github.io/tezu-homepage/tezu/": {
+      "status": 200,
+      "title": [
+        "TEZU \u2014 Create beyond imagination"
+      ],
+      "titlePreserved": true,
+      "headingsPreserved": true
+    }
+  },
+  "assetResults": [
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/2652x-ecr4tjj.css",
+      "status": 200,
+      "type": "text/css; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/27t_qfc-3_lzs.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/2bbwo8iammiqp.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/3fntmmi971322.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/3l04zcqx63h3y.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/40nxn8lnfvshf.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/chunks/turbopack-3qvogxqyt6qvz.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/_next/static/media/tiktok_sans-s.p.0pa36vrkdpcps.woff2",
+      "status": 200,
+      "type": "font/woff2"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/blue/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/15156e7b-audience-agency.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/1e6b379f-brand-images-1.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/1f69c4d8-explainer-2.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/201c6386-trojan-stickman.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/2634b3e2-hero-night-market-lg.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/2baa2e2f-ugc-product.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/39a50820-audience-marketing.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/3d377f32-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/3fd739c2-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/421b87d5-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/4a78b59a-sports-celebrating.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/4a7af228-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/57a8e8be-brand-video-v2.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/57d941cd-kling-4.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/6015c7a6-mirage-studio.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/60bb068d-celebrating-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/642253f5-studio-cast-tiles.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/6a82a0bf-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/6d38ac86-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/7fb8d9c9-kling-4.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/850800ee-studio_white--dewvana-hero.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/852e8f8b-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/8ade7a3b-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/91b6f8c4-explainer-3.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/924789a1-brand-images-3.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/9589b2b0-film-studio.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/9895368a-models-panel.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/9f31cf2e-ads-studio.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/a04cca20-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/a5e59642-neon-city.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/a8d3b63b-ugc-street.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/ad3578db-mirage-studio.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/b267b821-audience-creator.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/b4056a2b-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/b868d009-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/bfd01678-ugc-skincare.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/1e4afaae-cloud-a.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/4639d244-cloud-b.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/acda2036-logo-wordmark.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/c03dae77-film-studio-atmosphere.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/c57e271f-cloud-tuft.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/hero-grid.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/hero-light.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/blue/studio-3.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/c4e31026-brand-car.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/c63760ff-fight-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/cartoon/262995c6-boy.png",
+      "status": 200,
+      "type": "image/png"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/cartoon/29c3ff9c-boy-scene.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/cartoon/6260e04a-girl-scene.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/ccff8824-ads-studio.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/db91593f-social-content.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/e2e3fa7f-film-studio.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/effects/ca529f797477.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/f191e8a4-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/f4913ae6-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-0.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-1.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-10.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-11.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-12.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-2.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-3.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-4.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-5.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-6.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-7.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-8.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/model-9.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/studio-0.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/studio-1.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/studio-2.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/studio-4.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/graphics/studio-5.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/bob-wendy-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/brand-video-v2-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/curious-club-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/h3-max-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/horn-from-sea-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/neon-city-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/picnic-trouble-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/social-content-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/stormblade-duel-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/ugc-product-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/ugc-skincare-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home-video/ugc-street-hls/preview.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home/faceless-release.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/home/faceless-release.mp4",
+      "status": 200,
+      "type": "video/mp4"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/mcp/chatgpt-mcp-icon.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/mcp/chatgpt.svg",
+      "status": 200,
+      "type": "image/svg+xml"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/remote/0840eae6ea36-poster.jpg",
+      "status": 200,
+      "type": "image/jpeg"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/remote/8217a859d5d3-picnic-trouble.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/remote/99b350e13def-h3-max-v2.webp",
+      "status": 200,
+      "type": "image/webp"
+    },
+    {
+      "url": "https://odhasu.github.io/tezu-homepage/flashloop/sites/flashloop/tiktok-sans.woff2",
+      "status": 200,
+      "type": "font/woff2"
+    }
+  ]
+}

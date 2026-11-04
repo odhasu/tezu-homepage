@@ -149,3 +149,5 @@ Recheck the interactions and viewports affected by each change. Record actual ou
 - The export audit verified 80 rendered local route/asset destinations and found no unprefixed or missing URLs.
 - The existing Pages workflow now checks all three apps and adds Flashloop under `out/flashloop` without replacing the existing outputs.
 - Public verification and the workflow result are recorded after deployment below.
+
+Deployment completed: [run 41803972445](https://github.com/odhasu/tezu-homepage/actions/runs/41803972445), commit `45b37cbd56b1010e6e659313692f0729dac31e7d`. The live Flashloop page and 103 route/asset destinations returned HTTP 200; both existing Tezu pages retained their titles/H1 content. See [the app's verification record](../apps/flashloop/docs/VERIFICATION.md) for the machine-readable report and browser-check limits.
