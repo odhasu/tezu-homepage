@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 import { localPath } from "@/lib/local-path";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { AnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
+import { analyticsClientConfig } from "@/lib/analytics/server";
 import "./globals.css";
 import "@/components/sites/flashloop/reference-layout.css";
 import "@/components/sites/flashloop/flashloop.css";
@@ -22,6 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const analytics = analyticsClientConfig();
   return (
     <html lang="en" data-flashloop-theme="blue" className={tiktok.variable}>
       <body style={{
@@ -32,6 +35,7 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
+        {analytics && <AnalyticsConsent policyVersion={analytics.policyVersion} />}
       </body>
     </html>
   );

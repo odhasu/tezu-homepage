@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
+import { prepareAdministrativeFixture } from "./administrative-fixture.mjs";
 
 // This is a staging-only integration test, never a public CAPTCHA/email test.
 const project = "txwclngedcporvrfbolu";
@@ -67,11 +68,9 @@ try {
   assert.equal(request("/api/auth/signup", "", "POST", { email, password: randomBytes(24).toString("hex") }).status, 403);
   check("deployed signup rejects missing Turnstile tokens");
 
-  const permit = randomBytes(32).toString("hex");
-  const issued = await admin.rpc("issue_signup_permit", { p_email: email, p_permit_hash: createHash("sha256").update(permit).digest("hex") });
-  assert.ifError(issued.error);
+  const fixture = await prepareAdministrativeFixture(admin, { email, fixtureId: `auth-website:${email}` });
   const created = await admin.auth.admin.createUser({ email, password: randomBytes(24).toString("base64url"), email_confirm: true,
-    user_metadata: { signup_permit: permit } });
+    user_metadata: fixture.userMetadata });
   assert.ifError(created.error);
   userId = created.data.user.id;
 
@@ -109,7 +108,7 @@ try {
   assert.ok([401, 403].includes(request("/api/account", verified.cookie).status));
   check("verification failure also revokes an already verified session");
   console.log(`PASS: ${passed} deployed website assertions.`);
-  console.log("Not proven here: browser-entered signup credentials, delivered email/PKCE, human challenge success/replay, expired-token browser refresh.");
+  console.log("Not proven here: public signup/hook/IP quota, browser-entered signup credentials, delivered email/PKCE, human challenge success/replay, expired-token browser refresh.");
 } finally {
   for (const session of sessions) await admin.auth.admin.signOut(session.access_token, "global").catch(() => undefined);
   if (userId) {

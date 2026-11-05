@@ -1,0 +1,24 @@
+.analytics-consent,
+.analytics-preferences {
+  position: fixed;
+  z-index: 1000;
+  bottom: 16px;
+  left: 16px;
+  max-width: min(440px, calc(100vw - 32px));
+  border: 1px solid #bcc6db;
+  border-radius: 12px;
+  background: #fff;
+  color: #172238;
+  font: 14px/1.5 var(--font-flashloop), sans-serif;
+  box-shadow: 0 5px 24px #17223820;
+}
+
+.analytics-consent { padding: 20px; }
+.analytics-consent h2 { margin: 0 0 8px; font-size: 18px; }
+.analytics-consent p { margin: 0 0 16px; }
+.analytics-consent-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.analytics-consent button,
+.analytics-preferences { padding: 8px 12px; cursor: pointer; }
+.analytics-consent button { border: 1px solid #172238; border-radius: 6px; background: #fff; color: #172238; font: inherit; }
+.analytics-consent button:focus-visible,
+.analytics-preferences:focus-visible { outline: 3px solid #325dfb; outline-offset: 3px; }

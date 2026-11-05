@@ -1,15 +1,24 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomBytes } from "node:crypto";
+import { boundedProviderFetch } from "@/lib/security/provider-fetch";
 import { authConfig } from "./config";
 import { AuthFailure, parseAuthContext, requireVerified, type AuthContext } from "./security";
 
-export async function authClients(writable = true) {
+const userDataClients = new WeakSet<SupabaseClient>();
+
+/** Only the publishable-key cookie factory can issue a client for user data. */
+export function assertUserDataClient(client: SupabaseClient): void {
+  if (!userDataClients.has(client)) throw new AuthFailure("User-scoped database client required.", 503);
+}
+
+export async function authUserClient(writable = true) {
   const config = authConfig();
   const store = await cookies();
   const client = createServerClient(config.supabaseUrl, config.publishableKey, {
+    global: { fetch: boundedProviderFetch },
     cookieOptions: { httpOnly: true, secure: config.origin.startsWith("https:"), sameSite: "lax", path: "/" },
     cookies: {
       getAll: () => store.getAll(),
@@ -19,7 +28,14 @@ export async function authClients(writable = true) {
       },
     },
   });
+  userDataClients.add(client);
+  return { config, client };
+}
+
+export async function authClients(writable = true) {
+  const { config, client } = await authUserClient(writable);
   const admin = createClient(config.supabaseUrl, config.secretKey, {
+    global: { fetch: boundedProviderFetch },
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
   return { config, client, admin };
@@ -27,7 +43,7 @@ export async function authClients(writable = true) {
 
 export type AuthClients = Awaited<ReturnType<typeof authClients>>;
 
-export async function authContext({ client }: AuthClients): Promise<AuthContext | null> {
+export async function authContext({ client }: Pick<AuthClients, "client">): Promise<AuthContext | null> {
   const { data: { user }, error } = await client.auth.getUser();
   if (error || !user) return null;
   const result = await client.rpc("get_auth_context");
@@ -37,7 +53,7 @@ export async function authContext({ client }: AuthClients): Promise<AuthContext 
 }
 
 /** Every protected handler calls this; redirects and client state never authorize actions. */
-export async function requireProtectedSession(clients: AuthClients): Promise<AuthContext> {
+export async function requireProtectedSession(clients: Pick<AuthClients, "client">): Promise<AuthContext> {
   return requireVerified(await authContext(clients));
 }
 
@@ -66,18 +82,54 @@ export async function revokeSession({ client }: AuthClients): Promise<void> {
 
 export async function rateLimit(clients: AuthClients, key: string, limit = 5): Promise<void> {
   const hash = createHash("sha256").update(key).digest("hex");
-  const result = await clients.admin.rpc("consume_auth_rate_limit", {
-    p_key: hash, p_limit: limit, p_window_seconds: 600,
-  });
-  if (result.error) throw new AuthFailure("Authentication unavailable.", 503);
-  if (result.data !== true) throw new AuthFailure("Too many attempts. Try again later.", 429);
+  try {
+    const result = await clients.admin.rpc("consume_auth_rate_limit", {
+      p_key: hash, p_limit: limit, p_window_seconds: 600,
+    }).abortSignal(AbortSignal.timeout(8000));
+    if (result.error) throw new AuthFailure("Authentication unavailable.", 503, 600);
+    // The existing atomic RPC returns only a boolean. A full window is a safe
+    // retry bound even when this request arrives partway through that window.
+    if (result.data !== true) throw new AuthFailure("Too many attempts. Try again later.", 429, 600);
+  } catch (error) {
+    if (error instanceof AuthFailure) throw error;
+    throw new AuthFailure("Authentication unavailable.", 503, 600);
+  }
 }
 
-export async function signupPermit(clients: AuthClients, email: string): Promise<string> {
+function signupIpKey(trustedIp: string): string {
+  const ipSecret = process.env.SIGNUP_IP_HASH_SECRET;
+  if (!ipSecret || ipSecret.length < 32 || ipSecret.length > 256 || ipSecret.trim() !== ipSecret) {
+    throw new AuthFailure("Signup protection is not configured.", 503);
+  }
+  return createHmac("sha256", ipSecret).update(trustedIp).digest("hex");
+}
+
+function requireSignupQuota(status: unknown): void {
+  if (!status || typeof status !== "object" || Array.isArray(status)) throw new AuthFailure("Account creation unavailable.", 503);
+  const quota = status as Record<string, unknown>;
+  if (quota.allowed === false && typeof quota.retry_after_seconds === "number" &&
+    Number.isSafeInteger(quota.retry_after_seconds) && quota.retry_after_seconds > 0 && quota.retry_after_seconds <= 345600) {
+    throw new AuthFailure("This network has reached its signup limit. Try again later.", 429, quota.retry_after_seconds);
+  }
+  if (quota.allowed !== true) throw new AuthFailure("Account creation unavailable.", 503);
+}
+
+/** A failure-only recheck maps a racing database quota denial without parsing provider errors. */
+export async function recheckSignupQuota(clients: AuthClients, trustedIp: string): Promise<void> {
+  const result = await clients.admin.rpc("get_signup_ip_quota", { p_ip_key_hash: signupIpKey(trustedIp) });
+  if (result.error) throw new AuthFailure("Account creation unavailable.", 503, 600);
+  requireSignupQuota(result.data);
+}
+
+export async function signupPermit(clients: AuthClients, email: string, trustedIp: string): Promise<string> {
+  const ipKey = signupIpKey(trustedIp);
   const permit = randomBytes(32).toString("hex");
-  const result = await clients.admin.rpc("issue_signup_permit", {
-    p_email: email, p_permit_hash: createHash("sha256").update(permit).digest("hex"),
+  const result = await clients.admin.rpc("issue_signup_permit_for_ip", {
+    p_email: email,
+    p_permit_hash: createHash("sha256").update(permit).digest("hex"),
+    p_ip_key_hash: ipKey,
   });
   if (result.error) throw new AuthFailure("Account creation unavailable.", 503);
+  requireSignupQuota(result.data);
   return permit;
 }

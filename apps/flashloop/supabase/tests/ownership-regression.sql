@@ -1,0 +1,200 @@
+begin;
+create schema test_ownership;
+create table test_ownership.assertions (label text primary key);
+create table test_ownership.state (name text primary key, value text);
+create function test_ownership.ok(condition boolean, label text)
+returns void language plpgsql security invoker as $$
+begin
+  if condition is not true then raise exception 'Assertion failed: %', label; end if;
+  insert into test_ownership.assertions values (label);
+end;
+$$;
+create function test_ownership.raises(query text, expected_state text, label text)
+returns void language plpgsql security invoker as $$
+begin
+  begin execute query;
+  exception when others then
+    if sqlstate = expected_state then insert into test_ownership.assertions values(label); return; end if;
+    raise;
+  end;
+  raise exception 'Expected SQLSTATE %: %', expected_state, label;
+end;
+$$;
+grant usage on schema test_ownership to anon, authenticated, service_role;
+grant all on all tables in schema test_ownership to anon, authenticated, service_role;
+grant execute on all functions in schema test_ownership to anon, authenticated, service_role;
+
+insert into auth.users(id,email,email_confirmed_at) values
+  ('10000000-0000-4000-8000-000000000002','second@example.test',now());
+insert into auth.sessions(id,user_id) values
+  ('20000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001'),
+  ('20000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000002'),
+  ('20000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000001');
+insert into private.session_verifications(session_id,user_id,state,verified_at) values
+  ('20000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','verified',now()),
+  ('20000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000002','verified',now());
+update auth.users set raw_user_meta_data='{"owner_id":"10000000-0000-4000-8000-000000000002","is_admin":true,"verified":true}' where id='10000000-0000-4000-8000-000000000001';
+select test_ownership.ok((select count(*)=5 and bool_and(c.relrowsecurity and c.relforcerowsecurity) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname in ('accounts','projects','jobs','uploads','outputs')), 'all five ownership tables enable and force RLS');
+select test_ownership.ok((select count(*)=2 and not bool_or(p.prosecdef) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname in ('advance_owned_job','record_owned_output')), 'exposed workers have no definer privileges');
+select test_ownership.ok((select count(*)=2 and bool_and(display_name='') from public.accounts), 'backfill and auth trigger create empty profiles without metadata authority');
+
+set role anon;
+select test_ownership.raises('select * from public.accounts', '42501', 'anonymous cannot select accounts');
+select test_ownership.raises('select * from public.projects', '42501', 'anonymous cannot select projects');
+select test_ownership.raises('select * from public.jobs', '42501', 'anonymous cannot select jobs');
+select test_ownership.raises('select * from public.uploads', '42501', 'anonymous cannot select uploads');
+select test_ownership.raises('select * from public.outputs', '42501', 'anonymous cannot select outputs');
+select test_ownership.raises('select public.advance_owned_job(gen_random_uuid(),gen_random_uuid(),gen_random_uuid(),''running'')','42501','anonymous cannot invoke worker');
+reset role;
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000001","session_id":"20000000-0000-4000-8000-000000000001"}',true);
+set role authenticated;
+update public.accounts set display_name='A' where user_id=auth.uid();
+select test_ownership.ok((select count(*)=1 and bool_and(user_id=auth.uid()) from public.accounts), 'A sees only own account');
+insert into public.projects(id,name) values('30000000-0000-4000-8000-000000000001','A project');
+insert into public.jobs(id,project_id,label) values('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','A job');
+insert into public.uploads(id,project_id,filename,content_type,byte_size) values('50000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','A.png','image/png',100);
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) from public.projects), 'A sees only own project');
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) and bool_and(status='queued') from public.jobs), 'A sees own queued job');
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) and bool_and(status='pending') from public.uploads), 'A sees own pending upload');
+select test_ownership.ok((select object_key='owners/10000000-0000-4000-8000-000000000001/projects/30000000-0000-4000-8000-000000000001/uploads/50000000-0000-4000-8000-000000000001' from public.uploads where id='50000000-0000-4000-8000-000000000001'), 'A object key derives only from immutable ownership');
+update public.projects set name='A renamed' where id='30000000-0000-4000-8000-000000000001';
+update public.jobs set label='A renamed' where id='40000000-0000-4000-8000-000000000001';
+update public.uploads set filename='A-renamed.png' where id='50000000-0000-4000-8000-000000000001';
+select test_ownership.ok((select name='A renamed' from public.projects where id='30000000-0000-4000-8000-000000000001') and (select label='A renamed' from public.jobs where id='40000000-0000-4000-8000-000000000001') and (select filename='A-renamed.png' from public.uploads where id='50000000-0000-4000-8000-000000000001'), 'A can update allowed own metadata');
+reset role;
+set role service_role;
+select test_ownership.ok(public.advance_owned_job('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','running'), 'A authorized worker starts job');
+insert into test_ownership.state(name,value) select 'A_output',public.record_owned_output('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','A-out.mp4','video/mp4',200)::text;
+reset role;
+set role authenticated;
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) from public.outputs), 'A sees only own output');
+update public.outputs set filename='A-renamed.mp4' where id=(select value::uuid from test_ownership.state where name='A_output');
+select test_ownership.ok((select filename='A-renamed.mp4' from public.outputs where id=(select value::uuid from test_ownership.state where name='A_output')), 'A can rename own output');
+reset role;
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000002","session_id":"20000000-0000-4000-8000-000000000002"}',true);
+set role authenticated;
+update public.accounts set display_name='B' where user_id=auth.uid();
+select test_ownership.ok((select count(*)=1 and bool_and(user_id=auth.uid()) from public.accounts), 'B sees only own account');
+insert into public.projects(id,name) values('30000000-0000-4000-8000-000000000002','B project');
+insert into public.jobs(id,project_id,label) values('40000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','B job');
+insert into public.uploads(id,project_id,filename,content_type,byte_size) values('50000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','B.png','image/png',100);
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) from public.projects), 'B sees only own project');
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) and bool_and(status='queued') from public.jobs), 'B sees own queued job');
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) and bool_and(status='pending') from public.uploads), 'B sees own pending upload');
+select test_ownership.ok((select object_key='owners/10000000-0000-4000-8000-000000000002/projects/30000000-0000-4000-8000-000000000002/uploads/50000000-0000-4000-8000-000000000002' from public.uploads where id='50000000-0000-4000-8000-000000000002'), 'B object key derives only from immutable ownership');
+update public.projects set name='B renamed' where id='30000000-0000-4000-8000-000000000002';
+update public.jobs set label='B renamed' where id='40000000-0000-4000-8000-000000000002';
+update public.uploads set filename='B-renamed.png' where id='50000000-0000-4000-8000-000000000002';
+select test_ownership.ok((select name='B renamed' from public.projects where id='30000000-0000-4000-8000-000000000002') and (select label='B renamed' from public.jobs where id='40000000-0000-4000-8000-000000000002') and (select filename='B-renamed.png' from public.uploads where id='50000000-0000-4000-8000-000000000002'), 'B can update allowed own metadata');
+reset role;
+set role service_role;
+select test_ownership.ok(public.advance_owned_job('40000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000002','running'), 'B authorized worker starts job');
+insert into test_ownership.state(name,value) select 'B_output',public.record_owned_output('40000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000002','B-out.mp4','video/mp4',200)::text;
+reset role;
+set role authenticated;
+select test_ownership.ok((select count(*)=1 and bool_and(owner_id=auth.uid()) from public.outputs), 'B sees only own output');
+update public.outputs set filename='B-renamed.mp4' where id=(select value::uuid from test_ownership.state where name='B_output');
+select test_ownership.ok((select filename='B-renamed.mp4' from public.outputs where id=(select value::uuid from test_ownership.state where name='B_output')), 'B can rename own output');
+reset role;
+-- A attempts to read/mutate B through ordinary database roles.
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000001","session_id":"20000000-0000-4000-8000-000000000001","user_metadata":{"owner_id":"10000000-0000-4000-8000-000000000002","is_admin":true}}',true);
+set role authenticated;
+select test_ownership.ok((select count(*)=0 from public.accounts where user_id='10000000-0000-4000-8000-000000000002'), 'A cannot read B accounts even with forged metadata');
+with changed as (update public.accounts set display_name='stolen' where user_id='10000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from changed), 'A cannot update B accounts');
+with removed as (delete from public.accounts where user_id='10000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from removed), 'A cannot delete B accounts');
+select test_ownership.ok((select count(*)=0 from public.projects where id='30000000-0000-4000-8000-000000000002'), 'A cannot read B projects even with forged metadata');
+with changed as (update public.projects set name='stolen' where id='30000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from changed), 'A cannot update B projects');
+with removed as (delete from public.projects where id='30000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from removed), 'A cannot delete B projects');
+select test_ownership.ok((select count(*)=0 from public.jobs where id='40000000-0000-4000-8000-000000000002'), 'A cannot read B jobs even with forged metadata');
+with changed as (update public.jobs set label='stolen' where id='40000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from changed), 'A cannot update B jobs');
+with removed as (delete from public.jobs where id='40000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from removed), 'A cannot delete B jobs');
+select test_ownership.ok((select count(*)=0 from public.uploads where id='50000000-0000-4000-8000-000000000002'), 'A cannot read B uploads even with forged metadata');
+with changed as (update public.uploads set filename='stolen' where id='50000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from changed), 'A cannot update B uploads');
+with removed as (delete from public.uploads where id='50000000-0000-4000-8000-000000000002' returning 1) select test_ownership.ok((select count(*)=0 from removed), 'A cannot delete B uploads');
+select test_ownership.ok((select count(*)=0 from public.outputs where id=(select value::uuid from test_ownership.state where name='B_output')), 'A cannot read B outputs even with forged metadata');
+with changed as (update public.outputs set filename='stolen' where id=(select value::uuid from test_ownership.state where name='B_output') returning 1) select test_ownership.ok((select count(*)=0 from changed), 'A cannot update B outputs');
+with removed as (delete from public.outputs where id=(select value::uuid from test_ownership.state where name='B_output') returning 1) select test_ownership.ok((select count(*)=0 from removed), 'A cannot delete B outputs');
+select test_ownership.raises('insert into public.accounts(user_id,display_name) values(''10000000-0000-4000-8000-000000000002'',''forged'')','42501','forged account owner rejected');
+select test_ownership.raises('insert into public.projects(owner_id,name) values(''10000000-0000-4000-8000-000000000002'',''forged'')','42501','forged project owner rejected');
+select test_ownership.raises('insert into public.jobs(project_id,owner_id) values(''30000000-0000-4000-8000-000000000002'',''10000000-0000-4000-8000-000000000002'')','42501','forged child owner rejected');
+select test_ownership.raises('insert into public.jobs(project_id) values(''30000000-0000-4000-8000-000000000002'')','42501','own job cannot reference B project');
+select test_ownership.raises('insert into public.uploads(project_id,filename,content_type,byte_size) values(''30000000-0000-4000-8000-000000000002'',''bad.png'',''image/png'',0)','42501','own upload cannot reference B project');
+select test_ownership.raises('insert into public.outputs(project_id,owner_id,job_id,filename,content_type,byte_size) values(''30000000-0000-4000-8000-000000000001'',auth.uid(),''40000000-0000-4000-8000-000000000001'',''forged.mp4'',''video/mp4'',0)','42501','owner cannot forge output');
+select test_ownership.raises('update public.accounts set user_id=''10000000-0000-4000-8000-000000000002''','42501','owner cannot alter account identity');
+select test_ownership.raises('update public.projects set owner_id=''10000000-0000-4000-8000-000000000002''','42501','owner cannot alter project owner');
+select test_ownership.raises('update public.projects set id=gen_random_uuid()','42501','owner cannot alter project ID');
+select test_ownership.raises('update public.jobs set project_id=''30000000-0000-4000-8000-000000000002''','42501','owner cannot alter job project');
+select test_ownership.raises('update public.jobs set owner_id=''10000000-0000-4000-8000-000000000002''','42501','owner cannot alter job owner');
+select test_ownership.raises('update public.jobs set status=''succeeded''','42501','owner cannot alter job state');
+select test_ownership.raises('update public.uploads set project_id=''30000000-0000-4000-8000-000000000002''','42501','owner cannot alter upload project');
+select test_ownership.raises('update public.uploads set status=''ready''','42501','owner cannot alter upload completion');
+select test_ownership.raises('update public.uploads set object_key=''stolen''','428C9','owner cannot alter upload key');
+select test_ownership.raises('update public.uploads set byte_size=0','42501','owner cannot alter upload storage fact');
+select test_ownership.raises('update public.outputs set job_id=gen_random_uuid()','42501','owner cannot alter output job');
+select test_ownership.raises('update public.outputs set object_key=''stolen''','428C9','owner cannot alter output key');
+select test_ownership.raises('update public.outputs set content_type=''text/plain''','42501','owner cannot alter output storage fact');
+select test_ownership.raises('update public.projects set created_at=now()','42501','owner cannot alter creation timestamp');
+select test_ownership.raises('insert into public.jobs(project_id,status) values(''30000000-0000-4000-8000-000000000001'',''succeeded'')','42501','owner cannot insert completed job');
+select test_ownership.raises('insert into public.uploads(project_id,filename,content_type,byte_size,status) values(''30000000-0000-4000-8000-000000000001'',''bad'',''image/png'',0,''ready'')','42501','owner cannot insert ready upload');
+select test_ownership.raises('select public.advance_owned_job(''40000000-0000-4000-8000-000000000001'',''30000000-0000-4000-8000-000000000001'',auth.uid(),''succeeded'')','42501','owner cannot invoke state worker');
+select test_ownership.raises('select public.record_owned_output(''40000000-0000-4000-8000-000000000001'',''30000000-0000-4000-8000-000000000001'',auth.uid(),''bad'',''video/mp4'',0)','42501','owner cannot invoke output worker');
+insert into public.projects(id,name) values('30000000-0000-4000-8000-000000000003','A second project');
+reset role;
+-- Constraints and triggers protect identity even when ordinary RLS is bypassed.
+select test_ownership.raises('update public.accounts set user_id=gen_random_uuid()','23514','privileged identity trigger rejects account identity reassignment');
+select test_ownership.raises('update public.projects set owner_id=''10000000-0000-4000-8000-000000000002''','23514','privileged identity trigger rejects project owner reassignment');
+select test_ownership.raises('update public.jobs set project_id=''30000000-0000-4000-8000-000000000003''','23514','privileged identity trigger rejects job project reassignment');
+select test_ownership.raises('update public.uploads set project_id=''30000000-0000-4000-8000-000000000003''','23514','privileged identity trigger rejects upload project reassignment');
+select test_ownership.raises('update public.outputs set job_id=gen_random_uuid()','23514','privileged identity trigger rejects output job reassignment');
+select test_ownership.raises('update public.video_credit_accounts set user_id=gen_random_uuid()','23514','privileged identity trigger rejects credit owner reassignment');
+select test_ownership.raises('insert into public.jobs(project_id,owner_id) values(''30000000-0000-4000-8000-000000000001'',''10000000-0000-4000-8000-000000000002'')','23503','composite FK rejects forged parent owner even privileged');
+select test_ownership.raises('insert into public.outputs(job_id,project_id,owner_id,filename,content_type,byte_size) values(''40000000-0000-4000-8000-000000000001'',''30000000-0000-4000-8000-000000000003'',''10000000-0000-4000-8000-000000000001'',''bad'',''video/mp4'',0)','23503','output composite FK rejects same-owner cross-project job');
+set role service_role;
+select test_ownership.raises('delete from public.accounts','42501','service role has no broad accounts mutation');
+select test_ownership.raises('delete from public.projects','42501','service role has no broad projects mutation');
+select test_ownership.raises('delete from public.jobs','42501','service role has no broad jobs mutation');
+select test_ownership.raises('delete from public.uploads','42501','service role has no broad uploads mutation');
+select test_ownership.raises('delete from public.outputs','42501','service role has no broad outputs mutation');
+select test_ownership.ok(not public.advance_owned_job('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001','succeeded'), 'worker rejects wrong project tuple');
+select test_ownership.ok(not public.advance_owned_job('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000002','succeeded'), 'worker rejects wrong owner tuple');
+select test_ownership.raises('select public.record_owned_output(''40000000-0000-4000-8000-000000000001'',''30000000-0000-4000-8000-000000000003'',''10000000-0000-4000-8000-000000000001'',''bad'',''video/mp4'',0)','42501','worker rejects same-owner cross-project output');
+select test_ownership.ok(public.advance_owned_job('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','succeeded'), 'authorized worker completes running job');
+select test_ownership.ok(not public.advance_owned_job('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','running'), 'worker cannot resurrect terminal job');
+select test_ownership.raises('select public.record_owned_output(''40000000-0000-4000-8000-000000000001'',''30000000-0000-4000-8000-000000000001'',''10000000-0000-4000-8000-000000000001'',''bad'',''video/mp4'',0)','42501','worker cannot record output after terminal state');
+reset role;
+-- Pending verification, revocation and deleted Auth sessions deny unchanged claims.
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000001","session_id":"20000000-0000-4000-8000-000000000003","user_metadata":{"verified":true}}',true);
+set role authenticated;
+select test_ownership.ok((select count(*)=0 from public.accounts), 'unverified session cannot read accounts');
+select test_ownership.ok((select count(*)=0 from public.projects), 'unverified session cannot read projects');
+select test_ownership.ok((select count(*)=0 from public.jobs), 'unverified session cannot read jobs');
+select test_ownership.ok((select count(*)=0 from public.uploads), 'unverified session cannot read uploads');
+select test_ownership.ok((select count(*)=0 from public.outputs), 'unverified session cannot read outputs');
+select test_ownership.raises('insert into public.projects(name) values(''pending'')','42501','unverified session cannot insert owned project');
+reset role;
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000001","session_id":"20000000-0000-4000-8000-000000000001"}',true);
+set role authenticated;
+select public.revoke_current_session();
+select test_ownership.ok((select count(*)=0 from public.accounts), 'revoked JWT cannot read accounts');
+select test_ownership.ok((select count(*)=0 from public.projects), 'revoked JWT cannot read projects');
+select test_ownership.ok((select count(*)=0 from public.jobs), 'revoked JWT cannot read jobs');
+select test_ownership.ok((select count(*)=0 from public.uploads), 'revoked JWT cannot read uploads');
+select test_ownership.ok((select count(*)=0 from public.outputs), 'revoked JWT cannot read outputs');
+reset role;
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000002","session_id":"20000000-0000-4000-8000-000000000002"}',true);
+set role authenticated;
+-- Own deletes exercise DELETE policies and cascading child cleanup.
+with removed as (delete from public.outputs where owner_id=auth.uid() returning 1) select test_ownership.ok((select count(*)=1 from removed),'B can delete own output');
+with removed as (delete from public.uploads where owner_id=auth.uid() returning 1) select test_ownership.ok((select count(*)=1 from removed),'B can delete own upload');
+with removed as (delete from public.jobs where owner_id=auth.uid() returning 1) select test_ownership.ok((select count(*)=1 from removed),'B can delete own job');
+with removed as (delete from public.projects where owner_id=auth.uid() returning 1) select test_ownership.ok((select count(*)=1 from removed),'B can delete own project');
+with removed as (delete from public.accounts where user_id=auth.uid() returning 1) select test_ownership.ok((select count(*)=1 from removed),'B can delete own profile');
+insert into public.accounts(display_name) values('B restored');
+select test_ownership.ok((select count(*)=1 from public.accounts), 'B can insert only own profile after deletion');
+reset role;
+delete from auth.sessions where id='20000000-0000-4000-8000-000000000002';
+set role authenticated;
+select test_ownership.ok((select count(*)=0 from public.accounts), 'deleted Auth session denies owned account without JWT refresh');
+reset role;
+select count(*)::integer as passed from test_ownership.assertions;
+rollback;

@@ -2,6 +2,8 @@
 
 Updated: 4 November 2026. This is the authentication implementation for the independent Flashloop Next.js app. The Tezu/Krea apps and published GitHub Pages release are unchanged.
 
+The subsequent [project ownership milestone](OWNERSHIP.md) retains this session gate, adds owner-scoped metadata tables and APIs, and records its hosted migration and real two-identity verification. Those new APIs have not replaced the current Vercel auth release.
+
 ## Resource boundary
 
 | Resource | Current identity |

@@ -2,6 +2,8 @@
 
 Updated: 4 November 2026.
 
+Current implementation updates: dedicated Kumi Auth staging exists; see [AUTH.md](AUTH.md). Personal project ownership and its current verification are in [OWNERSHIP.md](OWNERSHIP.md). The original plan and missing-resource inventory below are historical; those two records supersede completed setup items.
+
 Staging target: a new Vercel project built from `apps/flashloop`, preserving the finished Blue frontend. Existing GitHub Pages and the existing Vercel `flashloop` project remain untouched. Staging must never charge production accounts, consume production AI quotas, write production data, or publish over the current Pages release.
 
 ## Isolation boundary
@@ -63,9 +65,9 @@ The existing Vercel `AWS_*` and `S3_BUCKET_NAME` variables are not staging varia
 3. Keep the finished scoped CSS as the visual baseline. Add Tailwind CSS only as an incremental, verified layer; do not replace the emulation styles while backend seams are being staged. Add an env-name template and a startup check that reports missing variable names without printing values. Add CI checks that reject production hostnames, production bucket names, production Supabase references, and live payment/MCP variables in staging.
 4. Provision a new Supabase project. Add schema migrations, Auth redirect URLs for the staging host, test users, and RLS policies. Use the publishable key in the browser; keep privileged keys server-only. Verify with a staging-only test query.
 5. Enable Cloudflare R2 and create the staging bucket. Add scoped read/write credentials, upload size/type limits, object ownership checks, CORS, lifecycle cleanup, and a staging media hostname. Verify upload and download using a disposable test object.
-6. Add Next.js Route Handlers for session, upload intent/completion, drafts, and generation requests. Validate auth, ownership, content type, size, idempotency, and rate limits before calling a provider. Keep provider credentials out of client components.
+6. Add Next.js Route Handlers for session, upload intent/completion, drafts, and generation requests. The generation reservation Route Handler and shared entitlement service now validate live auth, request fingerprints, idempotency, and PostgreSQL caps before any provider dispatch. Keep provider credentials out of client components.
 7. Add Inngest staging functions for long-running generation and cleanup. Use the staging environment and keys; exercise retries against test objects only.
-8. Add AI provider staging keys or a no-op adapter. Set hard quotas and a provider allowlist. Do not enable billing or production account access.
+8. Add AI provider staging keys or a no-op adapter. Configure the database currency, provider price keys, hard quotas, reset timezone, and provider allowlist. Do not enable billing or production account access.
 9. Add Sentry and PostHog staging telemetry. Tag events and errors with `environment=staging`; redact prompts, tokens, uploaded content, and user identifiers unless explicitly required.
 10. Add HTTP caching after auth/data behavior is verified: immutable caching for versioned public assets, short `s-maxage` plus `stale-while-revalidate` for public marketing data, and `private, no-store` for auth, drafts, uploads, and user media responses. Recheck Vercel and browser cache headers.
 11. Run the frontend checks, Route Handler tests, staging smoke flow, and a production-key scan. Keep the public Pages URL as the visual comparison baseline.
@@ -90,4 +92,4 @@ The existing Vercel `AWS_*` and `S3_BUCKET_NAME` variables are not staging varia
 
 ## Missing setup
 
-Current access confirms Vercel CLI and Cloudflare account identity, but no Flashloop Supabase project, R2 bucket, verified Inngest environment, Sentry project, PostHog project, or AI provider staging credentials. The service-creation steps above remain pending until those resources are intentionally provisioned.
+Kumi Supabase Auth and ownership staging already exist, as recorded above. The entitlement migration remains local-only. R2, verified Inngest transport, Sentry, PostHog, and AI provider staging configuration remain pending. Currency, cap amounts, reset timezone, active-job limit, provider pricing, and credit conversion remain unresolved. Supabase CLI v3.0.0 was located in the existing npm cache and used to create the entitlement migration; it was not applied to a hosted project. The service-creation steps above remain pending until resources are intentionally provisioned.

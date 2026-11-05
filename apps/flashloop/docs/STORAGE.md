@@ -1,0 +1,101 @@
+# Private uploads and outputs
+
+Current extension: [JOBS.md](JOBS.md) records durable generation orchestration and the fail-closed provider callback boundary added on 5 November. R2 activation and private video ingestion remain unresolved; no production provider adapter or output-ingestion connection is enabled by that extension.
+
+Updated: 4 November 2026. This milestone follows [ownership and RLS](OWNERSHIP.md). The finished Flashloop frontend, public marketing assets, other applications, and newer deployment checkout are preserved. No deployment, bucket creation, R2 billing enablement, hosted migration, payment integration, or live ChatGPT/MCP connection was performed.
+
+## Current state and boundaries
+
+The implementation uses Next.js 16.4.5 Route Handlers, strict TypeScript, Supabase PostgreSQL/Auth, the AWS S3 SDK for Cloudflare R2, and Inngest for durable cleanup. Vercel remains the runtime target. Sentry and PostHog remain selected but unconfigured; this milestone does not install or activate those services. The existing frontend and its styling are unchanged. Public preview remains [GitHub Pages](https://odhasu.github.io/tezu-homepage/flashloop/blue/); Pages cannot execute these APIs.
+
+Private storage is disabled by default in both application configuration and the database policy. Missing configuration fails closed. The Cloudflare plugin could read the connected account, but its real R2 bucket-list request returned HTTP 403, code `10042`, with “Please enable R2 through the Cloudflare Dashboard.” No bucket privacy settings or actual object operations could therefore be verified.
+
+Supported private media in this milestone is **single-frame JPEG, PNG, and WebP only**. HTML, SVG, GIF, audio, video, animated images, and unreviewed formats are rejected. Video outputs require a separate bounded media decoding/validation pipeline before enabling them. Existing public marketing MP4s remain separate; their presence does not enable private video ingestion.
+
+## Object lifecycle
+
+1. A verified owner requests a reservation for an owned project. Only `filename`, `content_type`, and `byte_size` are accepted. Ownership comes from the live Supabase session, never the request body. Edge and same-origin checks precede signing.
+2. The user-scoped `reserve_project_upload` RPC rechecks the live verified session and owned parent. A PostgreSQL transaction locks the parent and serializes reservations for the account. It enforces the private policy and counts existing reservations plus deletion work awaiting acknowledgment.
+3. PostgreSQL generates the random record ID and both exact object keys. The server signs only the temporary staging key. PUT signatures bind the content type, content length, and `Cache-Control: private, no-store`. A browser supplies Content-Length automatically from the body; client code must not attempt to set this forbidden browser header manually.
+4. Completion authorizes the project and object again. The server HEADs the staging object, checks type and exact size, GETs it conditionally against its ETag, and bounds the streamed body. Sharp checks the actual format, rejects multiple pages and more than 40 million pixels, and decodes every pixel with a four-second decoder timeout. A MIME label, filename, magic prefix, or pending database row does not establish validity. This is image validation, not a malware-scanning guarantee.
+5. The server rechecks authorization and the stored deadline, then writes those verified bytes to the distinct sealed key with `If-None-Match: *`. It records a server-computed SHA-256 in R2 metadata. A lost-write-response retry can recover only an existing object with that exact digest, size, type, and ETag. The client never receives a write URL for sealed objects. Replaying a staging URL therefore cannot replace ready bytes.
+6. Only the narrow service-only completion RPC can mark an exact owned tuple ready. Clients cannot write metadata state or use service credentials through an ownership client. If an object is deleted while completion is running, completion cannot recreate its metadata. The durable cleanup record retains both exact keys.
+7. A download request rechecks the current session, owned parent, exact persisted object identity, ready status, ETag, and retention deadline before issuing a short-lived GET URL. Downloads use `Content-Disposition: attachment` and private/no-store caching.
+
+Invalid size/type/content completion schedules deletion and never marks the object ready. Transient storage failures remain retryable pending work. An abandoned reservation expires into cleanup. Existing `uploads` and `outputs` tables remain legacy metadata only; their object keys never authorize these signing routes. The new `project_objects` table is the sole private-object authority.
+
+The generation service currently accepts text prompts and does not consume uploaded objects or install an R2 provider adapter. `requireReadyInputs` is the server-side boundary for a future image-input adapter: it accepts at most eight distinct object IDs, reauthorizes each parent and record, and rejects pending, foreign, expired, and unverified uploads. An oversized or invalid upload cannot become a ready input. Connecting a new generation path requires calling this boundary at dispatch; the helper alone is not proof that an unimplemented provider integration is secure.
+
+`storeGeneratedImage` is a server-only building block, with no public callback route. It resolves owner/project from a persisted running job, uses the protected outbound downloader, decodes the image, reserves quota atomically through the service-only output RPC, seals it, and completes the matching record. Output completion also requires the persisted job to remain running. A future worker must authenticate provider signatures, bind provider job IDs to stored jobs, and enforce replay/idempotency rules before invoking it. No provider callback is enabled by this milestone.
+
+## APIs and database authority
+
+All routes are runtime-only and excluded from static exports:
+
+| Route | Request | Result |
+| --- | --- | --- |
+| `POST /api/projects/[projectId]/storage` | JSON filename, content_type, byte_size | Object ID, PUT URL, required headers, remaining lifetime |
+| `POST /api/projects/[projectId]/storage/[objectId]/complete` | Empty JSON object | Verified ready object ID |
+| `POST /api/projects/[projectId]/storage/[objectId]/download` | Empty JSON object | GET URL and remaining lifetime |
+| `POST /api/projects/[projectId]/storage/[objectId]/delete` | Empty JSON object | 202 with cleanupScheduled |
+| Existing project DELETE | Existing ownership API | Project cascade atomically records object cleanup |
+| `/api/inngest` | Inngest protocol | Signed, gated cleanup execution |
+
+Signing uses POST even for downloads. Requests require the configured Origin, `X-Requested-With: flashloop`, JSON content type, and same-origin Fetch Metadata when present. Bodies retain the existing 12 KB limit. Missing and foreign records return the same 404. Signed URLs and authentication responses use `Cache-Control: private, no-store` and `Pragma: no-cache`.
+
+[The migration](../supabase/migrations/20261104211046_private_project_objects.sql) enables and forces RLS on `public.project_objects`, `private.storage_policy`, and `private.storage_cleanup`. Verified owners can SELECT their project object metadata; all raw client INSERT/UPDATE/DELETE privileges are revoked. Private policy and cleanup tables have no direct client grants. Composite foreign keys and immutable identity triggers bind objects to their owner/project/job. Public RPC wrappers are SECURITY INVOKER; narrow privileged implementations use the unexposed private schema, empty search paths, and explicit role grants. Neither anonymous nor authenticated users can configure policy, complete objects, reserve worker outputs, or acknowledge cleanup.
+
+The service-only `configure_storage_policy` RPC requires explicit choices for `enabled`, `upload_url_seconds`, `download_url_seconds`, `max_upload_bytes`, `max_account_bytes`, `retention_days`, and `allowed_content_types`. The policy starts disabled with unset operational values. Enabling it requires all values. Hard safety bounds are 30–900 seconds for PUT URLs, 1–900 seconds for GET URLs, 20 MiB per object, and 1–365 days retention. The configured account limit must cover at least twice the maximum object size. These bounds are implementation ceilings, not agreed deployment defaults.
+
+Reservations charge **twice the declared size**, covering temporary and sealed copies. Deleted objects remain charged through the cleanup outbox until both physical keys are deleted. This conservative accounting can retain more reserved capacity than actual stored bytes. It prevents deletion from immediately freeing quota while physical objects remain. The client cannot choose caps or bypass reservations through direct table writes. Local SQL tests exercise the lock-based quota logic, but independent hosted-connection concurrency remains unverified for this migration.
+
+## URL lifetime and caching
+
+Upload URL lifetime is capped to the remaining stored `upload_expires_at`, not a fresh policy lifetime after database/network work. Completion cannot start a sealed write after that deadline; the R2 write uses a 15-second deadline and an eight-second recovery HEAD. The completion Route Handler has a 60-second runtime ceiling. Download URL lifetime is capped to the remaining retention lifetime. Expired links require a fresh authorized request.
+
+Presigned URLs are bearer capabilities. Anyone holding an issued URL can use its permitted operation until expiration. Project deletion, logout, or session revocation prevents new signatures; it does not instantly revoke an existing R2 URL. A request accepted before expiration can continue transferring afterward. Immediate revocation would require a separately authorized streaming gateway instead of direct presigned downloads. Do not put URLs in analytics, Sentry events, PostHog properties, Inngest event data, logs, Markdown notes, or shared caches.
+
+Private object responses and signatures are not HTTP cache authorities. Keep authenticated API paths and the R2 S3 endpoint out of public Cloudflare/Vercel caches. Existing public marketing caching remains separate.
+
+## SSRF boundary
+
+Dynamic output downloads use `fetchProviderOutput`, not the fixed-service timeout helper. `PROVIDER_DOWNLOAD_ORIGINS` is an explicit list of canonical HTTPS origins; an empty list denies every destination. The downloader rejects credentials, ports, fragments, IP literals, local/special DNS answers, redirects, encoded responses, excessive headers, and oversized streams. It validates every DNS answer and pins the TLS connection to a checked public address while verifying the original hostname. It uses no caller-controlled headers, cookies, proxies, or shared connection pool. The eight-second deadline includes DNS resolution; the absolute body ceiling is 20 MiB.
+
+Callback URL validation accepts only the server-configured `AUTH_ORIGIN` with exact reserved path `/api/providers/callback`, with no query or fragment. There is no handler at that path. Destination validation does not authenticate a callback or authorize its job; those controls remain required before connecting any provider.
+
+## Retention, deletion, and cleanup
+
+Ready retention starts at successful completion. Expired pending reservations and expired ready objects are removed in bounded batches. Deleting a project, job, object, or Auth user cascades metadata deletion and atomically inserts a durable cleanup record that survives parent deletion. Deleting a profile row is not the same as deleting its Auth user. Cleanup uses only the recorded pair of generated keys; it never deletes by a user-supplied prefix, bucket, or URL.
+
+Cleanup waits until the stored upload deadline plus a 60-second grace period, preventing an outstanding signed PUT from recreating an already acknowledged staging key. The sealed writer rechecks that deadline immediately before writing, and all R2 writes are bounded. Inngest polls every five minutes with concurrency one and four retries. It deletes both exact keys before acknowledging the queue record. A crash or timeout repeats idempotent exact-key deletes; a failed deletion does not release reserved storage. Each pass handles at most 100 records and stops starting work after 240 seconds. Backlogs and service outages delay physical erasure; there is no promised deletion SLA until operational monitoring and a live scheduler are configured.
+
+Both staging and sealed copies currently remain until deletion or retention cleanup. Do not add a blanket bucket lifecycle rule that removes live sealed objects ahead of their metadata retention. Review bucket inventory against metadata/outbox during operational rollout and after outages; unknown pre-existing objects and external writes are not automatically attributable by this application. Retention and deletion do not cover separately configured provider copies, logs, Supabase backups, or object copies outside this bucket.
+
+## Required setup and rollout
+
+1. Enable R2 in the intended Cloudflare account. Choose a dedicated private bucket that does not contain marketing assets or another application's objects. Keep **r2.dev access disabled and all public/custom-domain access disabled**. Use the S3 API endpoint only. Audit these settings with Cloudflare before enabling application traffic; CORS is not authorization.
+2. Create bucket-scoped Object Read & Write credentials and install them only in the selected Vercel secret store. Set the nonsecret account and bucket names plus the environment names in [the example](../.env.example). Treat the account/bucket binding as fixed while any object metadata or cleanup records remain; changing it requires an explicit object migration and cleanup plan. Never paste credential values into notes, tool output, or browser code. Do not copy unrelated AWS credentials from another deployment.
+3. Review/apply the new migration to the intended database only, respecting the existing migration-history notes in [OWNERSHIP.md](OWNERSHIP.md). This milestone has **not applied it to hosted Kumi**. Use the service-only policy configuration RPC with agreed lifetimes, size/account limits, retention, and allowed image types. Do not enable a guessed policy.
+4. Configure CORS for the exact owned runtime HTTPS origin, methods PUT/GET/HEAD, allowed headers Content-Type/Cache-Control/Content-Length, and optional exposed ETag. Do not use wildcard origins or allow DELETE. A proposed preflight cache lifetime is 300 seconds. Include only headers actually needed by the deployed client; presigned requests still require valid signatures outside browsers.
+5. Configure the Inngest app and signing key, and route its owned HTTPS ingress through the existing Cloudflare edge guard. The endpoint requires `PRIVATE_STORAGE_ENABLED=true`, `STORAGE_CLEANUP_ENABLED=true`, explicit R2 configuration, and a signing key. It always uses Cloud mode; unsigned executions are rejected by the SDK. Confirm scheduled runs, retries, stale queues, and quota release before uploads are enabled. Do not bypass the edge guard to make discovery work.
+6. Approve exact provider download origins before enabling output ingestion. Review provider signatures, replay handling, persisted job mapping, media validation, and retention separately. No provider is installed here. Whop payments and a live ChatGPT/MCP connection remain deferred.
+7. Run provider-backed acceptance using two disposable verified accounts: unsigned S3/r2.dev/custom-domain object access must fail; B must not obtain a link for A's objects; changed type/size/key signatures and expired links must fail at R2; invalid uploads must never become ready; and deleting A's project must erase only A's recorded keys while B remains readable. Exercise replayed staging writes around deletion and real scheduler outages. Confirm CORS in a browser and independently test hosted concurrent reservations.
+
+Unresolved choices: R2 activation and bucket; actual URL lifetimes; upload/account limits; retention; permitted provider destinations; deployed origin/CORS; Inngest setup and operational deletion monitoring. The user acknowledged that setup can remain deferred; no concrete settings were supplied or inferred. The frontend still previews local references and does not transmit them to these APIs.
+
+## Verification record
+
+The installed Next.js Route Handler and data-security documentation was read before code changes. Current Supabase changelog/RLS guidance and Cloudflare presigned URL/CORS documentation were consulted. Dependencies were pinned in the Flashloop app only.
+
+- `npm run check` under Node.js 24.22.2: lint, strict TypeScript, existing security suites, private-storage tests, the 93-asset audit, and the production Next.js build passed. After final input authorization and output-worker coverage were added, `npm run test:storage` passed **111 tests** under Node.js 24.22.2: 39 storage-service/decoder/signer, 17 output-worker, 18 cleanup, and 37 SSRF tests. The normal runtime build was restored after the final source changes.
+- `npm run test:storage:database`: **51 PostgreSQL assertions** passed with the actual migrations in PGlite, covering anonymous/foreign denial, verified sessions, generated keys, direct-write denial, quotas, service-only completion, output job binding, expiry, project/account cascades, and exact-key deletion isolation. Guarded rollback refused both object metadata and pending physical cleanup; empty rollback/reapplication retained parent RLS.
+- `npm run test:ownership:database`: **103 existing assertions**, catalog audit, and historical ownership rollback/reapplication passed. Historical rollback is tested independently of later dependent migrations.
+- Existing authentication and generation database regressions passed **69** and **76** assertions respectively with all five current migrations. These use disposable PostgreSQL with synthetic Auth rows; they do not reverify hosted Auth.
+- `npm run test:storage:concurrency`: **23 assertions** passed twice on a disposable native PostgreSQL 17.11 cluster using independent connections. Twenty concurrent mixed upload/output reservations respected the account cap. Project/account deletion races retained cleanup charges, other accounts remained isolated, and output completion held its running-job lock. Temporary clusters were removed. This verifies local native PostgreSQL concurrency, not hosted configuration or R2 behavior.
+- `node scripts/verify-storage-disabled.mjs`: **five actual HTTP endpoints** on a locally started production Next.js server returned 503 with private/no-store and no signed URL, without provider credentials or service mocks. This tests disabled behavior only.
+- The GitHub Pages static export passed under Node.js 24.22.2. Its route manifest contained no runtime API/account routes, and the correctly configured export audit verified 85 destinations. The first audit invocation omitted the base-path environment variable and failed; rerunning with the export's base path passed. The normal runtime build was restored. No artifact was published. SHA-256 checks confirmed that all sampled frontend components, styles, content, layout, and homepage files were unchanged.
+- The Cloudflare plugin's real account read succeeded; bucket listing failed because R2 is not enabled. There was no actual R2 upload, anonymous object GET, signed URL expiry, browser CORS, hosted storage RLS, hosted storage concurrency, deployed Vercel route, or live Inngest cleanup verification.
+
+Unit authorization and transport tests use controlled clients. Actual Sharp decoding and installed AWS presigning test local library behavior. The installed Inngest SDK rejects an unsigned execution request. None of those checks proves hosted R2 behavior or production security.
+
+[The rollback](../supabase/rollback/20261104211046_private_project_objects.sql) refuses to discard object metadata or cleanup obligations. Stop storage traffic and workers, complete authorized physical deletion, and archive required data before rollback. Never disable the guard to remove pending cleanup records.

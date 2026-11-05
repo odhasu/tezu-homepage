@@ -3,9 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node run-regression.mjs"
+    "test": "node run-regression.mjs",
+    "test:ownership": "node run-ownership-regression.mjs",
+    "test:generation": "node run-generation-regression.mjs",
+    "test:storage": "node run-storage-regression.mjs",
+    "test:generation:concurrency": "node run-generation-concurrency.mjs",
+    "test:jobs": "node run-jobs-regression.mjs",
+    "test:jobs:concurrency": "node run-jobs-concurrency.mjs"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "0.5.15"
+    "@electric-sql/pglite": "0.5.15",
+    "embedded-postgres": "17.11.0-beta.19",
+    "pg": "8.16.3"
   }
 }

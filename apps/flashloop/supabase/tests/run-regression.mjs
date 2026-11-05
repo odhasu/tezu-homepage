@@ -9,7 +9,7 @@ const root = new URL("../", import.meta.url);
 try {
   await database.exec(await readFile(new URL("tests/auth-fixture.sql", root), "utf8"));
   const migrations = (await readdir(new URL("migrations/", root)))
-    .filter((file) => file.endsWith(".sql")).sort();
+    .filter((file) => file.endsWith(".sql") && !file.endsWith("_whop_subscription_billing.sql")).sort();
   assert.ok(migrations.length > 0, "SQL migration is required");
   for (const migration of migrations) {
     await database.exec(await readFile(new URL(`migrations/${migration}`, root), "utf8"));

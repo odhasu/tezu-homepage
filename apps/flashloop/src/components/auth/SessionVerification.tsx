@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
-import { getAuthSession, postAuth, type AuthSession } from "./auth-api";
+import { AuthRateLimitError, AuthRetryError, authErrorMessage, getAuthSession, postAuth, type AuthSession } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
+import { useAuthRetry } from "./useAuthRetry";
 
 const verificationActions = ["verify_session"] as const;
 
@@ -13,12 +14,13 @@ export function SessionVerification() {
   const [tokens, setTokens] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [challengeKey, setChallengeKey] = useState(0);
+  const { retrySeconds, retrying, startRetry } = useAuthRetry();
   const receiveTokens = useCallback((nextTokens: string[]) => setTokens(nextTokens), []);
   const failChallenge = useCallback(() => {
     setSession({ authenticated: false, verified: false });
     setError("Security check failed. Sign in again before continuing.");
-    void postAuth("signout", {}).catch(() => undefined);
-  }, []);
+    void postAuth("signout", {}).catch(startRetry);
+  }, [startRetry]);
   const enabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true" && !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   useEffect(() => {
@@ -33,9 +35,14 @@ export function SessionVerification() {
         }
         setSession(nextSession);
       }
-    }).catch(() => {
+    }).catch((reason) => {
       if (active) {
-        setError("Your session could not be checked. Please sign in again.");
+        startRetry(reason);
+        setError(reason instanceof AuthRateLimitError
+          ? "Too many attempts. Wait before signing in again."
+          : reason instanceof AuthRetryError
+            ? `${authErrorMessage(reason)} Sign in again before continuing.`
+          : "Your session could not be checked. Please sign in again.");
         setSession({ authenticated: false, verified: false });
       }
     }).finally(() => clearTimeout(timeout));
@@ -44,11 +51,11 @@ export function SessionVerification() {
       controller.abort();
       clearTimeout(timeout);
     };
-  }, [enabled]);
+  }, [enabled, startRetry]);
 
   async function verify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending || tokens.length !== 1) return;
+    if (pending || retrying || tokens.length !== 1) return;
     setPending(true);
     setError("");
     try {
@@ -57,10 +64,15 @@ export function SessionVerification() {
       if (!nextSession.authenticated || !nextSession.emailConfirmed || !nextSession.verified) throw new Error("Verification did not finish.");
       window.location.replace(localPath("/blue"));
       setSession(nextSession);
-    } catch {
-      await postAuth("signout", {}).catch(() => undefined);
+    } catch (reason) {
+      startRetry(reason);
+      await postAuth("signout", {}).catch(startRetry);
       setSession({ authenticated: false, verified: false });
-      setError("Verification could not finish. Sign in again before continuing.");
+      setError(reason instanceof AuthRateLimitError
+        ? "Too many attempts. Wait before signing in again."
+        : reason instanceof AuthRetryError
+          ? `${authErrorMessage(reason)} Sign in again before continuing.`
+        : "Verification could not finish. Sign in again before continuing.");
     } finally {
       setPending(false);
       setTokens([]);
@@ -69,12 +81,16 @@ export function SessionVerification() {
   }
 
   async function signOut() {
+    if (pending || retrying) return;
     setPending(true);
     try {
       await postAuth("signout", {});
       window.location.assign(localPath("/auth"));
-    } catch {
-      setError("Sign out could not finish. Please try again.");
+    } catch (reason) {
+      startRetry(reason);
+      setError(reason instanceof AuthRetryError
+        ? authErrorMessage(reason)
+        : "Sign out could not finish. Please try again.");
       setPending(false);
     }
   }
@@ -90,21 +106,23 @@ export function SessionVerification() {
         : !session ? <p className="auth-copy" role="status">Checking your session…</p>
         : !session.authenticated ? <>
           <p className="auth-copy">Sign in with your confirmed email to continue.</p>
-          <a className="auth-primary" href={localPath("/auth")}>Sign in</a>
+          {retrying ? <button className="auth-primary" type="button" disabled>Sign in</button>
+            : <a className="auth-primary" href={localPath("/auth")}>Sign in</a>}
         </>
         : !session.emailConfirmed ? <>
           <p className="auth-copy">Confirm your email before continuing. Then sign in again.</p>
-          <button className="auth-primary" type="button" disabled={pending} onClick={signOut}>Return to sign in</button>
+          <button className="auth-primary" type="button" disabled={pending || retrying} onClick={signOut}>Return to sign in</button>
         </>
         : <>
           <p className="auth-copy">Your email is confirmed. Complete one last security check to use your account.</p>
           <form className="auth-form" onSubmit={verify}>
-            {!pending ? <TurnstileChallenge key={challengeKey} actions={verificationActions} onTokens={receiveTokens} onFailure={failChallenge} /> : null}
-            <button className="auth-primary" type="submit" disabled={pending || tokens.length !== 1}>{pending ? "Verifying…" : "Verify account"}</button>
+            {!pending && !retrying ? <TurnstileChallenge key={challengeKey} actions={verificationActions} onTokens={receiveTokens} onFailure={failChallenge} /> : null}
+            <button className="auth-primary" type="submit" disabled={pending || retrying || tokens.length !== 1}>{pending ? "Verifying…" : "Verify account"}</button>
           </form>
-          <button className="auth-text-button" type="button" onClick={signOut} disabled={pending}>Sign out</button>
+          <button className="auth-text-button" type="button" onClick={signOut} disabled={pending || retrying}>Sign out</button>
         </>}
       {error ? <p className="auth-error" role="alert">{error}</p> : null}
+      {retrying ? <p className="auth-helper">Try again in {retrySeconds} {retrySeconds === 1 ? "second" : "seconds"}.</p> : null}
     </section>
   );
 }

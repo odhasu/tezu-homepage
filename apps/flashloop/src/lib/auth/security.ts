@@ -1,9 +1,13 @@
 export class AuthFailure extends Error {
   status: number;
+  retryAfter?: number;
 
-  constructor(message: string, status = 403) {
+  constructor(message: string, status = 403, retryAfter?: number) {
     super(message);
     this.status = status;
+    if (typeof retryAfter === "number" && Number.isSafeInteger(retryAfter) && retryAfter > 0 && retryAfter <= 345600) {
+      this.retryAfter = retryAfter;
+    }
   }
 }
 

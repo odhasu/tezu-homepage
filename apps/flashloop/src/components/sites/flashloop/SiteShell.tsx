@@ -79,10 +79,10 @@ export function Header() {
           <div className="shell-actions">
             <a className="shell-tryNow" href={authLink(true)}>Get Started</a>
             <div className="shell-desktopActions">
-            <a className="shell-pricing" href={referenceLink("pricing/")}>
+            <a className="shell-pricing" href={localPath("/pricing/")}>
               <i />
               <b>Pricing</b>
-              <span>30% OFF</span>
+              <span>Monthly</span>
             </a>
             <a className="shell-login" href={authLink()}>
               Login
@@ -117,8 +117,8 @@ export function Header() {
                 <Icon name="diagonal" />
               </a>
             ))}
-            <a href={referenceLink("pricing/")}>
-              Pricing <span>30% OFF</span>
+            <a href={localPath("/pricing/")}>
+              Pricing <span>Monthly</span>
             </a>
             <a href={authLink()}>Login / Sign up</a>
           </nav>

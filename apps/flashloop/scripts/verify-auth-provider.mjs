@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { createClient } from "@supabase/supabase-js";
+import { prepareAdministrativeFixture } from "./administrative-fixture.mjs";
 
 // Deliberately fixed to the dedicated staging project. This script never sends email.
 const project = "txwclngedcporvrfbolu";
@@ -38,12 +39,12 @@ try {
   assert.ok(unauthorized.error, "Anonymous callers must not issue signup permits.");
   check("anonymous callers cannot issue signup permits");
 
-  // Trusted administration creates a disposable fixture; this does not prove email delivery or a human CAPTCHA.
-  const permit = randomBytes(32).toString("hex");
-  const issued = await admin.rpc("issue_signup_permit", { p_email: email, p_permit_hash: createHash("sha256").update(permit).digest("hex") });
-  assert.ifError(issued.error);
+  // This is administrative provisioning, not a public signup or quota test.
+  const fixture = await prepareAdministrativeFixture(admin, {
+    email, fixtureId: `auth-provider:${run}`, userMetadata: { verified: true, credits: 999 },
+  });
   const created = await admin.auth.admin.createUser({ email, password, email_confirm: true,
-    user_metadata: { signup_permit: permit, verified: true, credits: 999 } });
+    user_metadata: fixture.userMetadata });
   assert.ifError(created.error);
   userId = created.data.user.id;
   const balance = await admin.from("video_credit_accounts").select("credits").eq("user_id", userId).single();
@@ -100,7 +101,7 @@ try {
   assert.ok(refreshed.error);
   check("supported local logout removes session and rejects old refresh token");
   console.log(`PASS: ${passed} hosted Auth/database assertions.`);
-  console.log("Not proven here: human Turnstile success/replay, website cookie flow, or delivered confirmation email.");
+  console.log("Not proven here: public signup/hook/IP quota, human Turnstile success/replay, website cookie flow, or delivered confirmation email.");
 } finally {
   for (const session of sessions) await admin.auth.admin.signOut(session.access_token, "global").catch(() => undefined);
   if (userId) {

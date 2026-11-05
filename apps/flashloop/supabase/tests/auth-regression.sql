@@ -229,8 +229,8 @@ update private.auth_rate_limits set window_started_at=clock_timestamp()-interval
 set role service_role;
 select test_auth.ok(public.consume_auth_rate_limit(repeat('a',64),2,600), 'rate-limit window resets after expiry');
 
-select public.issue_signup_permit('  New@Example.test  ',encode(sha256(convert_to(repeat('b',64),'UTF8')),'hex'));
-select public.issue_signup_permit('expires@example.test',encode(sha256(convert_to(repeat('c',64),'UTF8')),'hex'));
+select public.issue_signup_permit_for_ip('  New@Example.test  ',encode(sha256(convert_to(repeat('b',64),'UTF8')),'hex'),repeat('9',64));
+select public.issue_signup_permit_for_ip('expires@example.test',encode(sha256(convert_to(repeat('c',64),'UTF8')),'hex'),repeat('9',64));
 reset role;
 update private.signup_permits set expires_at=clock_timestamp()-interval '1 second' where email='expires@example.test';
 set role supabase_auth_admin;

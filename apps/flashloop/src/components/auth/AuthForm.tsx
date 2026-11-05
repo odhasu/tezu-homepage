@@ -4,6 +4,7 @@ import { useCallback, useRef, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
 import { authErrorMessage, postAuth } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
+import { useAuthRetry } from "./useAuthRetry";
 
 const challengeActions = {
   signup: ["signup", "signup_auth"],
@@ -17,11 +18,13 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [confirmationRequired, setConfirmationRequired] = useState(false);
+  const { retrySeconds, retrying, startRetry } = useAuthRetry();
   const form = useRef<HTMLFormElement>(null);
   const receiveTokens = useCallback((nextTokens: string[]) => setTokens(nextTokens), []);
   const enabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true" && !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   function switchMode() {
+    if (pending || retrying) return;
     setMode((current) => current === "signin" ? "signup" : "signin");
     setError("");
     setTokens([]);
@@ -32,7 +35,7 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending || tokens.length !== 2) return;
+    if (pending || retrying || tokens.length !== 2) return;
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
     const password = data.get("password");
@@ -48,6 +51,7 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
         window.location.assign(localPath("/auth/verify"));
       }
     } catch (reason) {
+      startRetry(reason);
       setError(authErrorMessage(reason));
     } finally {
       setPending(false);
@@ -89,14 +93,15 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
         <label htmlFor="auth-password">Password</label>
         <input id="auth-password" name="password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 12 : 1} maxLength={128} required disabled={pending} aria-describedby={mode === "signup" ? "auth-password-help" : undefined} />
         {mode === "signup" ? <p className="auth-helper" id="auth-password-help">Use at least 12 characters.</p> : null}
-        {!pending ? <TurnstileChallenge key={`${mode}-${challengeKey}`} actions={challengeActions[mode]} onTokens={receiveTokens} /> : null}
+        {!pending && !retrying ? <TurnstileChallenge key={`${mode}-${challengeKey}`} actions={challengeActions[mode]} onTokens={receiveTokens} /> : null}
         {error ? <p className="auth-error" role="alert">{error}</p> : null}
-        <button className="auth-primary" type="submit" disabled={pending || tokens.length !== 2}>
+        {retrying ? <p className="auth-helper">Try again in {retrySeconds} {retrySeconds === 1 ? "second" : "seconds"}.</p> : null}
+        <button className="auth-primary" type="submit" disabled={pending || retrying || tokens.length !== 2}>
           {pending ? (mode === "signup" ? "Creating account…" : "Signing in…") : (mode === "signup" ? "Create account" : "Sign in")}
         </button>
       </form>
       <p className="auth-switch">{mode === "signup" ? "Already have an account?" : "New to Flashloop?"}{" "}
-        <button type="button" onClick={switchMode} disabled={pending}>{mode === "signup" ? "Sign in" : "Create account"}</button>
+        <button type="button" onClick={switchMode} disabled={pending || retrying}>{mode === "signup" ? "Sign in" : "Create account"}</button>
       </p>
     </section>
   );

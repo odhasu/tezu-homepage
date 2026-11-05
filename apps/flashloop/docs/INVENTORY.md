@@ -34,7 +34,7 @@ The finished UI provides local behavior for:
 - Release carousel, creator media lightbox, scroll-driven format gallery, mobile format buttons, trend thumbnail cycling, FAQ disclosure, mobile navigation, lazy media loading, reduced-motion handling, and visibility-aware video playback.
 - Prompt submission as navigation to the reference site's create URL. It does not create media locally.
 
-Content is bundled in `src/components/sites/flashloop/content.json`. The 93 local assets are under `public/sites/flashloop/`; `docs/assets.json` records provenance. The app has no database model, user record, credit ledger, upload store, job queue, payment adapter, analytics adapter, or error-monitoring SDK.
+Content is bundled in `src/components/sites/flashloop/content.json`. The 93 local assets are under `public/sites/flashloop/`; `docs/assets.json` records provenance. The app has no database model, user record, credit ledger, upload store, job queue, or payment adapter in the published Blue frontend. The editable runtime includes consent-gated PostHog relay and Sentry boundaries, but both remain disabled until their separate staging configuration and privacy approval are supplied; see [ANALYTICS.md](ANALYTICS.md) and [OBSERVABILITY.md](OBSERVABILITY.md).
 
 ## Backend and integration inventory
 
@@ -85,8 +85,8 @@ No Supabase, Cloudflare R2, Inngest, Sentry, PostHog, or AI-provider variable ap
 | Supabase | Connected account exposes organization `lukas` and one active project named `lucasresellzcodex`, unrelated to Flashloop. | Create a dedicated Flashloop staging project. Do not reuse the visible project. |
 | Cloudflare | Connected account is readable. R2 bucket listing returned HTTP 403, code `10042`: “Please enable R2 through the Cloudflare Dashboard.” | Enable R2, then create a staging-only bucket and scoped token. No bucket was created. |
 | Inngest | Tool descriptors are present, but account/environment calls returned `Unknown tool`; no app or environment was verified. | Create or confirm a staging environment before adding event keys or signing keys. |
-| Sentry | No package, config, DSN, or project reference in this source. | Create a staging project and add DSN only after the runtime exists. |
-| PostHog | No package, config, key, or host reference in this source. | Create a staging project if analytics is required; keep production and staging projects separate. |
+| Sentry | Server SDK and privacy-gated integration are present; no DSN or hosted project was configured. | Create a staging project and add a DSN only after the runtime and privacy boundary are approved. |
+| PostHog | Consent-gated server relay is present; no token, destination or hosted project was configured. | Create separate staging and production projects, verify region and retention, then configure only the selected environment. |
 | AI providers | No provider credential or provider SDK is in the editable app or existing Vercel env listing. | Select providers, issue staging keys with spend limits, and keep provider calls server-side. |
 | Whop payments | No integration. | Deferred. Do not add payment keys or checkout routes in staging. |
 | Live ChatGPT/MCP | Static Blue source has no connection; deployed client advertises an external MCP URL. | Deferred. Do not connect or test a live account from this staging plan. |
