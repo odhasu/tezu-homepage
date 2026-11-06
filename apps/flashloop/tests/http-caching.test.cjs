@@ -22,6 +22,7 @@ function load(file, imports = {}, env = {}) {
 }
 
 const cache = load("lib/http/cache-policy.ts");
+const creation = load("lib/creation-draft.ts");
 const security = load("lib/auth/security.ts");
 const privateJson = (body, status = 200) => cache.privateResponse(Response.json(body, { status }));
 const authError = (error) => privateJson({ error: error.message }, error.status ?? 503);
@@ -57,7 +58,7 @@ test("private path classification includes future APIs and base paths, excludes 
   }
 });
 
-function proxyScenario({ user = null, refresh = false, failure = false } = {}) {
+function proxyScenario({ user = null, refresh = false, failure = false, basePath = "" } = {}) {
   const proxy = load("proxy.runtime.ts", {
     "@supabase/ssr": { createServerClient(_url, _key, options) {
       return { auth: { async getUser() {
@@ -70,13 +71,16 @@ function proxyScenario({ user = null, refresh = false, failure = false } = {}) {
       if (failure) throw new Error("Fixture failure");
       return { origin: "https://staging.example.test", supabaseUrl: "https://fixture.supabase.co", publishableKey: "public-fixture" };
     } },
-    "@/lib/local-path": { localPath: (path) => path },
+    "@/lib/local-path": { localPath: (path) => `${basePath}${path}` },
+    "@/lib/creation-draft": creation,
     "@/lib/security/edge-origin": { requireEdgeOrigin() {} },
     "@/lib/security/provider-fetch": {},
     "@/lib/auth/handlers": { authError },
     "@/lib/http/cache-policy": cache,
-  });
-  return (path) => proxy.proxy(new NextRequest(`https://staging.example.test${path}`));
+  }, { NEXT_PUBLIC_BASE_PATH: basePath });
+  return (path) => proxy.proxy(new NextRequest(`https://staging.example.test${basePath}${path}`, {
+    nextConfig: { basePath },
+  }));
 }
 
 test("proxy keeps refresh cookies, account redirects, configuration failures and APIs private", async () => {
@@ -92,6 +96,44 @@ test("proxy keeps refresh cookies, account redirects, configuration failures and
     assert.equal(response.headers.get("cache-control"), "private, no-store");
   }
   assert.equal((await proxyScenario()("/blue")).headers.get("cache-control"), null);
+});
+
+test("configured base paths keep account refreshes and auth redirects on NextURL's normalized pathname", async () => {
+  const basePath = "/tezu-homepage/flashloop";
+  const request = new NextRequest(`https://staging.example.test${basePath}/account`, { nextConfig: { basePath } });
+  // Use the actual installed NextRequest behavior, not a synthetic URL object.
+  assert.equal(request.nextUrl.pathname, "/account");
+  assert.equal(request.nextUrl.basePath, basePath);
+  for (const path of ["/account", "/account/billing", "/account/billing/complete"]) {
+    const refreshed = await proxyScenario({ basePath, user: { id: "fixture-account-a" }, refresh: true })(path);
+    assert.equal(refreshed.status, 200);
+    assert.match(refreshed.headers.get("set-cookie"), /fixture-refresh=public-test-value/);
+    for (const [name, value] of Object.entries(cache.PRIVATE_RESPONSE_HEADERS)) assert.equal(refreshed.headers.get(name), value);
+    const anonymous = await proxyScenario({ basePath, refresh: true })(path);
+    assert.equal(anonymous.status, 307);
+    assert.equal(anonymous.headers.get("location"), `https://staging.example.test${basePath}/auth`);
+    assert.match(anonymous.headers.get("set-cookie"), /fixture-refresh=public-test-value/);
+    const unavailable = await proxyScenario({ basePath, failure: true })(path);
+    assert.equal(unavailable.status, 503);
+    assert.equal(unavailable.headers.get("cache-control"), "private, no-store");
+  }
+  const lookalike = await proxyScenario({ basePath, failure: true })("/accounting");
+  assert.equal(lookalike.status, 200);
+  assert.equal(lookalike.headers.get("set-cookie"), null);
+});
+
+test("anonymous account navigation preserves only one allowlisted tool through auth", async () => {
+  const basePath = "/tezu-homepage/flashloop";
+  for (const kind of ["image", "video"]) {
+    const response = await proxyScenario({ basePath })(`/account?kind=${kind}&prompt=private-test&returnTo=https://invalid.example`);
+    assert.equal(response.status, 307);
+    assert.equal(response.headers.get("location"), `https://staging.example.test${basePath}/auth?kind=${kind}`);
+    assert.equal(response.headers.get("cache-control"), "private, no-store");
+  }
+  for (const query of ["kind=image&kind=video", "kind=https%3A%2F%2Finvalid.example", "returnTo=https://invalid.example", "kind=Image"]) {
+    const response = await proxyScenario({ basePath })(`/account?${query}`);
+    assert.equal(response.headers.get("location"), `https://staging.example.test${basePath}/auth`);
+  }
 });
 
 /** A controlled cache model, not proof of any browser, deployed CDN or hosted RLS. */

@@ -78,6 +78,82 @@ test("IP extraction first authenticates edge and rejects invalid or multiple IPs
   assert.equal(edge().trustedClientIp(request({ "cf-connecting-ip": "2001:0db8:0000:0000:0000:0000:0000:0001" })), "[2001:db8::1]");
 });
 
+const workerPublicOrigin = "https://flashloop-staging.fixture.workers.dev";
+const workerUpstream = "https://fixture-staging.vercel.app";
+function workerEdge(env = {}) {
+  return edge({ AUTH_ORIGIN: workerPublicOrigin, EDGE_ORIGIN_MODE: "worker-proxy", EDGE_UPSTREAM_ORIGIN: workerUpstream, ...env });
+}
+function workerRequest(overrides = {}) {
+  return request({ host: "fixture-staging.vercel.app", "x-flashloop-public-host": "flashloop-staging.fixture.workers.dev",
+    "x-flashloop-client-ip": "203.0.113.10", "cf-connecting-ip": "198.51.100.10", ...overrides });
+}
+
+test("explicit Worker mode authenticates exact upstream and proof-bound public host/IP", () => {
+  const api = workerEdge();
+  assert.doesNotThrow(() => api.requireEdgeOrigin(workerRequest()));
+  assert.equal(api.trustedClientIp(workerRequest()), "203.0.113.10");
+  assert.equal(api.trustedClientIp(workerRequest({ "x-flashloop-client-ip": "2001:0db8:0000:0000:0000:0000:0000:0001" })), "[2001:db8::1]");
+});
+
+test("Worker mode accepts only configured upstream or this deployment's exact system host", () => {
+  const api = workerEdge({ VERCEL_URL: "fixture-staging-immutable.vercel.app" });
+  assert.doesNotThrow(() => api.requireEdgeOrigin(workerRequest({ host: "fixture-staging-immutable.vercel.app" })));
+  for (const host of ["other.vercel.app", "vercel.app", "fixture-staging.vercel.app.attacker.example", "flashloop-staging.fixture.workers.dev", "fixture-staging.vercel.app:443"]) {
+    assert.throws(() => api.requireEdgeOrigin(workerRequest({ host })), { status: 403 });
+  }
+  assert.throws(() => workerEdge().requireEdgeOrigin(workerRequest({ host: "fixture-staging-immutable.vercel.app" })), { status: 403 });
+  assert.throws(() => workerEdge({ VERCEL_URL: "attacker.example" }).requireEdgeOrigin(workerRequest({ host: "attacker.example" })), { status: 403 });
+});
+
+for (const headers of [
+  { "x-flashloop-edge-key": "" }, { "x-flashloop-edge-key": "forged" },
+  { "x-flashloop-public-host": "" }, { "x-flashloop-public-host": "attacker.example" },
+  { "x-flashloop-public-host": "flashloop-staging.fixture.workers.dev:443" },
+  { "x-flashloop-client-ip": "" }, { "x-flashloop-client-ip": "203.0.113.10, 198.51.100.10" },
+  { "x-flashloop-client-ip": "forged", "cf-connecting-ip": "203.0.113.10" },
+  { "x-flashloop-public-host": "", "x-forwarded-host": "flashloop-staging.fixture.workers.dev" },
+]) test(`Worker mode rejects spoofed/missing metadata: ${Object.keys(headers).join(", ")}`, () => {
+  assert.throws(() => workerEdge().requireEdgeOrigin(workerRequest(headers)), { status: 403 });
+  assert.throws(() => workerEdge().trustedClientIp(workerRequest(headers)), { status: 403 });
+});
+
+for (const env of [
+  { EDGE_ORIGIN_MODE: "worker" }, { EDGE_ORIGIN_MODE: "" }, { EDGE_UPSTREAM_ORIGIN: "" },
+  { EDGE_UPSTREAM_ORIGIN: "http://fixture-staging.vercel.app" }, { EDGE_UPSTREAM_ORIGIN: "https://outside.example" },
+  { EDGE_UPSTREAM_ORIGIN: `${workerUpstream}/path` }, { EDGE_UPSTREAM_ORIGIN: `${workerUpstream}/` },
+  { EDGE_UPSTREAM_ORIGIN: `${workerUpstream}?key=fixture` }, { EDGE_UPSTREAM_ORIGIN: `${workerUpstream}:8443` },
+  { EDGE_UPSTREAM_ORIGIN: "https://fixture:password@fixture-staging.vercel.app" },
+]) test(`Worker mode unsafe configuration fails closed: ${Object.keys(env).join(", ")}`, () => {
+  assert.throws(() => workerEdge(env).requireEdgeOrigin(workerRequest()), { status: 503 });
+});
+
+test("default transform mode never trusts Worker metadata in place of its canonical Host/IP", () => {
+  assert.throws(() => edge().requireEdgeOrigin(workerRequest()), { status: 403 });
+  assert.equal(edge().trustedClientIp(request({ "x-flashloop-client-ip": "198.51.100.10" })), "203.0.113.4");
+});
+
+test("synthetic Worker transport headers satisfy only its matching Vercel boundary", async () => {
+  const { handleStagingProxy } = await import("../cloudflare/staging-proxy.mjs");
+  const settings = { ENABLED: "true", PUBLIC_ORIGIN: workerPublicOrigin, UPSTREAM_ORIGIN: workerUpstream, EDGE_ORIGIN_SECRET: testProof };
+  const incoming = new Request(`${workerPublicOrigin}/api/auth/session`, { headers: {
+    "CF-Connecting-IP": "203.0.113.10", "x-flashloop-edge-key": "forged", "x-flashloop-public-host": "forged.example",
+  } });
+  let calls = 0;
+  const response = await handleStagingProxy(incoming, settings, async (url, init) => {
+    calls++;
+    const forwarded = new Request(url, init);
+    assert.doesNotThrow(() => workerEdge().requireEdgeOrigin(forwarded));
+    assert.equal(workerEdge().trustedClientIp(forwarded), "203.0.113.10");
+    assert.throws(() => workerEdge({ AUTH_ORIGIN: "https://other.fixture.workers.dev" }).requireEdgeOrigin(forwarded), { status: 403 });
+    assert.throws(() => workerEdge({ EDGE_ORIGIN_SECRET: "different-proof-at-least-thirty-two-characters" }).requireEdgeOrigin(forwarded), { status: 403 });
+    return Response.json({ authenticated: false });
+  });
+  assert.equal(calls, 1);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Cache-Control"), "private, no-store");
+  assert.equal((await response.text()).includes(testProof), false);
+});
+
 test("proxy rejects callbacks, alternate paths, static assets before origin access", async () => {
   const api = edge();
   const proxy = load("proxy.runtime.ts", {
@@ -85,6 +161,7 @@ test("proxy rejects callbacks, alternate paths, static assets before origin acce
     "next/server": { NextResponse: { next: () => new Response(null), json: Response.json } },
     "@/lib/auth/config": { authConfig() { throw new Error("Must not load Auth configuration"); } },
     "@/lib/local-path": { localPath: (path) => path },
+    "@/lib/creation-draft": load("lib/creation-draft.ts", {}),
     "@/lib/security/edge-origin": api,
     "@/lib/security/provider-fetch": {},
     "@/lib/http/cache-policy": load("lib/http/cache-policy.ts", {}),

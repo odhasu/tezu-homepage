@@ -9,7 +9,7 @@ const source = ts.transpileModule(readFileSync(resolve(__dirname, "../src/compon
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
 
-function client(response) {
+function client(response, globals = {}) {
   let calls = 0;
   const module = { exports: {} };
   vm.runInNewContext(source, {
@@ -19,7 +19,7 @@ function client(response) {
       return { localPath: (path) => path };
     },
     fetch: async () => { calls++; return response; },
-    AbortSignal, Date, Error,
+    AbortSignal, Date, Error, ...globals,
   });
   return { ...module.exports, calls: () => calls };
 }
@@ -31,6 +31,60 @@ test("retry parser preserves delta seconds and rounds future HTTP dates upward",
   assert.equal(api.readRetryAfter(" 12 ", now), 12);
   assert.equal(api.readRetryAfter("Wed, 04 Nov 2026 12:00:11 GMT", now + 1), 11);
   assert.equal(api.readRetryAfter("0", now), 1);
+});
+
+function stalledSession() {
+  const timeout = new AbortController();
+  const deadlines = [];
+  let sentSignal;
+  const api = client(undefined, {
+    AbortSignal: {
+      any: (signals) => AbortSignal.any(signals),
+      timeout(ms) { deadlines.push(ms); return timeout.signal; },
+    },
+    fetch: async (_url, options) => {
+      sentSignal = options.signal;
+      return new Promise((_resolve, reject) => {
+        if (sentSignal.aborted) reject(sentSignal.reason);
+        else sentSignal.addEventListener("abort", () => reject(sentSignal.reason), { once: true });
+      });
+    },
+  });
+  return { api, timeout, deadlines, sentSignal: () => sentSignal };
+}
+
+test("a caller cancellation signal cannot remove the session request deadline", async () => {
+  const fixture = stalledSession();
+  const caller = new AbortController();
+  const pending = fixture.api.getAuthSession(caller.signal);
+  const rejected = assert.rejects(pending, (error) => error.name === "TimeoutError");
+  assert.deepEqual(fixture.deadlines, [15000]);
+  assert.notEqual(fixture.sentSignal(), caller.signal);
+  fixture.timeout.abort(new DOMException("Controlled timeout", "TimeoutError"));
+  await rejected;
+  assert.equal(caller.signal.aborted, false);
+  assert.equal(fixture.sentSignal().aborted, true);
+});
+
+test("caller cancellation still stops a session request before its deadline", async () => {
+  const fixture = stalledSession();
+  const caller = new AbortController();
+  const pending = fixture.api.getAuthSession(caller.signal);
+  const rejected = assert.rejects(pending, (error) => error.name === "AbortError");
+  caller.abort();
+  await rejected;
+  assert.deepEqual(fixture.deadlines, [15000]);
+  assert.equal(fixture.timeout.signal.aborted, false);
+  assert.equal(fixture.sentSignal().aborted, true);
+});
+
+test("session requests without a caller also expire", async () => {
+  const fixture = stalledSession();
+  const pending = fixture.api.getAuthSession();
+  const rejected = assert.rejects(pending, (error) => error.name === "TimeoutError");
+  assert.deepEqual(fixture.deadlines, [15000]);
+  fixture.timeout.abort(new DOMException("Controlled timeout", "TimeoutError"));
+  await rejected;
 });
 
 test("missing, malformed, past and unsafe retry values use bounded edge fallback", () => {

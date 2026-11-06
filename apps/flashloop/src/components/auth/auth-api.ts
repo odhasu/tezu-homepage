@@ -91,7 +91,7 @@ export async function getAuthSession(signal?: AbortSignal): Promise<AuthSession>
   const response = await fetch(localPath("/api/auth/session"), {
     credentials: "same-origin",
     cache: "no-store",
-    signal: signal ?? AbortSignal.timeout(15000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
   });
   const data: unknown = await response.json().catch(() => null);
   const retryError = retryFailure(response, data);

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
-import { clearCreationDraft, pendingCreationKind } from "@/lib/creation-draft";
+import { browserCreationKind, clearCreationDraft, creationContinuationPath, pendingCreationKind } from "@/lib/creation-draft";
 import { AuthRateLimitError, AuthRetryError, authErrorMessage, getAuthSession, postAuth, type AuthSession } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
 import { useAuthRetry } from "./useAuthRetry";
@@ -32,7 +32,7 @@ export function SessionVerification() {
     getAuthSession(controller.signal).then((nextSession) => {
       if (active) {
         if (nextSession.authenticated && nextSession.emailConfirmed && nextSession.verified) {
-          window.location.replace(localPath(`/account?kind=${pendingCreationKind()}`));
+          window.location.replace(localPath(creationContinuationPath("/account", pendingCreationKind(browserCreationKind()))));
         }
         setSession(nextSession);
       }
@@ -63,7 +63,7 @@ export function SessionVerification() {
       await postAuth("verify", { token: tokens[0] });
       const nextSession = await getAuthSession();
       if (!nextSession.authenticated || !nextSession.emailConfirmed || !nextSession.verified) throw new Error("Verification did not finish.");
-      window.location.replace(localPath(`/account?kind=${pendingCreationKind()}`));
+      window.location.replace(localPath(creationContinuationPath("/account", pendingCreationKind(browserCreationKind()))));
       setSession(nextSession);
     } catch (reason) {
       startRetry(reason);
@@ -109,7 +109,10 @@ export function SessionVerification() {
         : !session.authenticated ? <>
           <p className="auth-copy">Sign in with your confirmed email to continue.</p>
           {retrying ? <button className="auth-primary" type="button" disabled>Sign in</button>
-            : <a className="auth-primary" href={localPath("/auth")}>Sign in</a>}
+            : <a className="auth-primary" href={localPath("/auth")} onClick={(event) => {
+              event.preventDefault();
+              window.location.assign(localPath(creationContinuationPath("/auth", pendingCreationKind(browserCreationKind()))));
+            }}>Sign in</a>}
         </>
         : !session.emailConfirmed ? <>
           <p className="auth-copy">Confirm your email before continuing. Then sign in again.</p>

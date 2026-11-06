@@ -5,6 +5,7 @@ import { flushSync } from "react-dom";
 import Image from "next/image";
 import { localPath } from "@/lib/local-path";
 import { authLink } from "@/lib/links";
+import { createPrivateRequests } from "@/lib/private-requests";
 import { clearCreationDraft, consumeCreationDraft } from "@/lib/creation-draft";
 import { getAuthSession, postAuth } from "@/components/auth/auth-api";
 import { Icon } from "@/components/sites/flashloop/Icon";
@@ -151,6 +152,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
   const sessionEpoch = useRef(0);
   const projectMutation = useRef<AbortController | null>(null);
   const signoutInProgress = useRef(false);
+  const [privateReads] = useState(createPrivateRequests);
 
   const qualities = qualityOptions;
   const activeModelOptions = modelOptions[activeKind];
@@ -180,6 +182,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
   }, []);
 
   const clearPrivateState = useCallback(() => {
+    privateReads.reset();
     clearCreationDraft();
     setProjects([]);
     setProjectId("");
@@ -201,10 +204,11 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
       });
       return [];
     });
-  }, []);
+  }, [privateReads]);
 
   const validateSession = useCallback(async () => {
     if (!runtime || signoutInProgress.current) return;
+    privateReads.reset();
     sessionEpoch.current++;
     projectMutation.current?.abort();
     sessionCheck.current?.abort();
@@ -223,6 +227,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
       }
       if (sessionScope.current && sessionScope.current !== session.sessionScope) clearPrivateState();
       sessionScope.current = session.sessionScope;
+      privateReads.bind(session.sessionScope);
       setSessionCredits(session.credits);
       setSessionState("authenticated");
     } catch {
@@ -230,7 +235,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
       clearPrivateState();
       setSessionState("error");
     }
-  }, [clearPrivateState, runtime]);
+  }, [clearPrivateState, privateReads, runtime]);
 
   useEffect(() => {
     if (!runtime) return;
@@ -241,6 +246,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
       sessionEpoch.current++;
       sessionCheck.current?.abort();
       projectMutation.current?.abort();
+      privateReads.reset();
       sessionScope.current = null;
       flushSync(() => { clearPrivateState(); setSessionState("checking"); });
     };
@@ -255,52 +261,54 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
       window.removeEventListener("pageshow", revalidate);
       window.removeEventListener("pagehide", clearOnPageHide);
     };
-  }, [clearPrivateState, runtime, validateSession]);
+  }, [clearPrivateState, privateReads, runtime, validateSession]);
 
   useEffect(() => {
     if (!runtime || sessionState !== "authenticated") return;
-    const controller = new AbortController();
+    const request = privateReads.begin("projects");
+    if (!request) return;
     queueMicrotask(() => {
-      if (!controller.signal.aborted) { setProjectState("loading"); setRuntimeMessage(""); }
+      if (request.current()) { setProjectState("loading"); setRuntimeMessage(""); }
     });
-    void requestJson(localPath("/api/projects"), { signal: controller.signal })
+    void requestJson(localPath("/api/projects"), { signal: request.signal })
       .then((payload) => {
         const value = dataValue(payload);
         const list = Array.isArray(value) ? value.map(parseProject).filter((item): item is Project => item !== null) : [];
-        if (controller.signal.aborted) return;
+        if (!request.current()) return;
         setProjects(list);
         setProjectId((current) => list.some((item) => item.id === current) ? current : list[0]?.id ?? "");
         setProjectState("ready");
       })
       .catch(() => {
-        if (controller.signal.aborted) return;
+        if (!request.current()) return;
         setProjects([]);
         setProjectId("");
         setProjectState("error");
         setRuntimeMessage("Projects are unavailable right now. Try again in a moment.");
       });
-    return () => controller.abort();
-  }, [runtime, sessionState]);
+    return request.cancel;
+  }, [privateReads, runtime, sessionState]);
 
   useEffect(() => {
     if (!runtime || sessionState !== "authenticated" || !projectId) return;
-    const controller = new AbortController();
-    queueMicrotask(() => { if (!controller.signal.aborted) { setJobs([]); setJobState("loading"); } });
-    void requestJson(localPath(`/api/projects/${encodeURIComponent(projectId)}/jobs`), { signal: controller.signal })
+    const request = privateReads.begin("jobs");
+    if (!request) return;
+    queueMicrotask(() => { if (request.current()) { setJobs([]); setJobState("loading"); } });
+    void requestJson(localPath(`/api/projects/${encodeURIComponent(projectId)}/jobs`), { signal: request.signal })
       .then((payload) => {
         const value = dataValue(payload);
         const list = Array.isArray(value) ? value.map(parseJob).filter((item): item is Job => item !== null) : [];
-        if (controller.signal.aborted) return;
+        if (!request.current()) return;
         setJobs(list);
         setJobState("ready");
       })
       .catch(() => {
-        if (controller.signal.aborted) return;
+        if (!request.current()) return;
         setJobs([]);
         setJobState("error");
       });
-    return () => controller.abort();
-  }, [projectId, runtime, sessionState]);
+    return request.cancel;
+  }, [privateReads, projectId, runtime, sessionState]);
 
   const projectLabel = useMemo(() => {
     if (!runtime) return "Preview workspace";
@@ -353,6 +361,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
       const project = parseProject(dataValue(payload));
       if (!project) throw new Error("Invalid project");
       setProjects((current) => [project, ...current]);
+      privateReads.cancel("jobs");
       setProjectId(project.id);
       setProjectName("");
     } catch {
@@ -538,7 +547,7 @@ export function GenerationDashboard({ kind = "image", runtime = false }: Generat
             {runtime && (
               <section className={styles.workspaceCard} aria-labelledby="workspace-heading">
                 <div className={styles.cardHeaderCompact}><div><p className={styles.cardKicker}>Workspace</p><h2 id="workspace-heading">Your projects</h2></div><Icon name="settings" /></div>
-                <label className={styles.projectSelect}>Active project<select value={projectId} onChange={(event) => { setJobs([]); setJobState("idle"); setProjectId(event.currentTarget.value); }} disabled={projectState === "loading" || projects.length === 0}><option value="">Choose a project</option>{projects.map((project) => <option value={project.id} key={project.id}>{project.name}</option>)}</select></label>
+                <label className={styles.projectSelect}>Active project<select value={projectId} onChange={(event) => { privateReads.cancel("jobs"); setJobs([]); setJobState("idle"); setProjectId(event.currentTarget.value); }} disabled={projectState === "loading" || projects.length === 0}><option value="">Choose a project</option>{projects.map((project) => <option value={project.id} key={project.id}>{project.name}</option>)}</select></label>
                 <form className={styles.projectForm} onSubmit={createProject}><input value={projectName} onChange={(event) => setProjectName(event.currentTarget.value.slice(0, 160))} placeholder="New project name" maxLength={160} aria-label="New project name" /><button type="submit" disabled={!projectName.trim() || creatingProject}>{creatingProject ? "Adding…" : "Add"}</button></form>
                 {projectMessage && <p className={styles.inlineError} role="alert">{projectMessage}</p>}
                 {runtimeMessage && <p className={styles.inlineError} role="alert">{runtimeMessage}</p>}

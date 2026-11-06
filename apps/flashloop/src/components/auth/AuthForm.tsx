@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
-import { pendingCreationKind } from "@/lib/creation-draft";
+import { browserCreationKind, creationContinuationPath, pendingCreationKind, rememberCreationKind } from "@/lib/creation-draft";
 import { authErrorMessage, postAuth } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
 import { useAuthRetry } from "./useAuthRetry";
@@ -43,13 +43,14 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
     if (typeof email !== "string" || typeof password !== "string") return;
     setPending(true);
     setError("");
+    rememberCreationKind(pendingCreationKind(browserCreationKind()));
     try {
       const reply = await postAuth(mode, { email, password, token: tokens[0], captchaToken: tokens[1] });
       form.current?.reset();
       if (mode === "signup" && reply.confirmationRequired) {
         setConfirmationRequired(true);
       } else {
-        window.location.assign(localPath("/auth/verify"));
+        window.location.assign(localPath(creationContinuationPath("/auth/verify", pendingCreationKind(browserCreationKind()))));
       }
     } catch (reason) {
       startRetry(reason);
@@ -68,7 +69,7 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
         <p className="auth-copy">Account access is not available in this website preview. You can explore the image and video workspaces without signing in.</p>
         <a className="auth-primary" href={localPath("/create/video/")} onClick={(event) => {
           event.preventDefault();
-          window.location.assign(localPath(`/create/${pendingCreationKind()}/`));
+          window.location.assign(localPath(`/create/${pendingCreationKind(browserCreationKind())}/`));
         }}>Explore the workspace</a>
         <a className="auth-text-button" href={localPath("/blue/")}>Back to Flashloop</a>
       </section>
