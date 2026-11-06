@@ -3,7 +3,8 @@
 import { localPath } from "@/lib/local-path";
 import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "./Icon";
-import { referenceLink } from "@/lib/links";
+import { studioLink } from "@/lib/links";
+import { saveCreationDraft } from "@/lib/creation-draft";
 
 type Kind = "Video" | "Image";
 type Attachment = { name: string; url: string; type: string };
@@ -68,18 +69,17 @@ export function Composer() {
 
   function submit() {
     if (!prompt.trim()) return;
-    const params = new URLSearchParams({
-      prompt: prompt.trim(),
-      model,
-      ratio,
-      quality,
-      count,
-    });
-    if (kind === "Video") params.set("duration", duration);
-    // The reference is a frontend preview; generation continues in its existing flow.
-    window.location.assign(
-      referenceLink(`create/${kind.toLowerCase()}/?${params}`),
-    );
+    const next = kind === "Video" ? "video" : "image";
+    // File previews are local; private upload activation is a separate server gate.
+    if (attachments.length) {
+      setError("Reference files stay on this page. Remove them to continue with your text draft; uploads are not available yet.");
+      return;
+    }
+    if (!saveCreationDraft({ kind: next, prompt: prompt.trim(), model, ratio, quality, count, duration })) {
+      setError("Your browser could not keep this draft. Copy your prompt before opening the workspace.");
+      return;
+    }
+    window.location.assign(studioLink(next));
   }
 
   return (
@@ -198,6 +198,7 @@ export function Composer() {
           <div className="composer-promptWrap">
             <textarea
               aria-label={`Describe your ${kind.toLowerCase()}`}
+              maxLength={6000}
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
               onKeyDown={(event) => {
@@ -390,7 +391,7 @@ export function Composer() {
         )}
         <p className="sr-only">
           Press Enter to continue, or Shift and Enter for a new line. Credit
-          amounts are preview estimates. Reference files stay on this device.
+          amounts are preview estimates. Reference files stay on this page.
         </p>
         {error && (
           <p role="alert" className="composer-error">

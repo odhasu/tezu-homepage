@@ -1,4 +1,6 @@
-# Kumi signup and verification
+# Flashloop signup and verification
+
+6 November 2026: the current source sends successful verified sessions directly to the protected `/account` image/video workspace. Header auth links remain within Flashloop even when the static preview has accounts disabled. Kumi remains an internal staging resource name. The older `/blue` success-screen-removal record below describes the preceding release; this navigation change has not yet replaced that hosted runtime. See [WORKSPACE_FLOW.md](WORKSPACE_FLOW.md).
 
 Updated: 4 November 2026. This is the authentication implementation for the independent Flashloop Next.js app. The Tezu/Krea apps and published GitHub Pages release are unchanged.
 

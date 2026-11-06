@@ -1,6 +1,7 @@
 "use client";
 
 import { localPath } from "@/lib/local-path";
+import { productLink } from "@/lib/links";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "./Icon";
 import { Media, type MediaItem } from "./Media";
@@ -39,7 +40,7 @@ export function Releases() {
       <div className="home-releaseViewport">
         <div className="release-scroll" ref={track}>
           {content.releases.map((item) => (
-            <a className="home-release" key={item.title} href={item.href}>
+            <a className="home-release" key={item.title} href={productLink(item.href)}>
               <div>
                 <Media item={item} />
                 <div className="home-releaseCopy">
@@ -228,7 +229,7 @@ export function Formats() {
                     inert={index !== active}
                   >
                     <p>{item.description}</p>
-                    <a href={item.href}>
+                    <a href={productLink(item.href)}>
                       Create this <Icon name="arrow" width="14" height="14" />
                     </a>
                   </div>
@@ -272,7 +273,7 @@ export function Trends() {
             Effects riding the biggest AI trends right now, ready in one click.
           </p>
         </div>
-        <a href="https://odhasu.github.io/flashloop-clone/blue/effects/">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/effects/")}>
           See all <Icon name="arrow" />
         </a>
       </div>
@@ -288,7 +289,7 @@ function Trend({ item }: { item: (typeof content.trends)[number] }) {
   const [index, setIndex] = useState(0);
   return (
     <article>
-      <a href={item.href}>
+      <a href={productLink(item.href)}>
         <img
           src={localPath(item.posters[index])}
           alt={item.title}
@@ -349,7 +350,7 @@ export function Faq() {
             Can&apos;t find your answer? Write to us and we&apos;ll answer it
             ourselves.
           </p>
-          <a href="https://odhasu.github.io/flashloop-clone/blue/contact/">
+          <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/contact/")}>
             Get in touch <Icon name="diagonal" />
           </a>
         </div>

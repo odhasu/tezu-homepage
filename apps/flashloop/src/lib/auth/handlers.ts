@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { privateResponse } from "@/lib/http/cache-policy";
 import { localPath } from "@/lib/local-path";
@@ -102,7 +103,11 @@ export async function handleAuthGet(request: Request, operation: string) {
       const context = await authContext(clients);
       return authJson({ authenticated: Boolean(context), verified: context?.verification === "verified" && context.email_confirmed,
         emailConfirmed: context?.email_confirmed ?? false,
-        ...(context?.verification === "verified" ? { credits: context.credits } : {}),
+        ...(context?.verification === "verified" && context.email_confirmed ? {
+          credits: context.credits,
+          // An opaque UI binding, never an authentication capability or analytics identity.
+          sessionScope: createHash("sha256").update(`${context.user_id}:${context.session_id}`).digest("hex"),
+        } : {}),
       });
     }
     if (operation === "callback") {

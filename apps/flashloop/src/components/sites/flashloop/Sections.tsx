@@ -1,4 +1,5 @@
 import { localPath } from "@/lib/local-path";
+import { productLink } from "@/lib/links";
 import { Composer } from "./Composer";
 import { SourceIcon } from "./SourceIcon";
 
@@ -70,7 +71,7 @@ export function Hero() {
         <Composer />
         <a
           className="home-manual"
-          href="https://odhasu.github.io/flashloop-clone/blue/create/video/"
+          href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/video/")}
         >
           {"or create manually "}
           <SourceIcon name="0a0ede5646c9" />
@@ -129,7 +130,7 @@ export function CartoonStories() {
       <div className="home-cartoonGrid">
         <a
           className="home-cartoonCard"
-          href="https://odhasu.github.io/flashloop-clone/blue/create/video/"
+          href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/video/")}
         >
           <img
             src={localPath("/sites/flashloop/cartoon/29c3ff9c-boy-scene.webp")}
@@ -148,7 +149,7 @@ export function CartoonStories() {
         </a>
         <a
           className="home-cartoonCard"
-          href="https://odhasu.github.io/flashloop-clone/blue/create/video/"
+          href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/video/")}
         >
           <img
             src={localPath("/sites/flashloop/cartoon/6260e04a-girl-scene.webp")}
@@ -167,7 +168,7 @@ export function CartoonStories() {
         </a>
         <a
           className="home-cartoonCard"
-          href="https://odhasu.github.io/flashloop-clone/blue/create/image/"
+          href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/image/")}
         >
           <img
             src={localPath("/sites/flashloop/cartoon/262995c6-boy.png")}
@@ -206,7 +207,7 @@ export function Models() {
           </p>
           <a
             className="home-button"
-            href="https://odhasu.github.io/flashloop-clone/blue/models/"
+            href={productLink("https://odhasu.github.io/flashloop-clone/blue/models/")}
           >
             {"Explore all models"}
             <SourceIcon name="9273b0145860" />
@@ -481,7 +482,7 @@ export function AssistantPromo() {
                 </p>
                 <a
                   className="mcp-cta"
-                  href="https://odhasu.github.io/flashloop-clone/blue/mcp/?tab=chatgpt#connect"
+                  href={productLink("https://odhasu.github.io/flashloop-clone/blue/mcp/?tab=chatgpt#connect")}
                 >
                   <img
                     src={localPath("/sites/flashloop/mcp/chatgpt.svg")}
@@ -639,7 +640,7 @@ export function Studio() {
     <div className="home-section home-studio">
       <a
         className="presentation-963834915 home-studioMain"
-        href="https://odhasu.github.io/flashloop-clone/blue/effects/"
+        href={productLink("https://odhasu.github.io/flashloop-clone/blue/effects/")}
       >
         <img
           src={localPath("/sites/flashloop/642253f5-studio-cast-tiles.webp")}
@@ -660,7 +661,7 @@ export function Studio() {
         </span>
       </a>
       <div className="home-studioCards">
-        <a href="https://odhasu.github.io/flashloop-clone/blue/create/video/?model=kling-4.0">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/video/?model=kling-4.0")}>
           <img
             src={localPath("/sites/flashloop/graphics/studio-0.svg")}
             alt=""
@@ -672,7 +673,7 @@ export function Studio() {
             <p>{"Now available on Flashloop"}</p>
           </div>
         </a>
-        <a href="https://odhasu.github.io/flashloop-clone/blue/create/image/?model=gpt-image-2.5">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/image/?model=gpt-image-2.5")}>
           <img
             src={localPath("/sites/flashloop/graphics/studio-1.svg")}
             alt=""
@@ -684,7 +685,7 @@ export function Studio() {
             <p>{"with GPT Image 2.5"}</p>
           </div>
         </a>
-        <a href="https://odhasu.github.io/flashloop-clone/blue/create/image/?model=nano-banana-2">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/image/?model=nano-banana-2")}>
           <img
             src={localPath("/sites/flashloop/graphics/studio-2.svg")}
             alt=""
@@ -696,7 +697,7 @@ export function Studio() {
             <p>{"with Nano Banana 2.1"}</p>
           </div>
         </a>
-        <a href="https://odhasu.github.io/flashloop-clone/blue/mcp/">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/mcp/")}>
           <img src={localPath("/sites/flashloop/blue/studio-3.svg")} alt="" loading="lazy" />
           <SourceIcon name="9273b0145860" />
           <div>
@@ -704,7 +705,7 @@ export function Studio() {
             <p>{"with Flashloop MCP"}</p>
           </div>
         </a>
-        <a href="https://odhasu.github.io/flashloop-clone/blue/characters/">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/characters/")}>
           <img
             src={localPath("/sites/flashloop/graphics/studio-4.svg")}
             alt=""
@@ -716,7 +717,7 @@ export function Studio() {
             <p>{"with Characters"}</p>
           </div>
         </a>
-        <a href="https://odhasu.github.io/flashloop-clone/blue/create/video/?model=seedance-2.5">
+        <a href={productLink("https://odhasu.github.io/flashloop-clone/blue/create/video/?model=seedance-2.5")}>
           <img
             src={localPath("/sites/flashloop/graphics/studio-5.svg")}
             alt=""
@@ -816,7 +817,7 @@ export function CreatorBanner() {
       </div>
       <a
         className="home-button"
-        href="https://odhasu.github.io/flashloop-clone/blue/creators/"
+        href={productLink("https://odhasu.github.io/flashloop-clone/blue/creators/")}
       >
         {"Get the instructions"}
         <SourceIcon name="28aa5160394f" />

@@ -5,6 +5,7 @@ export type AuthSession = {
   verified: boolean;
   emailConfirmed?: boolean;
   credits?: number;
+  sessionScope?: string;
 };
 
 type AuthReply = {
@@ -109,6 +110,8 @@ export async function getAuthSession(signal?: AbortSignal): Promise<AuthSession>
     credits: typeof data.credits === "number" && Number.isSafeInteger(data.credits) && data.credits >= 0
       ? data.credits
       : undefined,
+    sessionScope: typeof data.sessionScope === "string" && /^[a-f0-9]{64}$/.test(data.sessionScope)
+      ? data.sessionScope : undefined,
   };
 }
 

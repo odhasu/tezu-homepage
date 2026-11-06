@@ -56,6 +56,7 @@ function scenario({ contextError = false, beginError = false, providerError = fa
     return Response.json({ success: true, hostname: config.hostname, action: providerAction, challenge_ts: new Date().toISOString() });
   } });
   const handlers = load("handlers.ts", {
+    "node:crypto": require("node:crypto"),
     "server-only": {}, "next/server": { NextResponse: { json: Response.json, redirect: Response.redirect } },
     "@/lib/local-path": { localPath: (value) => value }, "./security": security,
     "@/lib/security/edge-origin": {
@@ -107,6 +108,21 @@ test("success records verification only after Siteverify", async () => {
   assert.equal(result.status, 200);
   assert.deepEqual(s.calls, ["begin_session_verification", "rateLimit", "siteverify", "finish_session_verification:true"]);
   assert.equal(s.context().verification, "verified");
+});
+
+test("session UI binding is opaque, verified-only and changes between sessions", async () => {
+  const first = scenario({ userId: "fixture-account-a", sessionId: "fixture-session-a" });
+  const readSession = async (client) => (await client.handleAuthGet(new Request(origin + "/api/auth/session"), "session")).json();
+  assert.equal((await readSession(first)).sessionScope, undefined);
+  await first.handleAuthPost(first.request({ token: "fresh" }), "verify");
+  const verified = await readSession(first);
+  assert.match(verified.sessionScope, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(verified).includes("fixture-account-a"), false);
+  assert.equal(JSON.stringify(verified).includes("fixture-session-a"), false);
+  assert.equal((await readSession(first)).sessionScope, verified.sessionScope);
+  const next = scenario({ userId: "fixture-account-a", sessionId: "fixture-session-b" });
+  await next.handleAuthPost(next.request({ token: "fresh" }), "verify");
+  assert.notEqual((await readSession(next)).sessionScope, verified.sessionScope);
 });
 
 test("auth GET and POST reject origin bypass before creating clients", async () => {

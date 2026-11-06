@@ -10,4 +10,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Flashloop ownership
 
+The current workspace/auth consolidation is in `docs/WORKSPACE_FLOW.md`. Preserve the static preview/runtime separation and do not replace missing providers with simulated successful generation, authentication or payment results. Core creation/auth navigation is now local; some specialized reference documentation/features remain external.
+
 This app recreates the supplied blue Flashloop homepage. Read `docs/README.md`, `docs/VERIFICATION.md`, and the workspace `WORKSPACE.md` before changes. Run checks from this app directory. Keep Tezu at the workspace root and Krea in `../krea` intact. Product subpages currently point to the reference site; do not claim backend generation or accounts work locally. Use local assets and update `docs/assets.json` when adding/changing media.

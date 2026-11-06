@@ -3,7 +3,7 @@
 import { localPath } from "@/lib/local-path";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "./Icon";
-import { authLink, referenceLink } from "@/lib/links";
+import { authLink, productLink } from "@/lib/links";
 import content from "./content.json";
 
 const nav = [
@@ -69,7 +69,7 @@ export function Header() {
               <div key={label} className="shell-navItem">
                 <a
                   className={path ? "" : "shell-active"}
-                  href={path ? referenceLink(path) : localPath("/blue/")}
+                  href={path ? productLink(path) : localPath("/blue/")}
                 >
                   {label}
                 </a>
@@ -110,7 +110,7 @@ export function Header() {
             {nav.map(([label, path]) => (
               <a
                 key={label}
-                href={path ? referenceLink(path) : localPath("/blue/")}
+                href={path ? productLink(path) : localPath("/blue/")}
                 onClick={() => setOpen(false)}
               >
                 {label}
@@ -150,7 +150,7 @@ export function Footer() {
                           <ul>
                             {group.links.map((link) => (
                               <li key={link.href}>
-                                <a href={localPath(link.href)}>
+                                <a href={productLink(link.href)}>
                                   <span>{link.label}</span>
                                   <Icon
                                     name="pixel"
@@ -195,7 +195,7 @@ export function Footer() {
           {content.footer
             .find((group) => group.title === "Legal")
             ?.links.map((link) => (
-              <a href={localPath(link.href)} key={link.label}>
+              <a href={productLink(link.href)} key={link.label}>
                 {link.label}
               </a>
             ))}

@@ -24,6 +24,7 @@ function load(path, imports, globals = {}) {
 const security = load("lib/auth/security.ts", {});
 const { AuthFailure } = security;
 const authResponses = load("lib/auth/handlers.ts", {
+  "node:crypto": require("node:crypto"),
   "server-only": {}, "next/server": { NextResponse: { json: Response.json, redirect: Response.redirect } },
   "@/lib/local-path": {}, "@/lib/security/edge-origin": {}, "./server": {}, "./security": security,
 });

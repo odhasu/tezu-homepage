@@ -1,3 +1,16 @@
+## Workspace and public preview — 6 November 2026
+
+The user requested local image/video workspaces and subsequently confirmed that no owned domain or AI provider is available yet. Generate now runs an explicitly local, cancellable loading preview while waiting for provider setup. It never calls the generation API, creates a stored job, produces media or deducts credits. The finished blue homepage is preserved. See [WORKSPACE_FLOW.md](WORKSPACE_FLOW.md) for flow and privacy decisions.
+
+- Read installed Next.js 16.4.5 static-export, Route Handler, authentication, redirect, caching and build-environment documentation before changes.
+- The full app check passed under Node.js 24: ESLint, strict TypeScript, **396 tests**, 93 local assets and the static production build. Test totals: Auth 88, edge 49, ownership 48, entitlements 10, storage 111, jobs 32, billing 9, observability 39, caching 5, workspace draft 5. The only lint warning was in the unrelated untracked `service 2.ts` duplicate, which remains excluded from publication.
+- Static export produced the public image/video workspace, models, creators and deferred-connection routes, with no runtime account/API routes. The export audit verified **99 route/asset destinations**. The static build was deliberately supplied `NEXT_PUBLIC_AUTH_ENABLED=true`; its build override still disabled auth and used local public workspace links.
+- Normal runtime production build passed with the protected `/account` dashboard and existing Route Handlers. **28 actual local HTTP caching checks passed** in a credential-free build copy. The initial runner in the deployment checkout failed its public-startup assertion because the existing ignored Vercel environment file activated mandatory origin enforcement; the guard was preserved. These checks do not establish browser/CDN or real two-account production isolation.
+- Local browser: a video example fills the prompt, Generate enters continuous loading, a visible message says it is waiting for provider setup, and Cancel is available. The 319px viewport had no horizontal overflow. Final publication/browser acceptance is recorded below after execution.
+- Read-only live setup audit: Kumi staging retains only its `.vercel.app` domain and 10 auth-related environment keys; no origin secret, storage, generation, billing or telemetry config exists. Hosted Supabase has only signup-verification and ownership migrations. Cloudflare reports zero zones and R2 disabled (403/code 10042). No existing Vercel source, domain security, hosted migration, payment resource or secret was changed.
+
+No claim of live signup, paid fulfillment, provider generation, telemetry ingestion or production security follows from these checks. The user deferred domain/provider setup and requested the local loading behavior.
+
 # Verification
 
 ## Whop subscriptions — 5 November 2026

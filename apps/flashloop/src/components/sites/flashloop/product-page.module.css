@@ -1,0 +1,11 @@
+.main { max-width: 1140px; margin: 0 auto; padding: 150px 24px 100px; min-height: 70vh; }
+.eyebrow { text-transform: uppercase; letter-spacing: .16em; font-size: 12px; color: #a9ccff; margin-bottom: 20px; }
+.main h1 { font-size: clamp(36px, 6vw, 72px); font-weight: 500; line-height: 1.08; letter-spacing: -.045em; max-width: 850px; }
+.content { margin-top: 32px; color: #c0d2ed; font-size: 18px; }
+.content > p { max-width: 760px; margin-bottom: 20px; }
+.content > a { display: inline-flex; background: #0065fc; color: white; padding: 12px 22px; border-radius: 10px; margin: 8px 12px 0 0; font-weight: 600; }
+.content ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 28px 0; }
+.content li a { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 70px; padding: 18px; border: 1px solid #6ea8ff33; border-radius: 12px; background: #101f43; color: #fff; }
+.content small { display: block; color: #9bbcf0; font-size: 12px; margin-top: 3px; }
+.content li a:hover { border-color: #a9ccff; }
+@media (max-width: 600px) { .main { padding: 116px 20px 64px; } .content { font-size: 16px; } }

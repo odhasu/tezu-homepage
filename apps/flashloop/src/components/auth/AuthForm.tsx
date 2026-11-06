@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
+import { pendingCreationKind } from "@/lib/creation-draft";
 import { authErrorMessage, postAuth } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
 import { useAuthRetry } from "./useAuthRetry";
@@ -63,9 +64,13 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
   if (!enabled) {
     return (
       <section className="auth-card" aria-labelledby="auth-heading">
-        <h1 id="auth-heading">Account access is coming soon</h1>
-        <p className="auth-copy">Signups are not available yet. Check back soon.</p>
-        <a className="auth-primary" href={localPath("/blue")}>Back to Flashloop</a>
+        <h1 id="auth-heading">Your next idea starts here</h1>
+        <p className="auth-copy">Account access is not available in this website preview. You can explore the image and video workspaces without signing in.</p>
+        <a className="auth-primary" href={localPath("/create/video/")} onClick={(event) => {
+          event.preventDefault();
+          window.location.assign(localPath(`/create/${pendingCreationKind()}/`));
+        }}>Explore the workspace</a>
+        <a className="auth-text-button" href={localPath("/blue/")}>Back to Flashloop</a>
       </section>
     );
   }

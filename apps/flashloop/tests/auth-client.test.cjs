@@ -121,3 +121,11 @@ test("successful signup preserves confirmation handoff", async () => {
   assert.equal(result.confirmationRequired, true);
   assert.equal(api.calls(), 1);
 });
+
+test("session parser accepts only the opaque bounded UI binding", async () => {
+  for (const value of ["a".repeat(64), "invalid", "a".repeat(65), "https://invalid.example", null]) {
+    const api = client(Response.json({ authenticated: true, verified: true, emailConfirmed: true, sessionScope: value }));
+    const result = await api.getAuthSession();
+    assert.equal(result.sessionScope, value === "a".repeat(64) ? value : undefined);
+  }
+});

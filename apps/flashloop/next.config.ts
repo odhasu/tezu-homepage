@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   // Runtime handlers never enter the GitHub Pages artifact.
   pageExtensions: process.env.STATIC_EXPORT === "true" ? ["tsx", "ts"] : ["runtime.ts", "runtime.tsx", "tsx", "ts"],
   basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",
+  // A Pages build must never advertise absent account routes, even if a local
+  // runtime env file enables authentication for a separate deployment.
+  env: {
+    NEXT_PUBLIC_AUTH_ENABLED: process.env.STATIC_EXPORT === "true" ? "false" : process.env.NEXT_PUBLIC_AUTH_ENABLED ?? "false",
+  },
   ...(process.env.STATIC_EXPORT === "true" ? { output: "export", trailingSlash: true } : {}),
   turbopack: { root: __dirname },
   poweredByHeader: false,

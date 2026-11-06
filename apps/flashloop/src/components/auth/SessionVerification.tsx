@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
+import { clearCreationDraft, pendingCreationKind } from "@/lib/creation-draft";
 import { AuthRateLimitError, AuthRetryError, authErrorMessage, getAuthSession, postAuth, type AuthSession } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
 import { useAuthRetry } from "./useAuthRetry";
@@ -31,7 +32,7 @@ export function SessionVerification() {
     getAuthSession(controller.signal).then((nextSession) => {
       if (active) {
         if (nextSession.authenticated && nextSession.emailConfirmed && nextSession.verified) {
-          window.location.replace(localPath("/blue"));
+          window.location.replace(localPath(`/account?kind=${pendingCreationKind()}`));
         }
         setSession(nextSession);
       }
@@ -62,7 +63,7 @@ export function SessionVerification() {
       await postAuth("verify", { token: tokens[0] });
       const nextSession = await getAuthSession();
       if (!nextSession.authenticated || !nextSession.emailConfirmed || !nextSession.verified) throw new Error("Verification did not finish.");
-      window.location.replace(localPath("/blue"));
+      window.location.replace(localPath(`/account?kind=${pendingCreationKind()}`));
       setSession(nextSession);
     } catch (reason) {
       startRetry(reason);
@@ -85,6 +86,7 @@ export function SessionVerification() {
     setPending(true);
     try {
       await postAuth("signout", {});
+      clearCreationDraft();
       window.location.assign(localPath("/auth"));
     } catch (reason) {
       startRetry(reason);

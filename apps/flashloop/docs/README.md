@@ -1,5 +1,7 @@
 # Flashloop implementation notes
 
+The 6 November workspace consolidation and GitHub Pages/runtime boundary are recorded in [WORKSPACE_FLOW.md](WORKSPACE_FLOW.md). This adds local image/video previews and makes the protected account workspace the successful verification destination. These notes supersede the older core-link/reference-handoff descriptions below; provider generation and hosted runtime activation are still gated.
+
 Sentry manual error/job tracing, consent-gated PostHog analytics, safe request/job correlation, environment separation, current verification and unresolved live setup are recorded in [OBSERVABILITY.md](OBSERVABILITY.md). HTTP/browser/CDN cache policy and remaining two-account deployment acceptance are in [CACHING.md](CACHING.md). Telemetry is disabled until approved configuration is supplied; this supersedes older notes saying integration code is absent. No hosted telemetry ingestion or deployed cache-isolation acceptance has been claimed.
 
 The user-requested PostHog wizard execution and newly installed Sentry plugin's actual authentication requirements are recorded in [POSTHOG_WIZARD.md](POSTHOG_WIZARD.md). The wizard was launched in an isolated audit copy; browser authorization and an authenticated result must be observed before claiming it completed.
