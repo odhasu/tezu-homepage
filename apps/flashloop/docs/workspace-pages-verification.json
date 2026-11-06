@@ -1,0 +1,40 @@
+{
+  "release": "d22a1aeb142f9df224a4ab037d99e2eb7b408707",
+  "workflow": "https://github.com/odhasu/tezu-homepage/actions/runs/42183640713",
+  "verifiedDate": "2026-11-06",
+  "publicRoutes": 11,
+  "localDestinationsChecked": 99,
+  "failures": [],
+  "remainingReferenceDestinations": [
+    "https://odhasu.github.io/flashloop-clone/blue/ads-studio/",
+    "https://odhasu.github.io/flashloop-clone/blue/agent/",
+    "https://odhasu.github.io/flashloop-clone/blue/ai-safety/",
+    "https://odhasu.github.io/flashloop-clone/blue/alternatives/",
+    "https://odhasu.github.io/flashloop-clone/blue/alternatives/higgsfield/",
+    "https://odhasu.github.io/flashloop-clone/blue/blog/",
+    "https://odhasu.github.io/flashloop-clone/blue/characters/",
+    "https://odhasu.github.io/flashloop-clone/blue/compare/flashloop-vs-higgsfield/",
+    "https://odhasu.github.io/flashloop-clone/blue/contact/",
+    "https://odhasu.github.io/flashloop-clone/blue/copyright/",
+    "https://odhasu.github.io/flashloop-clone/blue/create/upscale/",
+    "https://odhasu.github.io/flashloop-clone/blue/create/voice/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/claymotion-explainer/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/hand-drawn/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/paper-collage/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/sports-anime/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/stickman-cartoon/",
+    "https://odhasu.github.io/flashloop-clone/blue/effects/watercolor/",
+    "https://odhasu.github.io/flashloop-clone/blue/faceless-studio/",
+    "https://odhasu.github.io/flashloop-clone/blue/film-studio/",
+    "https://odhasu.github.io/flashloop-clone/blue/get-app/",
+    "https://odhasu.github.io/flashloop-clone/blue/learn/presets/",
+    "https://odhasu.github.io/flashloop-clone/blue/mirage-studio/",
+    "https://odhasu.github.io/flashloop-clone/blue/privacy/",
+    "https://odhasu.github.io/flashloop-clone/blue/terms/"
+  ],
+  "limits": [
+    "Static HTTP/browser preview; no live auth/payment/provider/security acceptance",
+    "Specialized feature/legal/reference links retain original external destinations"
+  ]
+}
