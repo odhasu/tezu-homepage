@@ -5,14 +5,25 @@ import { handleStagingProxy } from "../cloudflare/staging-proxy.mjs";
 // Synthetic Worker transport only. No hosted Worker, Vercel or auth claim.
 const publicOrigin = "https://flashloop-staging.fixture.workers.dev";
 const upstreamOrigin = "https://fixture-staging.vercel.app";
+const providerOrigin = "https://fixture-project.supabase.co";
 const fixtureProof = "synthetic-proof-at-least-thirty-two-characters";
 const settings = { ENABLED: "true", PUBLIC_ORIGIN: publicOrigin, UPSTREAM_ORIGIN: upstreamOrigin, EDGE_ORIGIN_SECRET: fixtureProof };
+const googleSettings = { ...settings, AUTH_PROVIDER_ORIGIN: providerOrigin };
 const privatePolicy = {
   "cache-control": "private, no-store", "cdn-cache-control": "no-store", "vercel-cdn-cache-control": "no-store",
   pragma: "no-cache", expires: "0",
 };
 function request(path = "/blue", options = {}) {
   return new Request(`${publicOrigin}${path}`, { ...options, headers: { "CF-Connecting-IP": "203.0.113.10", ...options.headers } });
+}
+function googleLocation(edit = () => {}) {
+  const location = new URL(`${providerOrigin}/auth/v1/authorize`);
+  location.searchParams.set("provider", "google");
+  location.searchParams.set("redirect_to", `${publicOrigin}/api/auth/callback`);
+  location.searchParams.set("code_challenge", "synthetic");
+  location.searchParams.set("code_challenge_method", "s256");
+  edit(location);
+  return location.toString();
 }
 function assertPrivate(response) {
   for (const [key, value] of Object.entries(privatePolicy)) assert.equal(response.headers.get(key), value);
@@ -33,6 +44,12 @@ test("disabled Worker and invalid configuration make no upstream request", async
     { ...settings, UPSTREAM_ORIGIN: `${upstreamOrigin}?key=synthetic` },
     { ...settings, UPSTREAM_ORIGIN: "https://user:password@fixture-staging.vercel.app" },
     { ...settings, UPSTREAM_ORIGIN: "http://fixture-staging.vercel.app" },
+    ...[null, "", true, "http://fixture-project.supabase.co", `${providerOrigin}/`, `${providerOrigin}/auth/v1/authorize`,
+      `${providerOrigin}?provider=google`, `${providerOrigin}#fragment`, `${providerOrigin}:8443`,
+      "https://user:password@fixture-project.supabase.co", "https://fixture-project.supabase.co:443",
+      "https://FIXTURE-PROJECT.supabase.co", "https://supabase.co", "https://fixture.supabase.co.outside.example",
+      "https://nested.fixture.supabase.co", "https://auth.example", "https://-fixture.supabase.co",
+    ].map(AUTH_PROVIDER_ORIGIN => ({ ...settings, AUTH_PROVIDER_ORIGIN })),
   ];
   for (const configuration of configurations) {
     const response = await handleStagingProxy(request(), configuration, () => { throw new Error("Must not fetch"); });
@@ -124,6 +141,88 @@ test("outside/credential/protocol redirect targets never receive proof or a seco
     });
     assert.equal(calls, 1);
     assert.equal(response.status, 502);
+    assertPrivate(response);
+    await assertNoProof(response);
+  }
+});
+
+test("explicit Google authorize redirect preserves the provider URL, cookies and private policy without a second fetch", async () => {
+  const location = googleLocation(url => url.searchParams.set("prompt", "select_account"));
+  let calls = 0;
+  const headers = new Headers({ Location: location, Refresh: `0;url=${providerOrigin}`, "x-flashloop-edge-key": fixtureProof,
+    "Cache-Control": "public, max-age=3600" });
+  headers.append("Set-Cookie", "fixture-pkce=verifier; Secure; HttpOnly; SameSite=Lax; Path=/");
+  headers.append("Set-Cookie", "flashloop_auth_kind=image; Secure; HttpOnly; SameSite=Lax; Path=/");
+  const response = await handleStagingProxy(request("/api/auth/google?kind=image"), googleSettings, async (url, init) => {
+    calls++;
+    assert.equal(url, `${upstreamOrigin}/api/auth/google?kind=image`);
+    assert.equal(init.redirect, "manual");
+    assert.equal(init.cache, "no-store");
+    assert.equal(init.headers.get("x-flashloop-edge-key"), fixtureProof);
+    return new Response(null, { status: 303, headers });
+  });
+  assert.equal(calls, 1);
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("Location"), location);
+  assert.equal(response.headers.get("Refresh"), null);
+  assert.equal(response.headers.getSetCookie().length, 2);
+  assertPrivate(response);
+  await assertNoProof(response);
+});
+
+test("Google provider exception requires an explicit binding, exact GET route and 303 status", async () => {
+  const cases = [
+    ["binding omitted", "/api/auth/google", "GET", 303, settings],
+    ...["HEAD", "POST", "OPTIONS"].map(method => [method, "/api/auth/google", method, 303, googleSettings]),
+    ...[200, 301, 302, 307, 308].map(status => [String(status), "/api/auth/google", "GET", status, googleSettings]),
+    ...["/blue", "/api/auth/callback", "/api/auth/google/", "/api/auth/%67oogle", "/api/auth/google/other",
+      "/flashloop/api/auth/google", "//api/auth/google"].map(path => [path, path, "GET", 303, googleSettings]),
+  ];
+  for (const [label, path, method, status, configuration] of cases) {
+    let calls = 0;
+    const response = await handleStagingProxy(request(path, { method }), configuration, async () => {
+      calls++;
+      return new Response("sensitive upstream body", { status, headers: { Location: googleLocation() } });
+    });
+    assert.equal(calls, 1, label);
+    assert.equal(response.status, 502, label);
+    assert.equal(response.headers.get("Location"), null, label);
+    assertPrivate(response);
+    await assertNoProof(response);
+  }
+});
+
+test("Google provider exception rejects changed origins, paths, credentials, fragments and ambiguous query values", async () => {
+  const cases = [
+    ["different Supabase project", googleLocation(url => { url.hostname = "different-project.supabase.co"; })],
+    ["lookalike suffix", googleLocation(url => { url.hostname = "fixture-project.supabase.co.outside.example"; })],
+    ["non-HTTPS", googleLocation(url => { url.protocol = "http:"; })],
+    ["custom port", googleLocation(url => { url.port = "8443"; })],
+    ["credentials", googleLocation(url => { url.username = "fixture"; url.password = "password"; })],
+    ["fragment", googleLocation(url => { url.hash = "fragment"; })],
+    ...["/auth/v1/authorize/", "/auth/v1/token", "/AUTH/v1/authorize", "/auth/v1/%61uthorize"].map(path => [path, googleLocation(url => { url.pathname = path; })]),
+    ["missing provider", googleLocation(url => url.searchParams.delete("provider"))],
+    ["changed provider", googleLocation(url => url.searchParams.set("provider", "github"))],
+    ["provider case", googleLocation(url => url.searchParams.set("provider", "Google"))],
+    ["duplicate provider", googleLocation(url => url.searchParams.append("provider", "google"))],
+    ["encoded duplicate provider", `${googleLocation()}&%70rovider=google`],
+    ["missing callback", googleLocation(url => url.searchParams.delete("redirect_to"))],
+    ["duplicate callback", googleLocation(url => url.searchParams.append("redirect_to", `${publicOrigin}/api/auth/callback`))],
+    ["encoded duplicate callback", `${googleLocation()}&redirect%5fto=${encodeURIComponent(`${publicOrigin}/api/auth/callback`)}`],
+    ...[`${upstreamOrigin}/api/auth/callback`, "https://outside.example/api/auth/callback", "/api/auth/callback",
+      `${publicOrigin}/api/auth/callback/`, `${publicOrigin}/api/auth/callback?next=/account`, `${publicOrigin}/api/auth/callback#fragment`,
+      `${publicOrigin}/flashloop/api/auth/callback`, `${publicOrigin}/api/auth/%63allback`,
+    ].map(callback => [callback, googleLocation(url => url.searchParams.set("redirect_to", callback))]),
+  ];
+  for (const [label, location] of cases) {
+    let calls = 0;
+    const response = await handleStagingProxy(request("/api/auth/google"), googleSettings, async () => {
+      calls++;
+      return new Response("sensitive upstream body", { status: 303, headers: { Location: location } });
+    });
+    assert.equal(calls, 1, label);
+    assert.equal(response.status, 502, label);
+    assert.equal(response.headers.get("Location"), null, label);
     assertPrivate(response);
     await assertNoProof(response);
   }

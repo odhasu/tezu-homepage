@@ -61,6 +61,7 @@ export async function observeRequest(
 
 export function authOperation(operation: string): RequestOperation {
   if (operation === "signup" || operation === "signin") return operation;
+  if (operation === "google") return "signin";
   if (operation === "verify" || operation === "callback") return "verification";
   return "authorization";
 }

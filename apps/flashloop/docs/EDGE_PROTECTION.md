@@ -8,6 +8,8 @@ Application changes are local to `apps/flashloop`. The finished homepage, assets
 
 The user selected **two successful account creations per IP per rolling four days (96 hours / 345600 seconds)**. Fresh CAPTCHA tokens never reset this quota. Shared home/office/carrier IPs share the cap, and IP rotation means this is not a two-accounts-per-person guarantee. This quota is implemented locally and has not been applied to the hosted database. The user confirmed they do not yet own a domain; current staging stays unchanged.
 
+6 November Google sign-in addition: existing-account OAuth starts use a separate **10/IP/600-seconds** attempt budget and the same protected runtime boundary. The existing new-user hook is unchanged, preserving the successful-creation quota; unknown Google accounts cannot create users. Google authentication and provider-verified email do not satisfy the separate per-session Turnstile gate. See [AUTH.md](AUTH.md#google-sign-in) for disabled flags, provider setup, native linking behavior and verification limits.
+
 The low-overhead recommendation is Cloudflare's Free zone plan for combined burst filtering, a request-header transform for origin proof, and existing PostgreSQL for authoritative account limits. It needs no Worker or hosting migration. The available zone plan cannot be verified until an owned domain is selected and a zone exists. Edge thresholds remain proposals awaiting agreement.
 
 ## Implemented application boundary

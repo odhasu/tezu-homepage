@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { localPath } from "@/lib/local-path";
 import { browserCreationKind, creationContinuationPath, pendingCreationKind, rememberCreationKind } from "@/lib/creation-draft";
-import { authErrorMessage, postAuth } from "./auth-api";
+import { authErrorMessage, getAuthSession, postAuth } from "./auth-api";
 import { TurnstileChallenge } from "./TurnstileChallenge";
 import { useAuthRetry } from "./useAuthRetry";
 
@@ -22,9 +22,34 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
   const [confirmationRequired, setConfirmationRequired] = useState(false);
   const { retrySeconds, retrying, startRetry } = useAuthRetry();
   const form = useRef<HTMLFormElement>(null);
+  const sessionCheck = useRef<AbortController | null>(null);
   const receiveTokens = useCallback((nextTokens: string[]) => setTokens(nextTokens), []);
   const enabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true" && !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const googleEnabled = enabled && process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+
+  useEffect(() => {
+    if (!enabled) return;
+    let active = true;
+    const controller = new AbortController();
+    sessionCheck.current = controller;
+    let callbackFailed = false;
+    try {
+      const values = new URL(window.location.href).searchParams.getAll("authError");
+      callbackFailed = values.length === 1 && values[0] === "callback";
+    } catch { /* The form also renders without browser navigation state. */ }
+    if (callbackFailed) {
+      Promise.resolve().then(() => {
+        if (active) setError("Sign-in could not finish. Try again, or create an account with email first.");
+      });
+    } else {
+      void getAuthSession(controller.signal).then((session) => {
+        if (!active || controller.signal.aborted || !session.authenticated) return;
+        const destination = session.emailConfirmed && session.verified ? "/account" : "/auth/verify";
+        window.location.replace(localPath(creationContinuationPath(destination, pendingCreationKind(browserCreationKind()))));
+      }).catch(() => { /* Fresh credentials can still be submitted after a failed session check. */ });
+    }
+    return () => { active = false; controller.abort(); };
+  }, [enabled]);
 
   function switchMode() {
     if (pending || googlePending || retrying) return;
@@ -37,7 +62,8 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
   }
 
   function continueWithGoogle() {
-    if (pending || googlePending || retrying) return;
+    if (!googleEnabled || pending || googlePending || retrying) return;
+    sessionCheck.current?.abort();
     const kind = pendingCreationKind(browserCreationKind());
     rememberCreationKind(kind);
     setGooglePending(true);
@@ -46,7 +72,8 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending || retrying || tokens.length !== 2) return;
+    if (pending || googlePending || retrying || tokens.length !== 2) return;
+    sessionCheck.current?.abort();
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
     const password = data.get("password");
@@ -103,22 +130,23 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
       <p className="auth-copy">{mode === "signup"
         ? "Confirm your email and complete a security check before using your account."
         : "Sign in to your Flashloop account."}</p>
-      {googleEnabled ? <>
+      {googleEnabled && mode === "signin" ? <>
         <button className="auth-google" type="button" onClick={continueWithGoogle} disabled={pending || googlePending || retrying}>
           {googlePending ? "Opening Google…" : "Continue with Google"}
         </button>
+        <p className="auth-helper">Use your existing Flashloop account. New here? Create your account with email first.</p>
         <div className="auth-divider" aria-hidden="true"><span>or</span></div>
       </> : null}
       <form ref={form} onSubmit={submit} className="auth-form" aria-busy={pending || googlePending}>
         <label htmlFor="auth-email">Email</label>
-        <input id="auth-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} maxLength={254} required disabled={pending} />
+        <input id="auth-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} maxLength={254} required disabled={pending || googlePending} />
         <label htmlFor="auth-password">Password</label>
-        <input id="auth-password" name="password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 12 : 1} maxLength={128} required disabled={pending} aria-describedby={mode === "signup" ? "auth-password-help" : undefined} />
+        <input id="auth-password" name="password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} minLength={mode === "signup" ? 12 : 1} maxLength={128} required disabled={pending || googlePending} aria-describedby={mode === "signup" ? "auth-password-help" : undefined} />
         {mode === "signup" ? <p className="auth-helper" id="auth-password-help">Use at least 12 characters.</p> : null}
-        {!pending && !retrying ? <TurnstileChallenge key={`${mode}-${challengeKey}`} actions={challengeActions[mode]} onTokens={receiveTokens} /> : null}
+        {!pending && !googlePending && !retrying ? <TurnstileChallenge key={`${mode}-${challengeKey}`} actions={challengeActions[mode]} onTokens={receiveTokens} /> : null}
         {error ? <p className="auth-error" role="alert">{error}</p> : null}
         {retrying ? <p className="auth-helper">Try again in {retrySeconds} {retrySeconds === 1 ? "second" : "seconds"}.</p> : null}
-        <button className="auth-primary" type="submit" disabled={pending || retrying || tokens.length !== 2}>
+        <button className="auth-primary" type="submit" disabled={pending || googlePending || retrying || tokens.length !== 2}>
           {pending ? (mode === "signup" ? "Creating account…" : "Signing in…") : (mode === "signup" ? "Create account" : "Sign in")}
         </button>
       </form>

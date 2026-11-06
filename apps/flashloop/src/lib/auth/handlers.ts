@@ -15,12 +15,15 @@ function readCreationKind(value: unknown): "image" | "video" | undefined {
 
 function readCookie(header: string | null, name: string): string | undefined {
   if (!header) return undefined;
+  let value: string | undefined;
   for (const item of header.split(";")) {
     const separator = item.indexOf("=");
     if (separator < 0 || item.slice(0, separator).trim() !== name) continue;
-    return decodeURIComponent(item.slice(separator + 1).trim());
+    // Ambiguous or encoded values never select a destination or break a callback.
+    if (value !== undefined) return undefined;
+    value = item.slice(separator + 1).trim();
   }
-  return undefined;
+  return value;
 }
 
 function clearGoogleKindCookie(response: NextResponse, secure: boolean): void {
@@ -42,7 +45,8 @@ async function startGoogleAuth(request: Request, clients: AuthClients) {
   requireSafeAuthNavigation(request, clients.config.origin);
   await rateLimit(clients, `google:ip:${trustedClientIp(request)}`, 10);
   const requestUrl = new URL(request.url);
-  const kind = readCreationKind(requestUrl.searchParams.get("kind"));
+  const kinds = requestUrl.searchParams.getAll("kind");
+  const kind = kinds.length === 1 ? readCreationKind(kinds[0]) : undefined;
   const redirectTo = `${clients.config.origin}${localPath("/api/auth/callback")}`;
   const result = await clients.client.auth.signInWithOAuth({
     provider: "google",
@@ -51,8 +55,11 @@ async function startGoogleAuth(request: Request, clients: AuthClients) {
   if (result.error || !result.data.url) throw new AuthFailure("Google sign-in is not configured yet.", 503);
   const authorization = new URL(result.data.url);
   const supabase = new URL(clients.config.supabaseUrl);
+  const providers = authorization.searchParams.getAll("provider");
+  const redirects = authorization.searchParams.getAll("redirect_to");
   if (authorization.origin !== supabase.origin || authorization.pathname !== "/auth/v1/authorize" ||
-    authorization.username || authorization.password || authorization.hash) {
+    authorization.username || authorization.password || authorization.hash ||
+    providers.length !== 1 || providers[0] !== "google" || redirects.length !== 1 || redirects[0] !== redirectTo) {
     throw new AuthFailure("Google sign-in is not configured yet.", 503);
   }
   const response = NextResponse.redirect(authorization, 303);
@@ -61,6 +68,15 @@ async function startGoogleAuth(request: Request, clients: AuthClients) {
       httpOnly: true, secure: clients.config.origin.startsWith("https:"), sameSite: "lax", path: "/", maxAge: 600,
     });
   } else clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));
+  response.headers.set("Referrer-Policy", "no-referrer");
+  return privateResponse(response);
+}
+
+function callbackRecovery(clients: AuthClients, kind: "image" | "video" | undefined) {
+  const path = `/auth?authError=callback${kind ? `&kind=${kind}` : ""}`;
+  const response = NextResponse.redirect(`${clients.config.origin}${localPath(path)}`, 303);
+  clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));
+  response.headers.set("Referrer-Policy", "no-referrer");
   return privateResponse(response);
 }
 
@@ -170,18 +186,17 @@ export async function handleAuthGet(request: Request, operation: string) {
     if (operation === "callback") {
       const url = new URL(request.url);
       const kind = readCreationKind(readCookie(request.headers.get("cookie"), GOOGLE_KIND_COOKIE));
-      const code = url.searchParams.get("code");
-      if (url.searchParams.has("error")) {
-        const response = NextResponse.redirect(`${clients.config.origin}${localPath(kind ? `/auth?kind=${kind}` : "/auth")}`, 303);
-        clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));
-        return privateResponse(response);
+      const codes = url.searchParams.getAll("code");
+      const code = codes.length === 1 ? codes[0] : undefined;
+      if (url.searchParams.has("error") || !code || code.length > 4096 || /[\u0000-\u0020\u007f]/.test(code)) {
+        return callbackRecovery(clients, kind);
       }
-      if (!code || code.length > 4096) throw new AuthFailure("Confirmation link is invalid.", 400);
-      // PKCE binds the emailed callback to the browser that initiated signup. No open redirects.
-      const result = await clients.client.auth.exchangeCodeForSession(code);
+      // Both email and Google use the verifier in this browser's HttpOnly cookie.
+      const result = await clients.client.auth.exchangeCodeForSession(code).catch(() => null);
+      if (!result) return callbackRecovery(clients, kind);
       if (result.error || !result.data.user?.email_confirmed_at) {
         if (result.data.session) await revokeSession(clients);
-        throw new AuthFailure("Confirmation failed. Sign in again.");
+        return callbackRecovery(clients, kind);
       }
       const response = NextResponse.redirect(`${clients.config.origin}${localPath(kind ? `/auth/verify?kind=${kind}` : "/auth/verify")}`, 303);
       clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));

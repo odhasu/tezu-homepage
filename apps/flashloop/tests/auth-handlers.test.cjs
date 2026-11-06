@@ -27,7 +27,8 @@ function load(file, imports, globals = {}) {
 
 function scenario({ contextError = false, beginError = false, providerError = false, finishError = false,
   providerAction = "verify_session", userId = "user", sessionId = "session", edgeError = false, rateHook, signupError = false,
-  quotaFull = false, googleError = false, googleUrl = "https://project.supabase.co/auth/v1/authorize?provider=google" } = {}) {
+  quotaFull = false, googleEnabled = true, googleError = false, exchangeError = false, exchangeThrows = false,
+  googleUrl = `https://project.supabase.co/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(origin + "/api/auth/callback")}` } = {}) {
   const calls = [];
   const limitCalls = [];
   let clientsCreated = 0;
@@ -44,7 +45,12 @@ function scenario({ contextError = false, beginError = false, providerError = fa
   }, auth: {
     signUp: async () => { calls.push("signUp"); return { error: signupError ? { message: "private provider failure" } : null, data: { session: null } }; },
     signInWithOAuth: async () => { calls.push("signInWithOAuth"); return { error: googleError ? { message: "private provider failure" } : null, data: { url: googleUrl } }; },
-    exchangeCodeForSession: async () => { calls.push("exchangeCodeForSession"); return { error: null, data: { user: { email_confirmed_at: new Date().toISOString() }, session: { id: "oauth-session" } } }; },
+    exchangeCodeForSession: async () => {
+      calls.push("exchangeCodeForSession");
+      if (exchangeThrows) throw new Error("Private provider error");
+      return exchangeError ? { error: true, data: { session: null, user: null } }
+        : { error: null, data: { user: { email_confirmed_at: new Date().toISOString() }, session: { id: "oauth-session" } } };
+    },
   } }, admin: { rpc: async (name, args) => {
     calls.push(`${name}:${args.p_success}`);
     if (name === "finish_session_verification") {
@@ -86,7 +92,7 @@ function scenario({ contextError = false, beginError = false, providerError = fa
       },
       revokeSession: async () => { state = "failed"; calls.push("revoke", "signOut:local"); },
     },
-  });
+  }, { process: { env: { GOOGLE_AUTH_ENABLED: String(googleEnabled) } } });
   const request = (body, otherHeaders = {}) => new Request(origin + "/api/auth/verify", {
     method: "POST", headers: { origin, "content-type": "application/json", "x-requested-with": "flashloop", ...otherHeaders },
     body: typeof body === "string" ? body : JSON.stringify(body),
@@ -170,9 +176,63 @@ test("Google denial clears the tool cookie and returns to sign in", async () => 
   const s = scenario();
   const response = await s.handleAuthGet(new Request(`${origin}/api/auth/callback?error=access_denied&error_description=ignored`, { headers: { cookie: "flashloop_auth_kind=image" } }), "callback");
   assert.equal(response.status, 303);
-  assert.equal(response.headers.get("location"), `${origin}/auth?kind=image`);
+  assert.equal(response.headers.get("location"), `${origin}/auth?authError=callback&kind=image`);
   assert.match(response.headers.get("set-cookie"), /flashloop_auth_kind=; Max-Age=0/);
   assert.ok(!s.calls.includes("exchangeCodeForSession"));
+});
+
+test("Google start stays disabled until explicit provider readiness and rejects cross-site starts", async () => {
+  const disabled = scenario({ googleEnabled: false });
+  assert.equal((await disabled.handleAuthGet(new Request(`${origin}/api/auth/google`), "google")).status, 503);
+  assert.deepEqual(disabled.calls, []);
+  for (const headers of [{ "sec-fetch-site": "cross-site" }, { origin: "https://attacker.example" }]) {
+    const s = scenario();
+    assert.equal((await s.handleAuthGet(new Request(`${origin}/api/auth/google`, { headers }), "google")).status, 403);
+    assert.deepEqual(s.calls, []);
+  }
+});
+
+test("Google start replaces stale and ambiguous tool preferences without forwarding arbitrary navigation", async () => {
+  for (const query of ["", "?kind=other", "?kind=image&kind=video", "?returnTo=https://evil.example&prompt=private-fixture"]) {
+    const s = scenario();
+    const response = await s.handleAuthGet(new Request(`${origin}/api/auth/google${query}`, { headers: { cookie: "flashloop_auth_kind=image" } }), "google");
+    assert.equal(response.status, 303);
+    assert.match(response.headers.get("set-cookie"), /flashloop_auth_kind=; Max-Age=0/);
+    assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+    assert.equal(response.headers.get("cache-control"), "private, no-store");
+    assert.equal(response.headers.get("location").includes("private-fixture"), false);
+  }
+});
+
+test("missing, malformed and ambiguous callback codes recover without an exchange or unrelated logout", async () => {
+  for (const query of ["", "?code=", "?code=a&code=b", "?code=%00", "?code=" + "a".repeat(4097)]) {
+    const s = scenario();
+    const response = await s.handleAuthGet(new Request(`${origin}/api/auth/callback${query}`), "callback");
+    assert.equal(response.status, 303);
+    assert.equal(response.headers.get("location"), `${origin}/auth?authError=callback`);
+    assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+    assert.deepEqual(s.calls, []);
+  }
+});
+
+test("expired or missing-verifier provider replies return to sign-in without echoing raw errors", async () => {
+  for (const options of [{ exchangeError: true }, { exchangeThrows: true }]) {
+    const s = scenario(options);
+    const response = await s.handleAuthGet(new Request(`${origin}/api/auth/callback?code=synthetic`), "callback");
+    assert.equal(response.status, 303);
+    assert.equal(response.headers.get("location"), `${origin}/auth?authError=callback`);
+    assert.deepEqual(s.calls, ["exchangeCodeForSession"]);
+    assert.equal((await response.text()).includes("Private provider error"), false);
+  }
+});
+
+test("malformed and duplicate tool cookies cannot interrupt a valid callback or select a destination", async () => {
+  for (const cookie of ["flashloop_auth_kind=%E0%A4%A", "flashloop_auth_kind=image; flashloop_auth_kind=video", "flashloop_auth_kind=https://evil.example"]) {
+    const s = scenario();
+    const response = await s.handleAuthGet(new Request(`${origin}/api/auth/callback?code=synthetic`, { headers: { cookie } }), "callback");
+    assert.equal(response.status, 303);
+    assert.equal(response.headers.get("location"), `${origin}/auth/verify`);
+  }
 });
 
 test("verification limit follows account across fresh sessions", async () => {

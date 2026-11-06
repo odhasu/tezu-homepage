@@ -115,5 +115,6 @@ test("auth operation names never copy arbitrary URL path segments into telemetry
   const s = scenario();
   assert.equal(s.authOperation("callback"), "verification");
   assert.equal(s.authOperation("verify"), "verification");
+  assert.equal(s.authOperation("google"), "signin");
   assert.equal(s.authOperation("PRIVATE_PATH"), "authorization");
 });

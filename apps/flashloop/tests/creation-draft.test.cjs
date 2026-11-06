@@ -159,11 +159,12 @@ function authComponent(file, creation, { session = { authenticated: true, emailC
   vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText, {
     module, exports: module.exports, require(name) { assert.ok(name in imports, name); return imports[name]; },
     window: { location: {
+      href: creation.location.href,
       assign: (path) => navigation.push(path), replace: (path) => navigation.push(path),
     } },
     process: { env: { NEXT_PUBLIC_AUTH_ENABLED: "true", NEXT_PUBLIC_TURNSTILE_SITE_KEY: "public-fixture", NEXT_PUBLIC_GOOGLE_AUTH_ENABLED: "true" } },
     FormData: class { get(name) { return name === "email" ? "fixture@example.invalid" : "public-fixture-password"; } },
-    AbortController, setTimeout: () => 1, clearTimeout() {}, Error,
+    AbortController, URL, setTimeout: () => 1, clearTimeout() {}, Error,
   });
   function render(props = {}) {
     stateIndex = refIndex = 0;
@@ -199,6 +200,38 @@ test("Google sign-in preserves the allowlisted tool for the OAuth callback", () 
   google.props.onClick();
   assert.deepEqual(signin.navigation, ["/api/auth/google?kind=image"]);
   assert.equal(api.pendingCreationKind(), "image");
+});
+
+test("a verified existing session opens the chosen dashboard directly from sign-in", async () => {
+  const api = client("https://app.example.test/auth?kind=image");
+  const signin = authComponent("AuthForm.tsx", api);
+  signin.render();
+  const cleanup = signin.effects[0]();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(signin.navigation, ["/account?kind=image"]);
+  cleanup();
+});
+
+test("an unverified session continues security verification before the dashboard", async () => {
+  const api = client("https://app.example.test/auth?kind=video");
+  const signin = authComponent("AuthForm.tsx", api, { session: { authenticated: true, emailConfirmed: true, verified: false } });
+  signin.render();
+  const cleanup = signin.effects[0]();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(signin.navigation, ["/auth/verify?kind=video"]);
+  cleanup();
+});
+
+test("callback failures remain on sign-in with fixed recovery text", async () => {
+  const api = client("https://app.example.test/auth?authError=callback&error_description=private-fixture&kind=image");
+  const signin = authComponent("AuthForm.tsx", api);
+  signin.render();
+  const cleanup = signin.effects[0]();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(signin.navigation, []);
+  const alert = descendants(signin.render()).find((node) => node.props.role === "alert");
+  assert.equal(alert.props.children, "Sign-in could not finish. Try again, or create an account with email first.");
+  cleanup();
 });
 
 test("signup remembers only the tool for the exact same-tab email callback and draft choice keeps precedence", async () => {

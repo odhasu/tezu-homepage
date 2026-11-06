@@ -16,6 +16,8 @@ Enable native Supabase Cloudflare Turnstile CAPTCHA protection and Auth rate lim
 
 The website consumes one Turnstile token through Siteverify to validate its expected hostname, action, freshness, and single use. It sends a separate fresh token to Supabase Auth for native CAPTCHA validation. The server issues a random, email-bound signup permit only after its Siteverify check succeeds. The Auth hook consumes the permit's SHA-256 hash atomically before allowing account creation. A missing, invalid, expired, replayed, or differently addressed permit is rejected. User metadata transports this one-use bearer proof; metadata fields never grant protected access or credits.
 
+Google is an optional sign-in method for existing accounts, with setup and observed provider state in [AUTH.md](../docs/AUTH.md#google-sign-in). Its provider must be configured separately; do not remove or relax `before_user_created` to enable it. The hook still denies unknown Google accounts, so new users create an email account under the existing IP quota first. Supabase may link an existing account by a native verified Google email; this still leaves a fresh application session pending until Turnstile verification. No Google signup migration is included.
+
 ## Database contract
 
 - `issue_signup_permit(p_email, p_permit_hash)`: service role only; stores a five-minute proof after the server's successful Siteverify check.

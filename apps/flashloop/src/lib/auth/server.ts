@@ -24,7 +24,11 @@ export async function authUserClient(writable = true) {
       getAll: () => store.getAll(),
       setAll: (values) => {
         if (!writable) return;
-        for (const { name, value, options } of values) store.set(name, value, options);
+        for (const { name, value, options } of values) {
+          // The SDK's session cookie lifetime must not become a verifier lifetime.
+          const verifier = /-code-verifier(?:\.\d+)?$/.test(name);
+          store.set(name, value, verifier && options.maxAge !== 0 ? { ...options, maxAge: 600 } : options);
+        }
       },
     },
   });

@@ -43,14 +43,26 @@ function configuredOrigin(value, upstream = false) {
   return url;
 }
 
+function configuredProviderOrigin(value) {
+  if (typeof value !== "string") throw new Error("Invalid configuration");
+  const url = new URL(value);
+  if (url.protocol !== "https:" || url.origin !== value || url.port ||
+    !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.supabase\.co$/.test(url.hostname)) {
+    throw new Error("Invalid configuration");
+  }
+  return url;
+}
+
 function configuration(env) {
   const publicOrigin = configuredOrigin(env.PUBLIC_ORIGIN);
   const upstreamOrigin = configuredOrigin(env.UPSTREAM_ORIGIN, true);
+  // Omission keeps the existing internal-only redirect contract.
+  const providerOrigin = env.AUTH_PROVIDER_ORIGIN === undefined ? null : configuredProviderOrigin(env.AUTH_PROVIDER_ORIGIN);
   const secret = env.EDGE_ORIGIN_SECRET;
   if (typeof secret !== "string" || secret.length < 32 || secret.length > 256 || secret.trim() !== secret) {
     throw new Error("Invalid configuration");
   }
-  return { publicOrigin, upstreamOrigin, secret };
+  return { publicOrigin, upstreamOrigin, providerOrigin, secret };
 }
 
 function clientIp(request) {
@@ -95,12 +107,20 @@ function upstreamHeaders(request, settings, ip) {
   return headers;
 }
 
-function redirectLocation(value, target, settings) {
+function redirectLocation(value, target, settings, allowGoogleProvider) {
   const destination = new URL(value, target);
-  if (destination.username || destination.password ||
-    ![settings.publicOrigin.origin, settings.upstreamOrigin.origin].includes(destination.origin)) {
+  if (destination.username || destination.password) throw new Error("Unexpected redirect");
+  const internal = [settings.publicOrigin.origin, settings.upstreamOrigin.origin].includes(destination.origin);
+  const provider = allowGoogleProvider && settings.providerOrigin && destination.origin === settings.providerOrigin.origin &&
+    destination.pathname === "/auth/v1/authorize" && !destination.hash &&
+    destination.searchParams.getAll("provider").length === 1 &&
+    destination.searchParams.get("provider") === "google" &&
+    destination.searchParams.getAll("redirect_to").length === 1 &&
+    destination.searchParams.get("redirect_to") === `${settings.publicOrigin.origin}/api/auth/callback`;
+  if (!internal && !provider) {
     throw new Error("Unexpected redirect");
   }
+  if (provider) return destination.toString();
   destination.protocol = settings.publicOrigin.protocol;
   destination.host = settings.publicOrigin.host;
   return destination.toString();
@@ -148,7 +168,8 @@ export async function handleStagingProxy(request, env, fetchUpstream = fetch) {
     }
     const location = headers.get("Location");
     if (location) {
-      try { headers.set("Location", redirectLocation(location, target, settings)); }
+      const allowGoogleProvider = request.method === "GET" && incoming.pathname === "/api/auth/google" && response.status === 303;
+      try { headers.set("Location", redirectLocation(location, target, settings, allowGoogleProvider)); }
       catch { await response.body?.cancel(); return failure("Staging redirect is unavailable.", 502); }
     }
     // Encoded paths can be normalized differently by upstream routing; never
