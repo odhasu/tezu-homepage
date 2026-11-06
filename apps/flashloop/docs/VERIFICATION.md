@@ -140,3 +140,11 @@ The complete app check passed under Node.js 24.22.2. Static export and its 85-de
 ## 4 November 2026 — Cloudflare edge preparation
 
 See [EDGE_PROTECTION.md](EDGE_PROTECTION.md) for the local origin guard, per-account limits, agreed two-successful-accounts/IP/rolling-96-hours quota, executed tests, hosted negative CAPTCHA checks, and remaining deployment gates. [CLOUDFLARE_SETUP.md](CLOUDFLARE_SETUP.md) contains exact plan-aware proposed rules and DNS/origin/caching instructions. No Cloudflare zone or owned domain exists yet, and no edge-task deployment or hosted quota migration was performed. Local tests do not prove production security.
+
+## GitHub Pages release — 6 November 2026
+
+- Published commit `7ddd8e1` through [GitHub Actions run 42231136638](https://github.com/odhasu/tezu-homepage/actions/runs/42231136638). Build and deploy jobs completed successfully.
+- Static Flashloop check passed under Node.js 24 with Next.js 16.4.5: lint, strict TypeScript, auth/edge/ownership/entitlement/storage/job/billing/observability/cache/workspace tests, 93-asset audit, production build, and the static export audit (`99` routes/assets for `/tezu-homepage/flashloop`).
+- Focused workspace and staging-proxy tests passed after publication: `17` workspace tests, `16` Worker/private-request tests, and the existing `72` edge tests. Synthetic proxy tests cover fixed upstream routing, spoofed-header rejection, redirect handling, streaming, cookie preservation and private caching; they do not prove Cloudflare or production security.
+- Live HTTP checks returned `200` for `/blue/`, `/create/image/`, `/create/video/`, `/auth/` and `/pricing/`. Browser verification on the published image workspace accepted a prompt, entered the cancellable local loading state, displayed `Waiting for provider setup`, made no server job/media/credit request, and returned to the idle state after `Cancel`.
+- Public preview remains static. Supabase sessions, email delivery, private APIs, Whop fulfillment, R2, Sentry/PostHog ingestion and provider generation are not enabled on GitHub Pages. No domain, AI provider, telemetry project/region/consent policy, SMTP sender or R2 bucket was guessed or provisioned. Local tests and this static/browser check do not prove production authentication, account isolation through a deployed CDN, billing, generation or security.
