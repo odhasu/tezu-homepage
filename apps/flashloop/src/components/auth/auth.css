@@ -89,6 +89,40 @@
 .auth-primary:hover:not(:disabled) {
   background: #0755cf;
 }
+.auth-google {
+  min-height: 48px;
+  width: 100%;
+  padding: 12px 18px;
+  border: 1px solid #789bd269;
+  border-radius: 10px;
+  background: var(--fl-bg);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 160ms, border-color 160ms;
+}
+.auth-google:hover:not(:disabled) {
+  background: #172e51;
+  border-color: #94b9f0;
+}
+.auth-google:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--fl-muted);
+  font-size: 13px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--fl-border);
+}
 .auth-primary:disabled {
   background: #244674;
   color: #c2d8f6;
@@ -160,5 +194,6 @@
   .auth-card { padding: 36px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .auth-primary { transition: none; }
+  .auth-primary,
+  .auth-google { transition: none; }
 }

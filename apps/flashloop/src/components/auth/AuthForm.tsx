@@ -17,21 +17,31 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
   const [tokens, setTokens] = useState<string[]>([]);
   const [challengeKey, setChallengeKey] = useState(0);
   const [pending, setPending] = useState(false);
+  const [googlePending, setGooglePending] = useState(false);
   const [error, setError] = useState("");
   const [confirmationRequired, setConfirmationRequired] = useState(false);
   const { retrySeconds, retrying, startRetry } = useAuthRetry();
   const form = useRef<HTMLFormElement>(null);
   const receiveTokens = useCallback((nextTokens: string[]) => setTokens(nextTokens), []);
   const enabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true" && !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const googleEnabled = enabled && process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
 
   function switchMode() {
-    if (pending || retrying) return;
+    if (pending || googlePending || retrying) return;
     setMode((current) => current === "signin" ? "signup" : "signin");
     setError("");
     setTokens([]);
     setConfirmationRequired(false);
     setChallengeKey((value) => value + 1);
     form.current?.reset();
+  }
+
+  function continueWithGoogle() {
+    if (pending || googlePending || retrying) return;
+    const kind = pendingCreationKind(browserCreationKind());
+    rememberCreationKind(kind);
+    setGooglePending(true);
+    window.location.assign(localPath(`/api/auth/google?kind=${kind}`));
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -93,7 +103,13 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
       <p className="auth-copy">{mode === "signup"
         ? "Confirm your email and complete a security check before using your account."
         : "Sign in to your Flashloop account."}</p>
-      <form ref={form} onSubmit={submit} className="auth-form" aria-busy={pending}>
+      {googleEnabled ? <>
+        <button className="auth-google" type="button" onClick={continueWithGoogle} disabled={pending || googlePending || retrying}>
+          {googlePending ? "Opening Google…" : "Continue with Google"}
+        </button>
+        <div className="auth-divider" aria-hidden="true"><span>or</span></div>
+      </> : null}
+      <form ref={form} onSubmit={submit} className="auth-form" aria-busy={pending || googlePending}>
         <label htmlFor="auth-email">Email</label>
         <input id="auth-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} maxLength={254} required disabled={pending} />
         <label htmlFor="auth-password">Password</label>
@@ -107,7 +123,7 @@ export function AuthForm({ initialMode = "signin" }: { initialMode?: "signup" | 
         </button>
       </form>
       <p className="auth-switch">{mode === "signup" ? "Already have an account?" : "New to Flashloop?"}{" "}
-        <button type="button" onClick={switchMode} disabled={pending || retrying}>{mode === "signup" ? "Sign in" : "Create account"}</button>
+        <button type="button" onClick={switchMode} disabled={pending || googlePending || retrying}>{mode === "signup" ? "Sign in" : "Create account"}</button>
       </p>
     </section>
   );

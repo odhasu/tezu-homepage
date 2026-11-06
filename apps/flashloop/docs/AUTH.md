@@ -40,6 +40,12 @@ Verification transitions the exact live session to `verifying` before Siteverify
 
 The hosted Auth configuration enables native `turnstile` CAPTCHA, confirmed email, password minimum 12, and the Before User Created hook; anonymous and other signup providers remain disabled. Hosted sign-in/signup, token-verification, and refresh limits are configured in [config.toml](../supabase/config.toml). The CLI reports `email_sent` as unmanaged; the provider's built-in sender remains limited to two emails/hour. Website limits additionally run by IP before email to prevent rotating-email counter growth. Shared PostgreSQL counters expire.
 
+## Google sign-in
+
+The runtime now has a server-side Supabase PKCE Google sign-in path. The auth page shows **Continue with Google** only when both `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` and `NEXT_PUBLIC_AUTH_ENABLED=true`; the Route Handler separately requires `GOOGLE_AUTH_ENABLED=true`, applies a bounded per-IP start limit, validates Supabase's exact `/auth/v1/authorize` destination, stores only an allowlisted image/video choice in a short-lived HttpOnly cookie, and redirects the callback into the existing Turnstile session-verification step before `/account?kind=image|video`. OAuth denial clears that cookie and returns to sign-in. Google access never grants credits or bypasses live session, ownership, RLS or no-store checks.
+
+Google provider setup remains external: enable Google in the selected Supabase project's Auth Providers, configure the Google Cloud OAuth callback as the project's Supabase `/auth/v1/callback`, add the application's exact `https://<owned-domain>/api/auth/callback` to Supabase's redirect allowlist, and set the two deployment flags only after those settings and the protected runtime domain exist. The existing Before User Created policy still requires the server-issued permit for password signups and intentionally does not open first-time Google account creation without a reviewed quota policy. A Google account already provisioned or linked in Supabase can use this login path; no provider or quota migration was applied by this frontend change.
+
 ## Verification actually performed
 
 - `npm run check`: lint, strict TypeScript, **50 security/handler assertions**, 93-file asset audit, and runtime production build passed on Next.js **16.4.5**.

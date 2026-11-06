@@ -7,6 +7,63 @@ import { requireEdgeOrigin, trustedClientIp } from "@/lib/security/edge-origin";
 import { authClients, authContext, rateLimit, revokeSession, signupPermit, recheckSignupQuota, type AuthClients } from "./server";
 import { AuthFailure, readAuthBody, readCredentials, requireSameOrigin, requireToken, verifyTurnstile } from "./security";
 
+const GOOGLE_KIND_COOKIE = "flashloop_auth_kind";
+
+function readCreationKind(value: unknown): "image" | "video" | undefined {
+  return value === "image" || value === "video" ? value : undefined;
+}
+
+function readCookie(header: string | null, name: string): string | undefined {
+  if (!header) return undefined;
+  for (const item of header.split(";")) {
+    const separator = item.indexOf("=");
+    if (separator < 0 || item.slice(0, separator).trim() !== name) continue;
+    return decodeURIComponent(item.slice(separator + 1).trim());
+  }
+  return undefined;
+}
+
+function clearGoogleKindCookie(response: NextResponse, secure: boolean): void {
+  response.cookies.set(GOOGLE_KIND_COOKIE, "", {
+    httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: 0,
+  });
+}
+
+function requireSafeAuthNavigation(request: Request, origin: string): void {
+  const requestOrigin = request.headers.get("origin");
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if ((requestOrigin && requestOrigin !== origin) || (fetchSite && fetchSite !== "same-origin" && fetchSite !== "none")) {
+    throw new AuthFailure("Request origin rejected.", 403);
+  }
+}
+
+async function startGoogleAuth(request: Request, clients: AuthClients) {
+  if (process.env.GOOGLE_AUTH_ENABLED !== "true") throw new AuthFailure("Google sign-in is not configured yet.", 503);
+  requireSafeAuthNavigation(request, clients.config.origin);
+  await rateLimit(clients, `google:ip:${trustedClientIp(request)}`, 10);
+  const requestUrl = new URL(request.url);
+  const kind = readCreationKind(requestUrl.searchParams.get("kind"));
+  const redirectTo = `${clients.config.origin}${localPath("/api/auth/callback")}`;
+  const result = await clients.client.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo, queryParams: { prompt: "select_account" } },
+  });
+  if (result.error || !result.data.url) throw new AuthFailure("Google sign-in is not configured yet.", 503);
+  const authorization = new URL(result.data.url);
+  const supabase = new URL(clients.config.supabaseUrl);
+  if (authorization.origin !== supabase.origin || authorization.pathname !== "/auth/v1/authorize" ||
+    authorization.username || authorization.password || authorization.hash) {
+    throw new AuthFailure("Google sign-in is not configured yet.", 503);
+  }
+  const response = NextResponse.redirect(authorization, 303);
+  if (kind) {
+    response.cookies.set(GOOGLE_KIND_COOKIE, kind, {
+      httpOnly: true, secure: clients.config.origin.startsWith("https:"), sameSite: "lax", path: "/", maxAge: 600,
+    });
+  } else clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));
+  return privateResponse(response);
+}
+
 export function authJson(value: unknown, status = 200) {
   return privateResponse(NextResponse.json(value, { status }));
 }
@@ -112,7 +169,13 @@ export async function handleAuthGet(request: Request, operation: string) {
     }
     if (operation === "callback") {
       const url = new URL(request.url);
+      const kind = readCreationKind(readCookie(request.headers.get("cookie"), GOOGLE_KIND_COOKIE));
       const code = url.searchParams.get("code");
+      if (url.searchParams.has("error")) {
+        const response = NextResponse.redirect(`${clients.config.origin}${localPath(kind ? `/auth?kind=${kind}` : "/auth")}`, 303);
+        clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));
+        return privateResponse(response);
+      }
       if (!code || code.length > 4096) throw new AuthFailure("Confirmation link is invalid.", 400);
       // PKCE binds the emailed callback to the browser that initiated signup. No open redirects.
       const result = await clients.client.auth.exchangeCodeForSession(code);
@@ -120,11 +183,13 @@ export async function handleAuthGet(request: Request, operation: string) {
         if (result.data.session) await revokeSession(clients);
         throw new AuthFailure("Confirmation failed. Sign in again.");
       }
-      const response = NextResponse.redirect(`${clients.config.origin}${localPath("/auth/verify")}`, 303);
+      const response = NextResponse.redirect(`${clients.config.origin}${localPath(kind ? `/auth/verify?kind=${kind}` : "/auth/verify")}`, 303);
+      clearGoogleKindCookie(response, clients.config.origin.startsWith("https:"));
       response.headers.set("Cache-Control", "private, no-store");
       response.headers.set("Referrer-Policy", "no-referrer");
       return privateResponse(response);
     }
+    if (operation === "google") return await startGoogleAuth(request, clients);
     return authJson({ error: "Not found." }, 404);
   } catch (error) { return authError(error); }
 }

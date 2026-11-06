@@ -12,7 +12,7 @@
     "lint": "eslint src",
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run test:auth && npm run test:edge && npm run test:ownership && npm run test:entitlements && npm run test:storage && npm run test:jobs && npm run test:billing && npm run test:observability && npm run test:cache && npm run test:workspace && npm run audit:assets && npm run build",
-    "test:workspace": "node --test tests/creation-draft.test.cjs",
+    "test:workspace": "node --test tests/creation-draft.test.cjs tests/private-requests.test.cjs",
     "audit:assets": "node scripts/audit-assets.mjs",
     "test:auth": "node --test tests/auth-security.test.mjs tests/auth-handlers.test.cjs tests/auth-client.test.cjs tests/administrative-fixture.test.mjs",
     "test:edge": "node --test tests/edge-origin.test.cjs tests/edge-handlers.test.cjs tests/provider-fetch.test.cjs",

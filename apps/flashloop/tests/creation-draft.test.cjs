@@ -161,7 +161,7 @@ function authComponent(file, creation, { session = { authenticated: true, emailC
     window: { location: {
       assign: (path) => navigation.push(path), replace: (path) => navigation.push(path),
     } },
-    process: { env: { NEXT_PUBLIC_AUTH_ENABLED: "true", NEXT_PUBLIC_TURNSTILE_SITE_KEY: "public-fixture" } },
+    process: { env: { NEXT_PUBLIC_AUTH_ENABLED: "true", NEXT_PUBLIC_TURNSTILE_SITE_KEY: "public-fixture", NEXT_PUBLIC_GOOGLE_AUTH_ENABLED: "true" } },
     FormData: class { get(name) { return name === "email" ? "fixture@example.invalid" : "public-fixture-password"; } },
     AbortController, setTimeout: () => 1, clearTimeout() {}, Error,
   });
@@ -189,6 +189,16 @@ test("direct image sign-in carries its allowlisted tool into verification and th
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(verification.navigation, ["/account?kind=image"]);
   cleanup();
+});
+
+test("Google sign-in preserves the allowlisted tool for the OAuth callback", () => {
+  const api = client("https://app.example.test/auth?kind=image");
+  const signin = authComponent("AuthForm.tsx", api);
+  const google = descendants(signin.render()).find((node) => node.type === "button" && node.props.children === "Continue with Google");
+  assert.ok(google, "Google sign-in button must be present when runtime auth is enabled");
+  google.props.onClick();
+  assert.deepEqual(signin.navigation, ["/api/auth/google?kind=image"]);
+  assert.equal(api.pendingCreationKind(), "image");
 });
 
 test("signup remembers only the tool for the exact same-tab email callback and draft choice keeps precedence", async () => {

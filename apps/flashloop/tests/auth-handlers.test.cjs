@@ -6,7 +6,7 @@ const vm = require("node:vm");
 const ts = require("typescript");
 
 const origin = "https://kumi-staging.vercel.app";
-const config = { origin, secret: "test-secret", hostname: "kumi-staging.vercel.app" };
+const config = { origin, secret: "test-secret", hostname: "kumi-staging.vercel.app", supabaseUrl: "https://project.supabase.co" };
 
 function load(file, imports, globals = {}) {
   const code = ts.transpileModule(readFileSync(resolve(__dirname, "../src/lib/auth", file), "utf8"), {
@@ -20,13 +20,14 @@ function load(file, imports, globals = {}) {
       return imports[name];
     },
     Request, Response, URL, URLSearchParams, AbortSignal, TextDecoder, Uint8Array, Date, Error,
-    process: { env: {} }, ...globals,
+    process: { env: { GOOGLE_AUTH_ENABLED: "true" } }, ...globals,
   });
   return module.exports;
 }
 
 function scenario({ contextError = false, beginError = false, providerError = false, finishError = false,
-  providerAction = "verify_session", userId = "user", sessionId = "session", edgeError = false, rateHook, signupError = false, quotaFull = false } = {}) {
+  providerAction = "verify_session", userId = "user", sessionId = "session", edgeError = false, rateHook, signupError = false,
+  quotaFull = false, googleError = false, googleUrl = "https://project.supabase.co/auth/v1/authorize?provider=google" } = {}) {
   const calls = [];
   const limitCalls = [];
   let clientsCreated = 0;
@@ -42,6 +43,8 @@ function scenario({ contextError = false, beginError = false, providerError = fa
     throw new Error("Unexpected RPC");
   }, auth: {
     signUp: async () => { calls.push("signUp"); return { error: signupError ? { message: "private provider failure" } : null, data: { session: null } }; },
+    signInWithOAuth: async () => { calls.push("signInWithOAuth"); return { error: googleError ? { message: "private provider failure" } : null, data: { url: googleUrl } }; },
+    exchangeCodeForSession: async () => { calls.push("exchangeCodeForSession"); return { error: null, data: { user: { email_confirmed_at: new Date().toISOString() }, session: { id: "oauth-session" } } }; },
   } }, admin: { rpc: async (name, args) => {
     calls.push(`${name}:${args.p_success}`);
     if (name === "finish_session_verification") {
@@ -57,7 +60,11 @@ function scenario({ contextError = false, beginError = false, providerError = fa
   } });
   const handlers = load("handlers.ts", {
     "node:crypto": require("node:crypto"),
-    "server-only": {}, "next/server": { NextResponse: { json: Response.json, redirect: Response.redirect } },
+    "server-only": {}, "next/server": { NextResponse: { json: Response.json, redirect: (url, status) => {
+      const response = new Response(null, { status, headers: { location: String(url) } });
+      response.cookies = { set(name, value, options) { response.headers.append("Set-Cookie", `${name}=${encodeURIComponent(value)}; Max-Age=${options.maxAge}; Path=${options.path}`); } };
+      return response;
+    } } },
     "@/lib/local-path": { localPath: (value) => value }, "./security": security,
     "@/lib/security/edge-origin": {
       requireEdgeOrigin: () => { if (edgeError) throw new security.AuthFailure("Edge origin rejected."); },
@@ -131,6 +138,41 @@ test("auth GET and POST reject origin bypass before creating clients", async () 
   assert.equal((await s.handleAuthGet(new Request(origin + "/api/auth/session"), "session")).status, 403);
   assert.equal(s.clientsCreated(), 0);
   assert.deepEqual(s.calls, []);
+});
+
+test("Google OAuth keeps an allowlisted tool and uses the exact Supabase authorize origin", async () => {
+  const s = scenario();
+  const request = new Request(`${origin}/api/auth/google?kind=image`, { headers: { "sec-fetch-site": "same-origin" } });
+  const response = await s.handleAuthGet(request, "google");
+  assert.equal(response.status, 303);
+  assert.equal(new URL(response.headers.get("location")).origin, "https://project.supabase.co");
+  assert.equal(response.headers.get("set-cookie").startsWith("flashloop_auth_kind=image;"), true);
+  assert.deepEqual(s.calls, ["rateLimit", "signInWithOAuth"]);
+});
+
+test("Google OAuth fails closed on an unexpected authorization destination", async () => {
+  const s = scenario({ googleUrl: "https://evil.example/auth/v1/authorize?provider=google" });
+  const response = await s.handleAuthGet(new Request(`${origin}/api/auth/google?kind=video`, { headers: { "sec-fetch-site": "same-origin" } }), "google");
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get("location"), null);
+});
+
+test("Google callback consumes the tool cookie and lands in verification", async () => {
+  const s = scenario();
+  const response = await s.handleAuthGet(new Request(`${origin}/api/auth/callback?code=oauth-code`, { headers: { cookie: "flashloop_auth_kind=video" } }), "callback");
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("location"), `${origin}/auth/verify?kind=video`);
+  assert.match(response.headers.get("set-cookie"), /flashloop_auth_kind=; Max-Age=0/);
+  assert.ok(s.calls.includes("exchangeCodeForSession"));
+});
+
+test("Google denial clears the tool cookie and returns to sign in", async () => {
+  const s = scenario();
+  const response = await s.handleAuthGet(new Request(`${origin}/api/auth/callback?error=access_denied&error_description=ignored`, { headers: { cookie: "flashloop_auth_kind=image" } }), "callback");
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("location"), `${origin}/auth?kind=image`);
+  assert.match(response.headers.get("set-cookie"), /flashloop_auth_kind=; Max-Age=0/);
+  assert.ok(!s.calls.includes("exchangeCodeForSession"));
 });
 
 test("verification limit follows account across fresh sessions", async () => {
